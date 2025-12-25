@@ -1,7 +1,4 @@
----
-config:
-  theme: neo
----
+```mermaid
 sequenceDiagram
     participant User
     participant API as Presentation(API)
