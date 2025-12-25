@@ -9,8 +9,14 @@ sequenceDiagram
     User ->> API: POST /places (place data)
     API ->> Facade: createPlace(data)
     Facade ->> PlaceService: validatePlace(data)
-    PlaceService ->> DB: savePlace(place)
-    DB -->> PlaceService: place saved
-    PlaceService -->> Facade: place created
-    Facade -->> API: success response
-    API -->> User: 201 Created
+    alt data valid
+        PlaceService ->> DB: savePlace(place)
+        DB -->> PlaceService: place saved
+        PlaceService -->> Facade: place created
+        Facade -->> API: success response
+        API -->> User: 201 Created
+    else data invalid
+        PlaceService -->> Facade: validation error
+        Facade -->> API: error response
+        API -->> User: 400 Bad Request
+    end
