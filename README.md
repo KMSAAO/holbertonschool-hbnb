@@ -1,6 +1,10 @@
 
-# HBnB Evolution: Technical Blueprint <img src="https://github.com/user-attachments/assets/9027300d-16db-4118-9710-888e93619ce0" align="right" width="200" />
+<div align="right">
+  <img src="https://github.com/user-attachments/assets/9027300d-16db-4118-9710-888e93619ce0" width="200" />
+  <img src="https://emoji.slack-edge.com/T0423U1MW21/partyhorse/9e6f1c95d36d3e66.gif" width="100" />
+</div>
 
+# HBnB Evolution: Technical Blueprint
 ### Introduction
 HBnB Evolution is a simplified version of a vacation rental platform. This document provides a comprehensive technical guide to the system architecture and design, serving as a foundation for the upcoming implementation phases.
 
@@ -76,8 +80,14 @@ Each flow ensures robust error handling and clear response status codes for all 
 
 - All diagrams follow UML notation standards.
 
-- The design is based on the given business rules and requirements.
+- The design is based on the given business rules and requirements.  
 
 ---
 
 ### ✍️ Authors
+<img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExazA0cm81eWZ1cDkxYjAwa2g2aHV4Ymx1MGFxcDk2N2ltaTVnY3NpOCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/IbJj43OiKN6LBmOirN/giphy.gif" align="right" width="200" />
+
+* **Khalid Alomari** - [@KMSAAO](https://github.com/KMSAAO)
+* **Nawaf Saleh** - [@NSF9](https://github.com/NSF9)
+* **Shatha ALswailam** - [@shathasultan](https://github.com/shathasultan)
+
