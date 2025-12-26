@@ -1,6 +1,7 @@
-# HBnB Evolution: Technical Blueprint
 
-## Introduction
+# HBnB Evolution: Technical Blueprint <img src="https://github.com/user-attachments/assets/9027300d-16db-4118-9710-888e93619ce0" align="right" width="200" />
+
+### Introduction
 HBnB Evolution is a simplified version of a vacation rental platform. This document provides a comprehensive technical guide to the system architecture and design, serving as a foundation for the upcoming implementation phases.
 
 ---
@@ -53,3 +54,30 @@ Explanatory Notes:
 
 #### Fetching a List of Places
 <img width="2608" height="1488" alt="image" src="https://github.com/user-attachments/assets/37084465-ee07-4365-a909-d36aaaeeba45" />
+
+### Explanatory Note for Sequence Diagrams:
+These diagrams illustrate the dynamic interaction between the system layers. 
+They demonstrate how the Presentation Layer communicates with the Business Logic via a Facade, and how data is validated before being committed to the Persistence Layer.
+Each flow ensures robust error handling and clear response status codes for all key API endpoints.
+
+---
+
+### 🛠 Tools Used
+
+- draw.io – For creating UML diagrams.
+
+- Mermaid.js – For code-based diagram generation.
+
+- GitHub – For version control and documentation hosting.
+
+---
+
+### 📝 Notes
+
+- All diagrams follow UML notation standards.
+
+- The design is based on the given business rules and requirements.
+
+---
+
+### ✍️ Authors
