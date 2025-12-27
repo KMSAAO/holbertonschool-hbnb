@@ -59,6 +59,11 @@ Explanatory Notes:
 #### Fetching a List of Places
 <img width="2608" height="1488" alt="image" src="https://github.com/user-attachments/assets/37084465-ee07-4365-a909-d36aaaeeba45" />
 
+
+### Guest Full Scenario
+<img width="831" height="1309" alt="image" src="https://github.com/user-attachments/assets/6c780077-8ca3-4341-a9aa-702642d99252" />
+
+
 ### Explanatory Note for Sequence Diagrams:
 These diagrams illustrate the dynamic interaction between the system layers. 
 They demonstrate how the Presentation Layer communicates with the Business Logic via a Facade, and how data is validated before being committed to the Persistence Layer.
