@@ -38,7 +38,7 @@ Explanatory Notes:
 - Persistence Layer: Responsible for all database interactions.
 
 ### 2. Detailed Class Diagram 
-![Class Diagram](./path-to-your-image/Class_Diagram.png)
+<img width="2600" height="3200" alt="image" src="https://github.com/user-attachments/assets/da4075a3-dc5e-4648-991c-ec6f1c97f4d7" />
 
 Explanatory Notes:
 - Core Entities: Defines User, Place, Review, and Amenity.
