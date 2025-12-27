@@ -13,7 +13,7 @@ HBnB Evolution is a simplified version of a vacation rental platform. This docum
 ## Problem Description
 The HBnB project aims to solve the challenge of building a scalable and modular property management system. The primary goal is to ensure:
 - Decoupling: Separation of presentation, logic, and data storage layers to improve maintainability.
-- Consistency: Maintaining clear and logical relationships between users, places, and reviews.
+- Consistency: Maintaining clear and logical relationships between users, places, reviews, amenities, guests, bookings, payments, and refunds. 
 - Scalability: Creating a robust design that allows for future enhancements with minimal refactoring.
 
 ---
@@ -41,7 +41,7 @@ Explanatory Notes:
 <img width="2600" height="3200" alt="image" src="https://github.com/user-attachments/assets/da4075a3-dc5e-4648-991c-ec6f1c97f4d7" />
 
 Explanatory Notes:
-- Core Entities: Defines User, Place, Review, and Amenity.
+- Core Entities: Defines user, place, review, amenity, guest, booking, payment, and refund. 
 - BaseModel: Common parent class providing universal attributes like id and timestamps.
 
 ---
