@@ -30,7 +30,7 @@ This technical documentation is the result of completing the following foundatio
 ## Design Diagrams
 
 ### 1. High-Level Package Diagram 
-<img width="1200" height="1920" alt="image" src="https://github.com/user-attachments/assets/2ba8dda2-ab43-4742-9e75-6325023f6a85" />
+<img width="1500" height="1920" alt="image" src="https://github.com/user-attachments/assets/98fdd73a-d42f-4088-878e-41df24abd544" />
 
 Explanatory Notes:
 - Presentation Layer: The entry point for the system via API calls.
