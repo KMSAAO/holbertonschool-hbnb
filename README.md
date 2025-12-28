@@ -1,7 +1,6 @@
 
 <div align="right">
-  <img src="https://github.com/user-attachments/assets/9027300d-16db-4118-9710-888e93619ce0" width="200" />
-  <img src="https://emoji.slack-edge.com/T0423U1MW21/partyhorse/9e6f1c95d36d3e66.gif" width="100" />
+  <img src="https://github.com/user-attachments/assets/9027300d-16db-4118-9710-888e93619ce0](https://www.tabbykatz.com/hbnb.png" width="200" />
 </div>
 
 # HBnB Evolution: Technical Blueprint
