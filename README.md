@@ -1,6 +1,6 @@
 
 <div align="right">
-  <img src="https://github.com/user-attachments/assets/9027300d-16db-4118-9710-888e93619ce0](https://www.tabbykatz.com/hbnb.png" width="200" />
+  <img src="[https://github.com/user-attachments/assets/9027300d-16db-4118-9710-888e93619ce0](https://www.tabbykatz.com/hbnb.png" width="200](https://www.tabbykatz.com/hbnb.png)" />
 </div>
 
 # HBnB Evolution: Technical Blueprint
