@@ -16,14 +16,3 @@ class Place(BaseModel):
         self.latitude = latitude
         self.longitude = longitude
 
-
-    #implement these methods later
-    def create_place(self):
-        pass
-    def get_place_info(self): 
-        pass
-    def update_place(self):
-        pass
-    def delete_place(self):
-        pass
-
