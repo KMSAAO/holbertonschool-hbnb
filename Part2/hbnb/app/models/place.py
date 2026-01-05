@@ -15,4 +15,3 @@ class Place(BaseModel):
         self.status = status
         self.latitude = latitude
         self.longitude = longitude
-
