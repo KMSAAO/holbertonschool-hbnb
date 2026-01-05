@@ -1,9 +1,9 @@
-from app.models.amentiy import Amenity
+from app.models.amenity import Amenity
 from app.models.place import Place
 from app.models.user import User
 from app.models.review import Review
 
-
+class HBnBFacade():
    #implement these methods later
     def create_amenity(self):
         pass
