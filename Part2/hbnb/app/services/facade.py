@@ -1,5 +1,6 @@
 from app.models.amentiy import Amenity
 from app.models.place import Place
+from app.models.user import User 
    #implement these methods later
     def create_amenity(self):
         pass
@@ -19,4 +20,14 @@ from app.models.place import Place
     def update_place(self):
         pass
     def delete_place(self):
+        pass
+      
+          #implement these methods later
+    def login(self):
+        pass
+    def register_users(self):
+        pass
+    def get_user_info(self):
+        pass
+    def update_users(self):
         pass
