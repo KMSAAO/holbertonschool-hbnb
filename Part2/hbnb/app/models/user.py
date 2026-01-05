@@ -11,3 +11,13 @@ class User(BaseModel):
         self.__password = password
         self.is_admin = is_admin
         self.is_active = is_active
+
+    #implement these methods later
+    def login(self):
+        pass
+    def register_users(self):
+        pass
+    def get_user_info(self):
+        pass
+    def update_users(self):
+        pass
