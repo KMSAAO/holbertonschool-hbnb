@@ -9,13 +9,3 @@ class Amenity(BaseModel):
         self.amenity_name = amenity_name
         self.description = description
         self.status = status
-
-    #implement these methods later
-    def create_amenity(self):
-        pass
-    def get_amenity_info(self): 
-        pass
-    def update_amenity(self):
-        pass
-    def delete_amenity(self):
-        pass
