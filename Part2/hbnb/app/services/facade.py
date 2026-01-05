@@ -1,6 +1,9 @@
 from app.models.amentiy import Amenity
 from app.models.place import Place
-from app.models.user import User 
+from app.models.user import User
+from app.models.review import Review
+
+
    #implement these methods later
     def create_amenity(self):
         pass
@@ -30,4 +33,16 @@ from app.models.user import User
     def get_user_info(self):
         pass
     def update_users(self):
+        pass
+      
+         #implement these methods later
+    def create_Review(self):
+        pass
+    def get_Review_info(self): 
+        pass
+    def update_Review(self):
+        pass
+    def delete_Review(self):
+        pass
+    def get_all_reviews(self):
         pass
