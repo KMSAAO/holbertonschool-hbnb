@@ -10,16 +10,3 @@ class Review(BaseModel):
         self.user_id = user_id
         self.rating = rating
         self.comment = comment
-
-    
-    #implement these methods later
-    def create_Review(self):
-        pass
-    def get_Review_info(self): 
-        pass
-    def update_Review(self):
-        pass
-    def delete_Review(self):
-        pass
-    def get_all_reviews(self):
-        pass
