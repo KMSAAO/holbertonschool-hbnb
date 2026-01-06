@@ -1,21 +1,13 @@
-from flask_restx import Namespace, Resource, fields
-from app.services import facade
+from app.models.amenity import Amenity
 
-api = Namespace('amenities', description='Amenity operations')
+class Amenity_Service:
+    def create_amenity(self, amenity_data, repo):
+        new_amenity = Amenity(**amenity_data)
+        repo.add(new_amenity)
+        return new_amenity
 
-amenity_model = api.model('Amenity', {
-    'name': fields.String(required=True, description='Name of the amenity')
-})
+    def get_amenity_info(self, amenity_id, repo):
+        return repo.get(amenity_id)
 
-@api.route('/')
-class AmenityList(Resource):
-    @api.expect(amenity_model, validate=True)
-    @api.response(201, 'Amenity successfully created')
-    def post(self):
-        amenity_data = api.payload
-        new_amenity = facade.create_amenity(amenity_data)
-        return {'id': new_amenity.id, 'name': new_amenity.name}, 201
-
-    def get(self):
-        amenities = facade.get_all_amenities()
-        return [{'id': a.id, 'name': a.name} for a in amenities], 200
+    def get_all_amenities(self, repo):
+        return repo.get_all()
