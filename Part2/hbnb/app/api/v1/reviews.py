@@ -1,25 +1,21 @@
-from app.models.review import Review
+from flask_restx import Namespace, Resource, fields
+from app.services import facade
 
-class Review_Service:
-    def create_review(self, review_data, review_repo, user_repo, place_repo):
-        user = user_repo.get(review_data.get('user_id'))
-        place = place_repo.get(review_data.get('place_id'))
-        
-        if not user:
-            raise ValueError("User not found")
-        if not place:
-            raise ValueError("Place not found")
-        
-        rating = review_data.get('rating')
-        if not (1 <= rating <= 5):
-            raise ValueError("Rating must be between 1 and 5")
-            
-        new_review = Review(**review_data)
-        review_repo.add(new_review)
-        return new_review
+api = Namespace('reviews', description='Review operations')
 
-    def get_review_info(self, review_id, repo):
-        return repo.get(review_id)
+review_model = api.model('Review', {
+    'comment': fields.String(required=True),
+    'rating': fields.Integer(required=True, min=1, max=5),
+    'user_id': fields.String(required=True),
+    'place_id': fields.String(required=True)
+})
 
-    def get_all_reviews(self, repo):
-        return repo.get_all()
+@api.route('/')
+class ReviewList(Resource):
+    @api.expect(review_model, validate=True)
+    def post(self):
+        try:
+            review = facade.create_review(api.payload)
+            return {'id': review.id, 'status': 'Review created'}, 201
+        except ValueError as e:
+            return {'error': str(e)}, 400
