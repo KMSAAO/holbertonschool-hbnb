@@ -1,6 +1,7 @@
 from app.persistence.repository import InMemoryRepository
 from app.services.user_service import User_Service
 from app.services.place_service import Place_Service
+from app.services.amenity_service import Amenity_Service
 
 class HBnBFacade:
     def __init__(self):
@@ -8,6 +9,8 @@ class HBnBFacade:
         self.place_repo = InMemoryRepository()
         self.user_service = User_Service()
         self.place_service = Place_Service()
+        self.amenity_repo = InMemoryRepository()
+        self.amenity_service = Amenity_Service()
 
     # --- User Methods ---
     def create_user(self, user_data):
@@ -33,5 +36,22 @@ class HBnBFacade:
     def update_place(self, place_id, place_data):
         return self.place_service.update_place(place_id, place_data, self.place_repo)
 
-# Instantiate the facade
-facade = HBnBFacade()
+
+    def create_amenity(self, amenity_1):
+        return self.amenity_service.create_amenity(amenity_1, self.amenity_repo)
+    def get_amenity_info(self): 
+        pass
+    def update_amenity(self):
+        pass
+    def delete_amenity(self):
+        pass
+    def create_Review(self):
+        pass
+    def get_Review_info(self): 
+        pass
+    def update_Review(self):
+        pass
+    def delete_Review(self):
+        pass
+    def get_all_reviews(self):
+        pass

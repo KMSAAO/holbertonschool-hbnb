@@ -2,8 +2,10 @@ from app.models.amenity import Amenity
 
 class Amenity_Service():
     def create_amenity(self, amenity_data, repo):
-        name = amenity_data.get('name')
+        
+        name = amenity_data.get('amenity_name')
         desc = amenity_data.get('description')
+        status = amenity_data.get('status')
         if not name:
             raise ValueError("Amenity name is required")
         
@@ -13,7 +15,7 @@ class Amenity_Service():
 
         repo.add(amenity)
 
-        return amenity
+        return amenity.id
 
     def get_amenity_info(self, amenity_id, repo): 
         amenity = repo.get(amenity_id)
