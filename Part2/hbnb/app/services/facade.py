@@ -16,7 +16,7 @@ class HBnBFacade:
         self.amenity_service = Amenity_Service()
         self.review_service = Review_Service()
 
-    # --- User Methods ---
+
     def create_user(self, user_data):
         return self.user_service.register_users(user_data, self.user_repo)
 
@@ -26,7 +26,7 @@ class HBnBFacade:
     def get_all_users(self):
         return self.user_service.get_all_users(self.user_repo)
 
-    # --- Place Methods ---
+
     def create_place(self, place_data):
         return self.place_service.create_place(place_data, self.place_repo, self.user_repo)
 
@@ -39,7 +39,7 @@ class HBnBFacade:
     def update_place(self, place_id, place_data):
         return self.place_service.update_place(place_id, place_data, self.place_repo)
 
-    # --- Amenity Methods ---
+
     def create_amenity(self, amenity_data):
         return self.amenity_service.create_amenity(amenity_data, self.amenity_repo)
 
@@ -49,7 +49,7 @@ class HBnBFacade:
     def get_all_amenities(self):
         return self.amenity_service.get_all_amenities(self.amenity_repo)
 
-    # --- Review Methods ---
+
     def create_review(self, review_data):
         return self.review_service.create_review(review_data, self.review_repo, self.user_repo, self.place_repo)
 
