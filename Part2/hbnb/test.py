@@ -20,5 +20,3 @@ try:
     print(f"✅ Success: Created {str(amenity_1)}")
 except Exception as e:
     print(f"❌ Error: {e}")
-
-

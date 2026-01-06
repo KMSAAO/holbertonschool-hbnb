@@ -10,4 +10,4 @@ class Payment(BaseModel):
         self.amount = amount
         self.method_payment = method_payment
         self.status = status
-        self.paid_at = paid_at
+        self.paid = paid_at
