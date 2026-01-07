@@ -3,8 +3,7 @@ import hashlib
 
 class User(BaseModel):
 
-    def __init__(self, first_name, last_name, email, password, is_admin = False, is_active = True):
-
+    def __init__(self, first_name, last_name, email, password, is_admin=False, is_active=True):
         super().__init__()
 
         self.first_name = first_name
@@ -13,3 +12,25 @@ class User(BaseModel):
         self.__password = hashlib.sha256(password.encode()).hexdigest()
         self.is_admin = is_admin
         self.is_active = is_active
+
+    @property
+    def password(self):
+        return self.__password
+    
+    @password.setter
+    def password(self, value):
+        self.__password = hashlib.sha256(value.encode()).hexdigest()
+
+    def check_password(self, plain_password):
+        return self.__password == hashlib.sha256(plain_password.encode()).hexdigest()
+
+    def to_dict(self):
+        return {
+        "id": self.id,
+        "first_name": self.first_name,
+        "last_name": self.last_name,
+        "email": self.email,
+        "is_admin": self.is_admin,
+        "is_active": self.is_active,
+        "created_at": self.created_at.isoformat(),
+        "updated_at": self.updated_at.isoformat()}
