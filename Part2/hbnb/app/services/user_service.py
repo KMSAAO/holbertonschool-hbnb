@@ -53,7 +53,6 @@ class UserServices():
         )
 
         repo.add(user)
-        
         return user
     
     def login(self, email, password, repo):
@@ -115,7 +114,7 @@ class UserServices():
         if "password" in user_data:
             if not isinstance(user_data["password"], str) or len(user_data["password"]) < 6:
                 raise ValueError("Password must be at least 6 characters")
-            user._User__password = (user_data["password"])
+            user.password = (user_data["password"])
 
         if "is_admin" in user_data:
             if not isinstance(user_data["is_admin"], bool):
@@ -138,12 +137,10 @@ class UserServices():
         user = user_repo.get(user_id)
         if not user:
             raise ValueError("User not found")
-
-    # تأكد ما عنده أماكن
+        
         places = place_repo.get_all()
         for place in places:
             if hasattr(place, "user") and place.user.id == user_id:
                 raise ValueError("Cannot delete user with existing places")
 
-    # الآن نحذف
         return user_repo.delete(user_id)

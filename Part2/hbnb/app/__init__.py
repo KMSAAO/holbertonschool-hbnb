@@ -1,11 +1,22 @@
-#from flask import Flask
-#from flask_restx import Api
-#from app.api.v1 import blueprint as api_v1
+from flask import Flask, jsonify
+from flask_restx import Api
+from app.api.v1.users import api as users_ns
 
-#def create_app():
-    #app = Flask(__name__)
-    
-    # Register the Blueprint for version 1 of the API
-    #app.register_blueprint(api_v1)
-    
-    #return app
+def create_app():
+    app = Flask(__name__)
+
+    api = Api(
+        app,
+        version='1.0',
+        title='HBnB API',
+        description='HBnB Application API',
+        doc='/api/v1/docs'
+    )
+
+    api.add_namespace(users_ns, path='/api/v1/users')
+
+    @app.route("/")
+    def index():
+        return jsonify({"message": "HBnB API is running 👌"})
+
+    return app

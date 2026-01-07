@@ -20,6 +20,14 @@ class HBnBFacade:
     def login_user(self, email: str, password: str) -> bool:
         return self.user_service.login(email, password, self.user_repo)
 
+    def get_user(self, user_id: str) -> dict:
+
+        return self.user_service.get_user_info(user_id, self.user_repo)
+
+    def update_user(self, user_id: str, user_data: dict) -> bool:
+        
+        return self.user_service.update_user(user_id, user_data, self.user_repo)
+    
     def delete_user(self, user_id: str) -> bool:
 
         return self.user_service.delete_user(user_id, self.user_repo, self.place_repo)
