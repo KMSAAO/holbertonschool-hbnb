@@ -1,11 +1,15 @@
 from app.models.place import Place
-from app.enums import place_status
+from app.enums.place_status import PlaceStatus
 
-class Place_Service():
+class PlaceService():
 
-    def create_place(self, place_data, repo, user_repo):
+    def create_place(self, place_data: dict, repo, user_repo):
 
-        owner = user_repo.get(place_data.get('owner_id'))
+        owner_id = place_data.get('owner_id')
+        if not owner_id or not isinstance(owner_id, str):
+            raise ValueError("owner_id is required and must be a string")
+
+        owner = user_repo.get(owner_id)
         if not owner:
             raise ValueError("Owner not found")
 
@@ -17,10 +21,15 @@ class Place_Service():
         if price is None or not isinstance(price, (int, float)) or price < 0:
             raise ValueError("Price must be a non-negative number")
 
-        status = place_data.get('status')
-        if not isinstance(status, place_status):
-            raise ValueError("Invalid place status")
-        
+        raw_status = place_data.get('status')
+        if isinstance(raw_status, PlaceStatus):
+            status = raw_status
+        else:
+            try:
+                status = PlaceStatus(raw_status)
+            except Exception:
+                raise ValueError("Invalid place status")
+
         latitude = place_data.get('latitude')
         if latitude is None or not isinstance(latitude, (int, float)) or not -90.0 <= latitude <= 90.0:
             raise ValueError("Latitude must be between -90 and 90")
@@ -33,6 +42,115 @@ class Place_Service():
         if description and (not isinstance(description, str) or len(description) > 500):
             raise ValueError("Description must be a string with max 500 characters")
 
-        place = Place(**place_data)
+        place = Place(
+            user=owner,
+            title=title,
+            description=description,
+            price=price,
+            status=status,
+            latitude=latitude,
+            longitude=longitude
+        )
         repo.add(place)
-        return place
+
+        return place.id
+
+    def get_place_info(self, place_id: str, place_repo) -> dict:
+        """get_place_info(place_id) : dict"""
+
+        if not isinstance(place_id, str):
+            raise ValueError("Place ID must be a string")
+
+        place = place_repo.get(place_id)
+        if not place:
+            raise ValueError("Place not found")
+
+        if hasattr(place, "to_dict"):
+            data = place.to_dict()
+        else:
+            data = {
+                "id": place.id,
+                "title": place.title,
+                "description": place.description,
+                "price": place.price,
+                "status": place.status.value if hasattr(place.status, "value") else place.status,
+                "latitude": place.latitude,
+                "longitude": place.longitude,
+                "owner_id": place.user.id if hasattr(place, "user") else None,
+            }
+        return data
+    
+    def update_place(self, place_id: str, place_data: dict, place_repo, user_repo) -> bool:
+
+        if not isinstance(place_id, str):
+            raise ValueError("Place ID must be a string")
+
+        place = place_repo.get(place_id)
+        if not place:
+            raise ValueError("Place not found")
+
+        if "user_id" in place_data or "owner_id" in place_data:
+            owner_id = place_data.get("user_id") or place_data.get("owner_id")
+            if not isinstance(owner_id, str):
+                raise ValueError("user_id must be a string")
+            owner = user_repo.get(owner_id)
+            if not owner:
+                raise ValueError("Owner not found")
+            place.user = owner
+
+        if "title" in place_data:
+            title = place_data["title"]
+            if not title or not isinstance(title, str) or len(title) > 100:
+                raise ValueError("Invalid title")
+            place.title = title
+
+        if "description" in place_data:
+            desc = place_data["description"]
+            if desc and (not isinstance(desc, str) or len(desc) > 500):
+                raise ValueError("Invalid description")
+            place.description = desc
+
+        if "price" in place_data:
+            price = place_data["price"]
+            if price is None or not isinstance(price, (int, float)) or price < 0:
+                raise ValueError("Invalid price")
+            place.price = price
+
+        if "latitude" in place_data:
+            lat = place_data["latitude"]
+            if lat is None or not isinstance(lat, (int, float)) or not -90.0 <= lat <= 90.0:
+                raise ValueError("Invalid latitude")
+            place.latitude = lat
+
+        if "longitude" in place_data:
+            lon = place_data["longitude"]
+            if lon is None or not isinstance(lon, (int, float)) or not -180.0 <= lon <= 180.0:
+                raise ValueError("Invalid longitude")
+            place.longitude = lon
+
+        if "status" in place_data:
+            raw_status = place_data["status"]
+            if isinstance(raw_status, PlaceStatus):
+                status = raw_status
+            else:
+                try:
+                    status = PlaceStatus(raw_status)
+                except Exception:
+                    raise ValueError("Invalid place status")
+            place.status = status
+
+        place_repo.update(place_id, {})
+        return True
+
+    @staticmethod
+    def delete_place(place_id: str, place_repo) -> bool:
+        """delete_place(place_id) : bool"""
+
+        if not isinstance(place_id, str):
+            raise ValueError("Place ID must be a string")
+
+        place = place_repo.get(place_id)
+        if not place:
+            raise ValueError("Place not found")
+
+        return place_repo.delete(place_id)

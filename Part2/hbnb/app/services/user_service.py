@@ -53,7 +53,8 @@ class UserServices():
         )
 
         repo.add(user)
-        return user.id
+        
+        return user
     
     def login(self, email, password, repo):
         if not email or not isinstance(email, str) or '@' not in email:
@@ -129,13 +130,20 @@ class UserServices():
         return True
     
     @staticmethod
-    def delete_user(user_id: str, repo):
+    def delete_user(user_id: str, user_repo, place_repo):
 
         if not isinstance(user_id, str):
             raise ValueError("User ID must be a string")
 
-        user = repo.get(user_id)
+        user = user_repo.get(user_id)
         if not user:
             raise ValueError("User not found")
 
-        return True
+    # تأكد ما عنده أماكن
+        places = place_repo.get_all()
+        for place in places:
+            if hasattr(place, "user") and place.user.id == user_id:
+                raise ValueError("Cannot delete user with existing places")
+
+    # الآن نحذف
+        return user_repo.delete(user_id)
