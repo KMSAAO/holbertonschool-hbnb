@@ -1,16 +1,33 @@
 from app.models.review import Review
+from app.models.user import User
+from app.models.place import Place
 
-class Review_Service():
-    def create_Review(self, review_data, repo):
+class ReviewService():
+
+    def create_Review(self, review_data: dict, repo):
+
         rating = review_data.get('rating')
-        comment = review_data.get('comment')
-        if type(rating) != int and rating <= 5:
-            raise ValueError("Rating value is not correct")
+
+        if not isinstance(rating, int) or not 1 <= rating <= 5:
+            raise ValueError("Rating must be an integer between 1 and 5")
         
+        comment = review_data.get("comment")
+
+        if not isinstance(comment, str) or not comment.strip():
+            raise ValueError("Comment is required and must be a non-empty string")
+
         if len(comment) > 250:
-            raise ValueError("Comment is too long")
-        
-        review = Review(**review_data)
+            raise ValueError("Comment must not exceed 250 characters")
+
+
+        user_id  = user["user_id"]
+        place_id = place["place_id"]
+
+        user  = repo.get(user_id)
+        place = repo.get(place_id)
+
+        review = Review(rating, comment)
+
         repo.add(review)
 
         return review
