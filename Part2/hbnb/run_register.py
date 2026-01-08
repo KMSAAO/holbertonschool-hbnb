@@ -1,42 +1,52 @@
-# run_register.py
-from app.persistence.repository import InMemoryRepository
-from app.models.user import User
-from app.models.place import Place
-
-from app.services.user_service import UserServices
-from app.services.place_service import PlaceService
 from app.services.facade import HBnBFacade
-
+from app.services.place_service import PlaceService
+from app.services.review_service import ReviewService
 from app.enums.place_status import PlaceStatus
 
 if __name__ == "__main__":
     facade = HBnBFacade()
-
+    place_service = PlaceService()
+    review_services = ReviewService()
 
     user = facade.register_user({
         "first_name": "Nawaf",
         "last_name": "Alzahrani",
         "email": "nawaf@example.com",
-        "password": "AaZz123456",
+        "password": "A12345",
         "is_admin": True,
         "is_active": True
     })
 
-    print("✅ User ID:", user.id)
-    user_info = facade.get_user(user.id)
-    print("👤 User info:", user_info)
 
-    IsLogged = facade.login_user(user.email, "AaZz123456")
-    print("Success", user)
+    place = place_service.create_place({
+        "owner_id": user.id,
+        "title": "Vila",
+        "description": "nice",
+        "price": 122,
+        "status": PlaceStatus.AVAILABLE,
+        "latitude": 24.774265,
+        "longitude": 46.738586
+    }, facade.place_repo, facade.user_repo)
 
-    updated = facade.update_user(user.id, {
-    "first_name": "Saleh",
-    "is_active": False
+
+    is_logged = facade.login_user("nawaf@example.com", "A12345")
+    if is_logged:
+        print("Welcome back", f"{user.first_name} {user.last_name}")
+
+
+    saved_place = facade.place_repo.get(place)
+    print("Place Info:", {
+        "id": saved_place.id,
+        "title": saved_place.title,
+        "price": saved_place.price
     })
-    print(updated)
 
-    user_info = facade.get_user(user.id)
-    print("👤 User info:", user_info)
+    add_review = review_services.create_Review(
+        { "place": place,
+         "user": user,
+         "rating": 5,
+         "comment": "Very good"
+    }, facade.review_repo)
 
-    delete_user = facade.delete_user(user.id)
+    
 
