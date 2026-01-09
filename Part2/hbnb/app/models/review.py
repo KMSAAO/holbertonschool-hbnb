@@ -8,7 +8,15 @@ class Review(BaseModel):
 
         super().__init__()
 
-        self.place = place
         self.place_id = place.id
+        self.place = place
         self.rating = rating
         self.comment = comment
+
+    @classmethod
+    def from_place_id(cls, place_id: str, rating: int, comment: str, place_repo):
+        place = place_repo.get(place_id)
+        if place is None:
+            raise ValueError("Place not found")
+
+        return cls(place=place, rating=rating, comment=comment)

@@ -18,7 +18,7 @@ if __name__ == "__main__":
     })
 
 
-    place = place_service.create_place({
+    place = facade.create_place({
         "owner_id": user.id,
         "title": "Vila",
         "description": "nice",
@@ -26,7 +26,7 @@ if __name__ == "__main__":
         "status": PlaceStatus.AVAILABLE,
         "latitude": 24.774265,
         "longitude": 46.738586
-    }, facade.place_repo, facade.user_repo)
+    })
 
 
     is_logged = facade.login_user("nawaf@example.com", "A12345")

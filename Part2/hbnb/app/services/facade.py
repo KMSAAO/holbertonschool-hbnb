@@ -31,3 +31,35 @@ class HBnBFacade:
     def delete_user(self, user_id: str) -> bool:
 
         return self.user_service.delete_user(user_id, self.user_repo, self.place_repo)
+    
+
+    def create_place(self, place_data: dict):
+
+        return self.place_service.create_place(
+            place_data=place_data,
+            repo=self.place_repo,
+            user_repo=self.user_repo
+        )
+
+    def get_place_info(self, place_id: str) -> dict:
+
+        return self.place_service.get_place_info(
+            place_id=place_id,
+            place_repo=self.place_repo
+        )
+
+    def update_place(self, place_id: str, place_data: dict) -> bool:
+
+        return self.place_service.update_place(
+            place_id=place_id,
+            place_data=place_data,
+            place_repo=self.place_repo,
+            user_repo=self.user_repo
+        )
+
+    def delete_place(self, place_id: str) -> bool:
+
+        return self.place_service.delete_place(
+            place_id=place_id,
+            place_repo=self.place_repo
+        )
