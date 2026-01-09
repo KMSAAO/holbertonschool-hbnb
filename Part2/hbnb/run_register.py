@@ -34,19 +34,11 @@ if __name__ == "__main__":
         print("Welcome back", f"{user.first_name} {user.last_name}")
 
 
-    saved_place = facade.place_repo.get(place)
-    print("Place Info:", {
-        "id": saved_place.id,
-        "title": saved_place.title,
-        "price": saved_place.price
-    })
-
-    add_review = review_services.create_Review(
+    review = review_services.create_Review(
         { "place": place,
-         "user": user,
          "rating": 5,
          "comment": "Very good"
     }, facade.review_repo)
 
-    
+    print(f"Review ID",{review.id}, "Owner review",{user.first_name}, "Place name", {review.place.title})
 

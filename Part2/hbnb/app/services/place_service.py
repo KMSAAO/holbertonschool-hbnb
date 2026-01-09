@@ -53,7 +53,7 @@ class PlaceService():
         )
         repo.add(place)
 
-        return place.id
+        return place
 
     def get_place_info(self, place_id: str, place_repo) -> dict:
         """get_place_info(place_id) : dict"""

@@ -19,14 +19,9 @@ class ReviewService():
         if len(comment) > 250:
             raise ValueError("Comment must not exceed 250 characters")
 
+        palce = review_data.get('place') 
 
-        user_id  = user["user_id"]
-        place_id = place["place_id"]
-
-        user  = repo.get(user_id)
-        place = repo.get(place_id)
-
-        review = Review(rating, comment)
+        review = Review(place = palce, rating = rating, comment = comment)
 
         repo.add(review)
 
@@ -38,7 +33,7 @@ class ReviewService():
         if not review:
             return None
         
-        return review
+        return review.id
 
     def update_Review(self, review_id, updated_data, repo):
         review = repo.get(review_id)
