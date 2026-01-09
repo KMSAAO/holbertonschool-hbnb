@@ -2,7 +2,7 @@ from app.models.base_model import BaseModel
 
 class Amenity(BaseModel):
 
-    def __init__(self,amenity_name, description, status):
+    def __init__(self, amenity_name, description, status):
         
         super().__init__()
 

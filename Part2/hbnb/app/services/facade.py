@@ -1,6 +1,7 @@
 from app.persistence.repository import InMemoryRepository
 from app.services.user_service import UserServices
 from app.services.place_service import PlaceService
+from app.services.amenity_service import AmenityService
 
 class HBnBFacade:
     def __init__(self):
@@ -12,6 +13,7 @@ class HBnBFacade:
 
         self.user_service = UserServices()
         self.place_service = PlaceService()
+        self.amenity_service = AmenityService()
 
     def register_user(self, user_data: dict) -> str:
 
@@ -62,4 +64,29 @@ class HBnBFacade:
         return self.place_service.delete_place(
             place_id=place_id,
             place_repo=self.place_repo
+        )
+    
+    def create_amenity(self, amenity_data: dict):
+        return self.amenity_service.create_amenity(
+            amenity_data,
+            self.amenity_repo
+        )
+
+    def get_amenity_info(self, amenity_id: str) -> dict:
+        return self.amenity_service.get_amenity_info(
+            amenity_id,
+            self.amenity_repo
+        )
+
+    def update_amenity(self, amenity_id: str, amenity_data: dict) -> bool:
+        return self.amenity_service.update_amenity(
+            amenity_id,
+            amenity_data,
+            self.amenity_repo
+        )
+
+    def delete_amenity(self, amenity_id: str) -> bool:
+        return self.amenity_service.delete_amenity(
+            amenity_id,
+            self.amenity_repo
         )

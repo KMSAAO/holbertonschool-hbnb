@@ -2,7 +2,7 @@ from app.services.facade import HBnBFacade
 from app.services.place_service import PlaceService
 from app.services.review_service import ReviewService
 from app.enums.place_status import PlaceStatus
-
+from app.enums.place_amenity_status import PlaceAmenityStatus
 if __name__ == "__main__":
     facade = HBnBFacade()
     place_service = PlaceService()
@@ -42,3 +42,11 @@ if __name__ == "__main__":
 
     print(f"Review ID",{review.id}, "Owner review",{user.first_name}, "Place name", {review.place.title})
 
+    amenity = facade.create_amenity({
+    "amenity_name": "Wi-Fi",
+    "description": "High speed internet",
+    "status": PlaceAmenityStatus.ACTIVE
+    })
+
+    info = facade.get_amenity_info(amenity.id)
+    print(info)
