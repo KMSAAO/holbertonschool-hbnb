@@ -56,7 +56,6 @@ class PlaceService():
         return place
 
     def get_place_info(self, place_id: str, place_repo) -> dict:
-        """get_place_info(place_id) : dict"""
 
         if not isinstance(place_id, str):
             raise ValueError("Place ID must be a string")
@@ -65,20 +64,16 @@ class PlaceService():
         if not place:
             raise ValueError("Place not found")
 
-        if hasattr(place, "to_dict"):
-            data = place.to_dict()
-        else:
-            data = {
-                "id": place.id,
-                "title": place.title,
-                "description": place.description,
-                "price": place.price,
-                "status": place.status.value if hasattr(place.status, "value") else place.status,
-                "latitude": place.latitude,
-                "longitude": place.longitude,
-                "owner_id": place.user.id if hasattr(place, "user") else None,
+        return{
+            "id": place.id,
+            "title": place.title,
+            "description": place.description,
+            "price": place.price,
+            "status": place.status.value,
+            "latitude": place.latitude,
+            "longitude": place.longitude,
+            "owner_id": place.user.id
             }
-        return data
     
     def update_place(self, place_id: str, place_data: dict, place_repo, user_repo) -> bool:
 

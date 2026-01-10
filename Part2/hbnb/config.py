@@ -6,6 +6,7 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
+    PROPAGATE_EXCEPTIONS = True
 
 config = {
     'development': DevelopmentConfig,

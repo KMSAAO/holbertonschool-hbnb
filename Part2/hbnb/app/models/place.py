@@ -7,7 +7,7 @@ class Place(BaseModel):
     def __init__(self, user: User, title, description, price, status: place_status, latitude, longitude):
 
         super().__init__()
-        
+        self.user_id = user.id
         self.user = user
         self.title = title
         self.description = description

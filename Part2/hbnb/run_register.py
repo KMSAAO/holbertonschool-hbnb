@@ -33,20 +33,20 @@ if __name__ == "__main__":
     if is_logged:
         print("Welcome back", f"{user.first_name} {user.last_name}")
 
+    print(facade.get_place_info(place.id))
 
-    review = review_services.create_Review(
-        { "place": place,
-         "rating": 5,
-         "comment": "Very good"
-    }, facade.review_repo)
 
-    print(f"Review ID",{review.id}, "Owner review",{user.first_name}, "Place name", {review.place.title})
+    review = facade.create_review({
+        "place": place,
+        "rating": 5,
+        "comment": "Great place!"
+    })  
 
-    amenity = facade.create_amenity({
-    "amenity_name": "Wi-Fi",
-    "description": "High speed internet",
-    "status": PlaceAmenityStatus.ACTIVE
-    })
+    print(facade.get_review_info(review.id))
 
-    info = facade.get_amenity_info(amenity.id)
-    print(info)
+ 
+    updated_review = facade.update_review(review.id, {
+        "comment": "Updated comment"
+    })  
+
+    print(facade.get_review_info(review.id))

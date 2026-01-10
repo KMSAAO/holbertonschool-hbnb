@@ -2,6 +2,7 @@ from app.persistence.repository import InMemoryRepository
 from app.services.user_service import UserServices
 from app.services.place_service import PlaceService
 from app.services.amenity_service import AmenityService
+from app.services.review_service import ReviewService
 
 class HBnBFacade:
     def __init__(self):
@@ -13,8 +14,10 @@ class HBnBFacade:
 
         self.user_service = UserServices()
         self.place_service = PlaceService()
+        self.review_service = ReviewService()
         self.amenity_service = AmenityService()
 
+    """User Methods"""
     def register_user(self, user_data: dict) -> str:
 
         return self.user_service.register_users(user_data, self.user_repo)
@@ -34,7 +37,7 @@ class HBnBFacade:
 
         return self.user_service.delete_user(user_id, self.user_repo, self.place_repo)
     
-
+    """Place Methods"""
     def create_place(self, place_data: dict):
 
         return self.place_service.create_place(
@@ -65,7 +68,32 @@ class HBnBFacade:
             place_id=place_id,
             place_repo=self.place_repo
         )
-    
+
+    """review Methods"""
+    def create_review(self, review_data: dict):
+        return self.review_service.create_Review(review_data, self.review_repo)
+
+
+    def get_review_info(self, review_id: str) -> dict:
+        return self.review_service.get_Review_info(
+        review_id,
+        self.review_repo
+        )
+
+    def update_review(self, review_id: str, review_data: dict) -> bool:
+        return self.review_service.update_review(
+            review_id,
+            review_data,
+            self.review_repo
+        )   
+
+    def delete_review(self, review_id: str) -> bool:
+        return self.review_service.delete_Review(
+            review_id, self.review_repo
+        )
+
+
+    """Amenity Methods"""
     def create_amenity(self, amenity_data: dict):
         return self.amenity_service.create_amenity(
             amenity_data,

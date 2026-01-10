@@ -85,7 +85,16 @@ class UserServices():
             if not user:
                 raise ValueError("User not found")
 
-            return user.to_dict()
+
+            return {
+            "id": self.id,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "email": self.email,
+            "is_admin": self.is_admin,
+            "is_active": self.is_active,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat()}
 
     def update_user(self, user_id: str, user_data: dict, repo):
 
