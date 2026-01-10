@@ -73,7 +73,7 @@ class UserLogin(Resource):
         password = data.get('password')
 
         try:
-            success = facade.login_user(email, password)  # ترجع bool أو ترمي ValueError
+            success = facade.login_user(email, password)
             if not success:
                 api.abort(400, "Invalid credentials")
         except ValueError as e:

@@ -112,7 +112,7 @@ class PlaceDetail(Resource):
         return place, 200
 
     @api.expect(place_update_model, validate=False)
-    @api.marshal_with(place_response_model, code=200)  # 🔹
+    @api.marshal_with(place_response_model, code=200)
     @api.response(400, 'Validation / business error')
     def put(self, place_id):
         ...

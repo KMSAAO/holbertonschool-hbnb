@@ -70,14 +70,18 @@ class HBnBFacade:
         )
 
     """review Methods"""
-    def create_review(self, review_data: dict):
-        return self.review_service.create_Review(review_data, self.review_repo)
+    def create_review(self, review_data: dict) -> dict:
+        return self.review_service.create_Review(
+        review_data=review_data,
+        place_repo=self.place_repo,
+        review_repo=self.review_repo,
+    )
 
 
     def get_review_info(self, review_id: str) -> dict:
-        return self.review_service.get_Review_info(
-        review_id,
-        self.review_repo
+        return self.review_service.get_review_info(
+            review_id=review_id,
+            review_repo=self.review_repo
         )
 
     def update_review(self, review_id: str, review_data: dict) -> bool:
