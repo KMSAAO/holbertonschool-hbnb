@@ -1,12 +1,10 @@
 # app/api/v1/users.py
-
-from flask import request
 from flask_restx import Namespace, Resource, fields
-from app.services import facade
+from app.services import facade  
 
 api = Namespace('users', description='User operations')
 
-# ===== Swagger Models =====
+
 
 user_register_model = api.model('UserRegister', {
     'first_name': fields.String(required=True, description='First name'),
@@ -14,6 +12,7 @@ user_register_model = api.model('UserRegister', {
     'email':      fields.String(required=True, description='Email'),
     'password':   fields.String(required=True, description='Password'),
     'is_admin':   fields.Boolean(required=False, description='Is admin', default=False),
+    'is_active':  fields.Boolean(required=False, description='Is active', default=True),
 })
 
 login_model = api.model('UserLogin', {
@@ -32,26 +31,35 @@ user_response_model = api.model('UserResponse', {
     'updated_at': fields.String,
 })
 
+user_update_model = api.model('UserUpdate', {
+    'first_name': fields.String(required=False, description='First name'),
+    'last_name':  fields.String(required=False, description='Last name'),
+    'email':      fields.String(required=False, description='Email'),
+    'password':   fields.String(required=False, description='Password'),
+    'is_admin':   fields.Boolean(required=False, description='Is admin'),
+    'is_active':  fields.Boolean(required=False, description='Is active'),
+})
 
-# ===== /api/v1/users/register =====
+
 
 @api.route('/register')
 class UserRegister(Resource):
     @api.expect(user_register_model, validate=True)
-    @api.response(201, 'User created', user_response_model)
+    @api.marshal_with(user_response_model, code=201)
     @api.response(400, 'Validation error')
     def post(self):
         """Register new user"""
         data = api.payload
-
         try:
+
             user = facade.register_user(data)
-            return user.to_dict(), 201
         except ValueError as e:
-            return {'message': str(e)}, 400
+            api.abort(400, str(e))
+
+        return user, 201
 
 
-# ===== /api/v1/users/login =====
+
 
 @api.route('/login')
 class UserLogin(Resource):
@@ -65,37 +73,33 @@ class UserLogin(Resource):
         password = data.get('password')
 
         try:
-            success = facade.login_user(email, password)
-            if success:
-                return {'message': 'Login successful'}, 200
+            success = facade.login_user(email, password)  # ترجع bool أو ترمي ValueError
+            if not success:
+                api.abort(400, "Invalid credentials")
         except ValueError as e:
-            return {'message': str(e)}, 400
+            api.abort(400, str(e))
+
+        return {'message': 'Login successful'}, 200
 
 
-# ===== /api/v1/users/<user_id> =====
+
 
 @api.route('/<string:user_id>')
 @api.response(404, 'User not found')
 class UserDetail(Resource):
 
-    @api.response(200, 'Success', user_response_model)
+    @api.marshal_with(user_response_model, code=200)
     def get(self, user_id):
         """Get user info by ID"""
         try:
-            user_dict = facade.get_user(user_id)
-            return {
-        "id": str(user.id),          # لو id عندك UUID حوّله سترنق
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "email": user.email,
-        "is_admin": user.is_admin,
-        "is_active": user.is_active,
-        }, 201
+            user = facade.get_user(user_id)
         except ValueError as e:
-            return {'message': str(e)}, 404
+            api.abort(404, str(e))
 
-    @api.expect(user_register_model, validate=False)
-    @api.response(200, 'User updated', user_response_model)
+        return user, 200
+
+    @api.expect(user_update_model, validate=False)
+    @api.marshal_with(user_response_model, code=200)
     @api.response(400, 'Validation error')
     def put(self, user_id):
         """Update user by ID"""
@@ -103,27 +107,35 @@ class UserDetail(Resource):
 
         try:
             updated = facade.update_user(user_id, data)
-            if not updated:
-                return {'message': 'User not found'}, 404
-
-            user_dict = facade.get_user(user_id)
-            return user_dict, 200
         except ValueError as e:
             msg = str(e)
             if "not found" in msg.lower():
-                return {'message': msg}, 404
-            return {'message': msg}, 400
+                api.abort(404, msg)
+            api.abort(400, msg)
+
+
+        if isinstance(updated, dict):
+            return updated, 200
+
+        if not updated:
+            api.abort(404, "User not found")
+
+        user = facade.get_user(user_id)
+        return user, 200
 
     @api.response(204, 'User deleted')
+    @api.response(400, 'Delete error')
     def delete(self, user_id):
         """Delete user by ID"""
         try:
             deleted = facade.delete_user(user_id)
-            if not deleted:
-                return {'message': 'User not found'}, 404
-            return '', 204
         except ValueError as e:
             msg = str(e)
             if "not found" in msg.lower():
-                return {'message': msg}, 404
-            return {'message': msg}, 400
+                api.abort(404, msg)
+            api.abort(400, msg)
+
+        if not deleted:
+            api.abort(404, "User not found")
+
+        return '', 204

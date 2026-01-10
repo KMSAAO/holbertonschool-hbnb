@@ -1,68 +1,138 @@
+# app/api/v1/places.py
 from flask_restx import Namespace, Resource, fields
+from app.services import facade
 
 api = Namespace('places', description='Place operations')
 
-place_model = api.model('Place', {
-    'title': fields.String(required=True, description='Title of the place'),
-    'description': fields.String(description='Description of the place'),
-    'price_per_night': fields.Float(required=True, description='Price per night'),
-    'latitude': fields.Float(required=True, description='Latitude coordinate'),
-    'longitude': fields.Float(required=True, description='Longitude coordinate'),
-    'number_rooms': fields.Integer(default=1, description='Number of rooms'),
-    'number_bathrooms': fields.Integer(default=1, description='Number of bathrooms'),
-    'max_guest': fields.Integer(default=1, description='Maximum number of guests'),
-    'owner_id': fields.String(required=True, description='ID of the owner (User)')
+place_create_model = api.model('PlaceCreate', {
+    'owner_id':    fields.String(required=True, description='ID of the owner (User)'),
+    'title':       fields.String(required=True, description='Title of the place'),
+    'description': fields.String(required=False, description='Description of the place'),
+    'price':       fields.Float(required=True, description='Price of the place'),
+    'status':      fields.String(required=False, description='Status of the place'),
+    'latitude':    fields.Float(required=True, description='Latitude'),
+    'longitude':   fields.Float(required=True, description='Longitude'),
+})
+
+place_response_model = api.model('PlaceResponse', {
+    'id':          fields.String,
+    'owner_id':    fields.String,
+    'title':       fields.String,
+    'description': fields.String,
+    'price':       fields.Float,
+    'status':      fields.String,
+    'latitude':    fields.Float,
+    'longitude':   fields.Float,
+    'created_at':  fields.String,
+    'updated_at':  fields.String,
+})
+
+
+place_update_model = api.model('PlaceUpdate', {
+    'place_id':    fields.String(required=True),
+    'title':       fields.String(required=False),
+    'description': fields.String(required=False),
+    'price':       fields.Float(required=False),
+    'status':      fields.String(required=False),
+    'latitude':    fields.Float(required=False),
+    'longitude':   fields.Float(required=False),
+    'updated_at':   fields.Float(required=False)
 })
 
 @api.route('/')
 class PlaceList(Resource):
-    @api.expect(place_model, validate=True)
-    @api.response(201, 'Place successfully created')
-    @api.response(400, 'Invalid input data')
+
+    @api.expect(place_create_model, validate=True)
+    @api.marshal_with(place_response_model, code=201)
+    @api.response(400, 'Validation / business error')
     def post(self):
         """Create a new place"""
+        data = api.payload
+
         try:
-            new_place = facade.create_place(api.payload)
-            return {
-                'id': new_place.id,
-                'title': new_place.title,
-                'price_per_night': new_place.price_per_night
-            }, 201
+            place = facade.create_place(place_data=data)
         except ValueError as e:
-            return {'error': str(e)}, 400
+            api.abort(400, str(e))
 
-    @api.response(200, 'List of places retrieved')
-    def get(self):
-        """List all places"""
-        places = facade.get_all_places()
-        return [
-            {
-                'id': p.id,
-                'title': p.title,
-                'latitude': p.latitude,
-                'longitude': p.longitude
-            } for p in places
-        ], 200
-
-@api.route('/<place_id>')
-class PlaceResource(Resource):
-    @api.response(200, 'Place details retrieved')
-    @api.response(404, 'Place not found')
-    def get(self, place_id):
-        """Get place details by ID"""
-        place = facade.get_place(place_id)
-        if not place:
-            return {'error': 'Place not found'}, 404
         return {
-            'id': place.id,
-            'title': place.title,
-            'description': place.description,
-            'price_per_night': place.price_per_night,
-            'latitude': place.latitude,
-            'longitude': place.longitude,
-            'number_rooms': place.number_rooms,
-            'number_bathrooms': place.number_bathrooms,
-            'max_guest': place.max_guest,
-            'owner_id': place.user.id if hasattr(place.user, 'id') else place.user
-        }, 200
+            "id":          place.id,
+            "owner_id":    place.user_id,
+            "title":       place.title,
+            "description": place.description,
+            "price":       place.price,
+            "status":      place.status,
+            "latitude":    place.latitude,
+            "longitude":   place.longitude,
+            "created_at":  place.created_at.isoformat(),
+            "updated_at":  place.updated_at.isoformat(),
+        }, 201
 
+
+@api.expect(place_update_model, validate=False)
+@api.marshal_with(place_response_model, code=200)
+@api.response(400, 'Validation / business error')
+def put(self, place_id):
+    """Update place by ID"""
+    data = api.payload or {}
+
+    try:
+        updated = facade.update_place(
+            place_id=place_id,
+            place_data=data
+        )
+    except ValueError as e:
+        msg = str(e)
+        if "not found" in msg.lower():
+            api.abort(404, msg)
+        api.abort(400, msg)
+
+    if not updated:
+        api.abort(404, "Place not found")
+
+    try:
+        place = facade.get_place_info(place_id=place_id)
+    except ValueError as e:
+        api.abort(404, str(e))
+
+    return place, 200
+
+
+@api.route('/<string:place_id>')
+@api.response(404, 'Place not found')
+class PlaceDetail(Resource):
+
+    @api.marshal_with(place_response_model, code=200)
+    def get(self, place_id):
+        """Get place info by ID"""
+        try:
+            place = facade.get_place_info(place_id=place_id)
+        except ValueError as e:
+            api.abort(404, str(e))
+
+        return place, 200
+
+    @api.expect(place_update_model, validate=False)
+    @api.marshal_with(place_response_model, code=200)  # 🔹
+    @api.response(400, 'Validation / business error')
+    def put(self, place_id):
+        ...
+        place = facade.get_place_info(place_id=place_id)
+        return place, 200
+
+
+    @api.response(204, 'Place deleted')
+    @api.response(400, 'Delete error')
+    def delete(self, place_id):
+        """Delete place by ID"""
+        try:
+            deleted = facade.delete_place(place_id=place_id)
+        except ValueError as e:
+            msg = str(e)
+            if "not found" in msg.lower():
+                api.abort(404, msg)
+            api.abort(400, msg)
+
+        if not deleted:
+            api.abort(404, "Place not found")
+
+        return '', 204

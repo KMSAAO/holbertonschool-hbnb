@@ -78,23 +78,23 @@ class UserServices():
 
     def get_user_info(self, user_id, repo):
             
-            if not isinstance(user_id, str):
-                raise ValueError("User ID must be a string")
+        if not isinstance(user_id, str):
+            raise ValueError("User ID must be a string")
 
-            user = repo.get(user_id)
-            if not user:
-                raise ValueError("User not found")
+        user = repo.get(user_id)
+        if not user:
+            raise ValueError("User not found")
 
 
-            return {
-            "id": self.id,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "email": self.email,
-            "is_admin": self.is_admin,
-            "is_active": self.is_active,
-            "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat()}
+        return {
+            "id": user.id,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "is_admin": user.is_admin,
+            "is_active": user.is_active,
+            "created_at": user.created_at.isoformat(),
+            "updated_at": user.updated_at.isoformat()}
 
     def update_user(self, user_id: str, user_data: dict, repo):
 

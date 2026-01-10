@@ -34,19 +34,3 @@ if __name__ == "__main__":
         print("Welcome back", f"{user.first_name} {user.last_name}")
 
     print(facade.get_place_info(place.id))
-
-
-    review = facade.create_review({
-        "place": place,
-        "rating": 5,
-        "comment": "Great place!"
-    })  
-
-    print(facade.get_review_info(review.id))
-
- 
-    updated_review = facade.update_review(review.id, {
-        "comment": "Updated comment"
-    })  
-
-    print(facade.get_review_info(review.id))
