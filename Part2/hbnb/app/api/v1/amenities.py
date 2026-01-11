@@ -53,6 +53,9 @@ class AmenityList(Resource):
 
         except ValueError as ex:
             api.abort(400, str(ex))
+    @api.marshal_list_with(amenity_response_model)
+    def get(self):
+        return facade.get_all_amenities(), 200        
 
 
 # ====== /api/v1/amenities/<amenity_id> ======

@@ -6,7 +6,6 @@ from app.services.review_service import ReviewService
 
 class HBnBFacade:
     def __init__(self):
-
         self.user_repo = InMemoryRepository()
         self.place_repo = InMemoryRepository()
         self.review_repo = InMemoryRepository()
@@ -18,28 +17,23 @@ class HBnBFacade:
         self.amenity_service = AmenityService()
 
     """User Methods"""
-    def register_user(self, user_data: dict) -> str:
-
+    def register_user(self, user_data: dict):
         return self.user_service.register_users(user_data, self.user_repo)
 
     def login_user(self, email: str, password: str) -> bool:
         return self.user_service.login(email, password, self.user_repo)
 
     def get_user(self, user_id: str) -> dict:
-
         return self.user_service.get_user_info(user_id, self.user_repo)
 
     def update_user(self, user_id: str, user_data: dict) -> bool:
-        
         return self.user_service.update_user(user_id, user_data, self.user_repo)
     
     def delete_user(self, user_id: str) -> bool:
-
         return self.user_service.delete_user(user_id, self.user_repo, self.place_repo)
     
     """Place Methods"""
     def create_place(self, place_data: dict):
-
         return self.place_service.create_place(
             place_data=place_data,
             repo=self.place_repo,
@@ -47,14 +41,15 @@ class HBnBFacade:
         )
 
     def get_place_info(self, place_id: str) -> dict:
-
         return self.place_service.get_place_info(
             place_id=place_id,
             place_repo=self.place_repo
         )
+    
+    def get_all_places(self):
+        return self.place_repo.get_all()
 
     def update_place(self, place_id: str, place_data: dict) -> bool:
-
         return self.place_service.update_place(
             place_id=place_id,
             place_data=place_data,
@@ -63,26 +58,28 @@ class HBnBFacade:
         )
 
     def delete_place(self, place_id: str) -> bool:
-
         return self.place_service.delete_place(
             place_id=place_id,
             place_repo=self.place_repo
         )
 
-    """review Methods"""
+    """Review Methods"""
     def create_review(self, review_data: dict) -> dict:
-        return self.review_service.create_Review(
-        review_data=review_data,
-        place_repo=self.place_repo,
-        review_repo=self.review_repo,
-    )
-
+        return self.review_service.create_review(
+            review_data=review_data,
+            place_repo=self.place_repo,
+            review_repo=self.review_repo,
+            user_repo=self.user_repo
+        )
 
     def get_review_info(self, review_id: str) -> dict:
         return self.review_service.get_review_info(
             review_id=review_id,
             review_repo=self.review_repo
         )
+
+    def get_all_reviews(self):
+        return self.review_service.get_all_reviews(self.review_repo)
 
     def update_review(self, review_id: str, review_data: dict) -> bool:
         return self.review_service.update_review(
@@ -92,10 +89,9 @@ class HBnBFacade:
         )   
 
     def delete_review(self, review_id: str) -> bool:
-        return self.review_service.delete_Review(
+        return self.review_service.delete_review(
             review_id, self.review_repo
         )
-
 
     """Amenity Methods"""
     def create_amenity(self, amenity_data: dict):
@@ -109,6 +105,9 @@ class HBnBFacade:
             amenity_id,
             self.amenity_repo
         )
+
+    def get_all_amenities(self):
+        return self.amenity_repo.get_all()
 
     def update_amenity(self, amenity_id: str, amenity_data: dict) -> bool:
         return self.amenity_service.update_amenity(

@@ -1,82 +1,49 @@
 from app.models.review import Review
-from app.models.user import User
-from app.models.place import Place
 
-class ReviewService():
-
-    def create_Review(self, review_data: dict, place_repo, review_repo):
+class ReviewService:
+    def create_review(self, review_data, place_repo, review_repo, user_repo):
         place_id = review_data.get("place_id")
+        user_id  = review_data.get("user_id")
         rating   = review_data.get("rating")
-        comment  = review_data.get("comment")
-
-        if not isinstance(place_id, str):
-            raise ValueError("place_id must be a string")
+        text     = review_data.get("text")
 
         place = place_repo.get(place_id)
-        if place is None:
+        if not place:
             raise ValueError("Place not found")
 
-        review = Review(place=place, rating=rating, comment=comment)
+        user = user_repo.get(user_id)
+        if not user:
+            raise ValueError("User not found")
+
+        review = Review(text=text, rating=rating, place=place, user=user)
+        
         review_repo.add(review)
-
-        return {
-            "id": review.id,
-            "place_id": review.place_id,
-            "rating": review.rating,
-            "comment": review.comment,
-        }
-
-    def get_review_info(self, review_id: str, review_repo):
-        if not isinstance(review_id, str):
-            raise ValueError("Review ID must be a string")
-
-        review = review_repo.get(review_id)
-        if not review:
-            raise ValueError("Review not found")
-
-        return {
-            "id": review.id,
-            "place_id": review.place_id,
-            "rating": review.rating,
-            "comment": review.comment,
-            "created_at": review.created_at,
-            "updated_at": review.updated_at,
-        }
-
-
-    def update_review(self, review_id: str, review_data: dict, review_repo):
-
-        if not isinstance(review_id, str):
-            raise ValueError("review_id must be a string")
-
-        review = review_repo.get(review_id)
-        if not review:
-            raise ValueError("Review not found")
-
-        if "rating" in review_data:
-            review.rating = review_data["rating"]
-
-        if "comment" in review_data:
-            review.comment = review_data["comment"]
-
-        review_repo.update(
-            review_id,
-            {
-                "rating": review.rating,
-                "comment": review.comment
-            }
-        )
-
         return review
 
+    def get_review_info(self, review_id, review_repo):
+        review = review_repo.get(review_id)
+        if not review:
+             raise ValueError("Review not found")
+        return review
 
-    def delete_Review(self, review_id, repo):
-        Deleted = repo.delete(review_id)
-        return Deleted
+    def get_all_reviews(self, review_repo):
+        return review_repo.get_all()
 
-    def get_all_reviews(self, repo):
-        all_reviews = repo.get_all()
-        if not all_reviews:
-            return None
+    def update_review(self, review_id, review_data, review_repo):
+        review = review_repo.get(review_id)
+        if not review:
+            raise ValueError("Review not found")
 
-        return all_reviews 
+        if 'text' in review_data:
+            review.text = review_data['text']
+        if 'rating' in review_data:
+            review.rating = review_data['rating']
+
+        review_repo.update(review_id, review.to_dict())
+        return review
+
+    def delete_review(self, review_id, review_repo):
+        review = review_repo.get(review_id)
+        if not review:
+            raise ValueError("Review not found")
+        review_repo.delete(review_id)
