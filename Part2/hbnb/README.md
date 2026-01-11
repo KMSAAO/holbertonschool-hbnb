@@ -61,7 +61,7 @@ api/
     ├── refund_service.py
     └── review_service.py
 
-##Architecture Notes
+Architecture Notes
 Facade Pattern
 
 services/facade.py is the single entry point used by the API layer to call business logic without touching repositories directly.
