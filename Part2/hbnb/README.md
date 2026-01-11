@@ -4,6 +4,12 @@ A layered REST-style API for an Airbnb-like domain: **Users, Places, Amenities, 
 
 ---
 
+## Team
+- Nawaf Alzahrani
+- Khalid Alomari
+- Shatha Alsuwailm
+
+
 ## Overview
 
 This project follows a clean layered architecture:
@@ -55,7 +61,7 @@ api/
     ├── refund_service.py
     └── review_service.py
 
-Architecture Notes
+##Architecture Notes
 Facade Pattern
 
 services/facade.py is the single entry point used by the API layer to call business logic without touching repositories directly.
