@@ -1,4 +1,3 @@
-# app/api/v1/places.py
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 
@@ -27,16 +26,14 @@ place_response_model = api.model('PlaceResponse', {
     'updated_at':  fields.String,
 })
 
-
 place_update_model = api.model('PlaceUpdate', {
-    'place_id':    fields.String(required=True),
     'title':       fields.String(required=False),
     'description': fields.String(required=False),
     'price':       fields.Float(required=False),
     'status':      fields.String(required=False),
     'latitude':    fields.Float(required=False),
     'longitude':   fields.Float(required=False),
-    'updated_at':   fields.Float(required=False)
+    'owner_id':    fields.String(required=False)
 })
 
 @api.route('/')
@@ -54,47 +51,7 @@ class PlaceList(Resource):
         except ValueError as e:
             api.abort(400, str(e))
 
-        return {
-            "id":          place.id,
-            "owner_id":    place.user_id,
-            "title":       place.title,
-            "description": place.description,
-            "price":       place.price,
-            "status":      place.status,
-            "latitude":    place.latitude,
-            "longitude":   place.longitude,
-            "created_at":  place.created_at.isoformat(),
-            "updated_at":  place.updated_at.isoformat(),
-        }, 201
-
-
-@api.expect(place_update_model, validate=False)
-@api.marshal_with(place_response_model, code=200)
-@api.response(400, 'Validation / business error')
-def put(self, place_id):
-    """Update place by ID"""
-    data = api.payload or {}
-
-    try:
-        updated = facade.update_place(
-            place_id=place_id,
-            place_data=data
-        )
-    except ValueError as e:
-        msg = str(e)
-        if "not found" in msg.lower():
-            api.abort(404, msg)
-        api.abort(400, msg)
-
-    if not updated:
-        api.abort(404, "Place not found")
-
-    try:
-        place = facade.get_place_info(place_id=place_id)
-    except ValueError as e:
-        api.abort(404, str(e))
-
-    return place, 200
+        return place, 201
 
 
 @api.route('/<string:place_id>')
@@ -115,10 +72,27 @@ class PlaceDetail(Resource):
     @api.marshal_with(place_response_model, code=200)
     @api.response(400, 'Validation / business error')
     def put(self, place_id):
-        ...
-        place = facade.get_place_info(place_id=place_id)
-        return place, 200
+        """Update place by ID"""
+        data = api.payload or {}
 
+        try:
+            updated = facade.update_place(
+                place_id=place_id,
+                place_data=data
+            )
+        except ValueError as e:
+            msg = str(e)
+            if "not found" in msg.lower():
+                api.abort(404, msg)
+            api.abort(400, msg)
+        if not updated:
+            api.abort(404, "Place not found")
+
+        try:
+            place = facade.get_place_info(place_id=place_id)
+            return place, 200
+        except ValueError as e:
+            api.abort(404, str(e))
 
     @api.response(204, 'Place deleted')
     @api.response(400, 'Delete error')
