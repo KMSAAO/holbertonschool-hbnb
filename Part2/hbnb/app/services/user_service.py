@@ -65,11 +65,11 @@ class UserServices():
 
         user = repo.get_by_attribute('email', email)
         if not user:
-            raise ValueError("User not found")
+            raise ValueError("Incorrect email or password")
 
 
         if not user.check_password(password):
-            raise ValueError("Incorrect password")
+            raise ValueError("Incorrect email or password")
 
         if user.is_active != True:
             raise ValueError("User is not active")
