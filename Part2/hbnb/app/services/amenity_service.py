@@ -60,29 +60,28 @@ class AmenityService:
 
         if "amenity_name" in amenity_data:
             amenity_name = amenity_data["amenity_name"]
-        if not amenity_name or not isinstance(amenity_name, str) or len(amenity_name) > 100:
-            raise ValueError("invalid name")
-        amenity.amenity_name = amenity_name
+            if not amenity_name or not isinstance(amenity_name, str) or len(amenity_name) > 100:
+                raise ValueError("invalid name")
+            amenity.amenity_name = amenity_name
 
         if "description" in amenity_data:
             desc = amenity_data["description"]
-        if not isinstance(desc, str) or len(desc) > 500:
-            raise ValueError("invalid description")
-        amenity.description = desc
+            if not isinstance(desc, str) or len(desc) > 500:
+                raise ValueError("invalid description")
+            amenity.description = desc
 
         if "status" in amenity_data:
             raw_status = amenity_data["status"]
-        if isinstance(raw_status, PlaceAmenityStatus):
-            status = raw_status
-        else:
-            try:
-                status = PlaceAmenityStatus(raw_status)
-            except Exception:
-                raise ValueError("invalid amenity status")
-        amenity.status = status
+            if isinstance(raw_status, PlaceAmenityStatus):
+                status = raw_status
+            else:
+                try:
+                    status = PlaceAmenityStatus(raw_status)
+                except Exception:
+                    raise ValueError("invalid amenity status")
+            amenity.status = status
 
         return True
-
 
     @staticmethod
     def delete_amenity(amenity_id: str, amenity_repo) -> bool:

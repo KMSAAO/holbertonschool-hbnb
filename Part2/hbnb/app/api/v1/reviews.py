@@ -80,11 +80,12 @@ class ReviewResource(Resource):
     @api.expect(review_update_model, validate=False)
     @api.marshal_with(review_response_model, code=200)
     def put(self, review_id):
-        review_data = api.payload or {}
-
-        review = facade.update_review(review_id, review_data)
-
-        return review, 200
+        try:
+            review_data = api.payload or {}
+            review = facade.update_review(review_id, review_data)
+            return review, 200
+        except ValueError as e:
+            api.abort(404, str(e))
 
     @api.response(204, 'Review deleted')
     @api.response(400, 'Delete error')
