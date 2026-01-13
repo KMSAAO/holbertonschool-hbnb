@@ -3,6 +3,7 @@ from app.services.user_service import UserServices
 from app.services.place_service import PlaceService
 from app.services.amenity_service import AmenityService
 from app.services.review_service import ReviewService
+from app.services.guest_service import GuestService
 
 class HBnBFacade:
     def __init__(self):
@@ -16,6 +17,7 @@ class HBnBFacade:
         self.place_service = PlaceService()
         self.review_service = ReviewService()
         self.amenity_service = AmenityService()
+        self.guest_service = GuestService
 
     """User Methods"""
     def register_user(self, user_data: dict) -> str:
@@ -118,7 +120,12 @@ class HBnBFacade:
         )
 
     def delete_amenity(self, amenity_id: str) -> bool:
+
         return self.amenity_service.delete_amenity(
             amenity_id,
             self.amenity_repo
         )
+    
+    def register_as_guest(self,user_id,user_data: dict, repo, bio):
+
+        return GuestService.register_as_guest(user_id, user_data, repo, bio)
