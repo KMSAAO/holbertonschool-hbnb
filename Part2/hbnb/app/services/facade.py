@@ -5,6 +5,7 @@ from app.services.amenity_service import AmenityService
 from app.services.review_service import ReviewService
 from app.services.guest_service import GuestService
 from app.services.booking_service import BookingService
+from app.services.payment_service import PaymentService
 
 class HBnBFacade:
     def __init__(self):
@@ -16,7 +17,8 @@ class HBnBFacade:
         self.amenity_repo = InMemoryRepository()
         self.guest_repo = InMemoryRepository()
         self.booking_repo = InMemoryRepository()
-
+        self.payment_repo = InMemoryRepository()
+    
         """Services Initialization"""
         self.user_service = UserServices()
         self.place_service = PlaceService()
@@ -24,6 +26,7 @@ class HBnBFacade:
         self.amenity_service = AmenityService()
         self.guest_service = GuestService()
         self.booking_service = BookingService()
+        self.payment_service = PaymentService()
 
     """User Methods"""
     def register_user(self, user_data: dict) -> str:
@@ -183,5 +186,29 @@ class HBnBFacade:
             check_out,
             repo=self.place_repo
         )
+
+    """ payment methods """
+    def create_payment(self, payment: dict, amount: float):
+
+        return self.payment_service.create_payment(
+            payment,
+            amount,
+            repo=self.payment_repo
+        )
+    
+    def get_payment_info(self, payment_id: str) -> dict:
+
+        return self.payment_service.get_payment_info(
+            payment_id,
+            repo=self.payment_repo
+        )
+    
+    def update_payment_status(self, payment_id: str, status: str) -> bool:
+
+        pass
+
+    def delete_payment(self, payment_id: str) -> bool:
+
+        pass
 
     
