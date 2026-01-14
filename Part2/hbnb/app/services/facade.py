@@ -126,6 +126,11 @@ class HBnBFacade:
             self.amenity_repo
         )
     
+    """guest methods"""
     def register_as_guest(self,user_id,user_data: dict, repo, bio):
 
         return GuestService.register_as_guest(user_id, user_data, repo, bio)
+    
+    def get_guest_info(self, guest_id):
+
+        return GuestService.get_guest_info(guest_id, self.repo)

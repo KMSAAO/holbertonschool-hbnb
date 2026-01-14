@@ -10,4 +10,16 @@ if __name__ == "__main__":
     facade = HBnBFacade()
     place_service = PlaceService()
     review_services = ReviewService()
-    g
+    guest_service = GuestService()
+    
+
+
+    user = facade.register_user({
+        "first_name": "Nawaf",
+        "last_name": "Alzahrani",
+        "email": "nawaf@example.com",
+        "password": "A12345",
+        "is_admin": True,
+        "is_active": True
+    })
+
