@@ -4,13 +4,17 @@ from app.enums.payment_type import MethodPayment
 
 class PaymentService():
 
-    def create_payment(self, payment: dict, amount: float, repo) -> Payment:
+    def create_payment(self, payment: dict, repo, booking_repo) -> Payment:
        
-        booking_id = payment.get('booking_id')
-        if not booking_id or not isinstance(booking_id, str):
-            raise ValueError("Booking ID is required and must be a string")
+        booking_id = payment.get('book_id')
+        if not booking_id:
+            raise ValueError("booking_id is required")
+
+        booking = booking_repo.get(booking_id)
+        if not booking:
+            raise ValueError("Invalid booking ID")
         
-        amount = amount.get('amount')
+        amount = payment.get('amount')
         if not amount or not isinstance(amount, (int, float)) or amount <= 0:
             raise ValueError("Amount must be a non-negative number")
 
@@ -24,16 +28,20 @@ class PaymentService():
                 raise ValueError("Invalid method payment")
             
         status = payment.get('status')
+        if not status:
+            raise ValueError("status is required")
+
         if isinstance(status, PaymentStatus):
             status_payment = status
         else:
             try:
-                status = PaymentStatus(status)
+                status_payment = PaymentStatus(status)
             except Exception:
                 raise ValueError("Invalid status payment")
 
         new_payment = Payment(
-            book_id=booking_id,
+            book_id=booking.id,
+            booking=booking,
             amount=amount,
             method_payment=method,
             status=status_payment

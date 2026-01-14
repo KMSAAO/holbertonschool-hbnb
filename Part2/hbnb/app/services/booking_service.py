@@ -1,42 +1,34 @@
 from app.models.booking import Booking
 from app.enums.booking_status import BookingStatus
-import datetime
+from datetime import datetime
 
 class BookingService():
 
-    def create_booking(self, booking_data: dict, repo):
+    def create_booking(self, booking_data, repo, place_repo):
 
-        guest_id = booking_data.get('guest_id')
-        if not guest_id or not isinstance(guest_id, str):
-            raise ValueError("guest_id is required and must be a string")
+        guest = booking_data.get('guest')
+        if not guest:
+            raise ValueError("Invalid guest")
+        
 
-        guest_id = repo.get(guest_id)
-        if not guest_id:
-            raise ValueError("guest not found")
-        
-        place_id  = booking_data.get('place_id')
-        if not place_id or not isinstance(place_id, str):
-            raise ValueError("place_id is required and must be a string")
-        place_id = repo.get(place_id)
-        if not place_id:
-            raise ValueError("place_id not found")
-        
-        Payment_id  = booking_data.get('Payment_id')
-        if not Payment_id or not isinstance(Payment_id, str):
-            raise ValueError("Payment_id is required and must be a string")
-        Payment_id = repo.get(Payment_id)
-        if not Payment_id:
-            raise ValueError("Payment_id not found")
+        place = booking_data.get('place')
+        if not place:
+                raise ValueError("Invalid place")
+    
 
-        check_in = check_in.get('check_in')
-        if not check_in or not isinstance(check_in, datetime):
-            raise ValueError("check_out is required")
-        
-        check_out = check_out.get('check_out')
-        if not check_out or not isinstance(check_out, datetime):
-            raise ValueError("check_out is required")
+        payment_id  = None
+
+        start_raw = booking_data.get("start_date")
+        end_raw = booking_data.get("end_date")
+
+        try:
+            check_in = datetime.strptime(start_raw, "%Y-%m-%d")
+            check_out = datetime.strptime(end_raw, "%Y-%m-%d")
+        except Exception:
+            raise ValueError("start_date and end_date must be in format YYYY-MM-DD")
         
         raw_status = booking_data.get('status')
+
         if isinstance(raw_status, BookingStatus):
             status = raw_status
         else:
@@ -44,19 +36,19 @@ class BookingService():
                 status = BookingStatus(raw_status)
             except Exception:
                 raise ValueError("Invalid booking status")
-            
-            booking = Booking(
-            guest_id,
-            place_id,
-            Payment_id,
-            Payment_id,
+
+        booking = Booking(
+            guest,
+            place,
+            payment_id,
             check_in,
             check_out,
-            status)
+            status
+            )
 
-            repo.add(booking)
+        repo.add(booking)
+        return booking
 
-            return booking
         
     def cancel_booking(self, booking_id: str, repo):
 
@@ -67,12 +59,14 @@ class BookingService():
         booking.status = BookingStatus.CANCELLED
         return repo.update(booking)  
     
-    def update_status(self, booking_id: str, new_status: BookingStatus, repo):
+    def update_booking_payment(self, booking_id: str, new_status: BookingStatus, repo):
 
 
         booking = repo.get(booking_id)
         if not booking:
             raise ValueError("booking not found")
+
+        
         
         if not isinstance(new_status, BookingStatus):
             try:
@@ -113,7 +107,7 @@ class BookingService():
             "Payment_id": booking.Payment_id,
             "check_in": booking.check_in,
             "check_out": booking.check_out,
-            "status": booking.status.value
+            "status": booking.status.name
         }
     
     def is_place_available(self, place_id: str, check_in: datetime, check_out: datetime, repo):

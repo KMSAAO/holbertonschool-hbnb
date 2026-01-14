@@ -139,9 +139,9 @@ class HBnBFacade:
         )
     
     """guest methods"""
-    def register_as_guest(self, user_data: dict, bio):
+    def register_as_guest(self, user, bio=""):
 
-        return self.guest_service.register_as_guest(user_data, self.guest_repo, bio)
+        return self.guest_service.register_as_guest(user, self.guest_repo, bio)
     
     def get_guest_info(self, guest_id):
 
@@ -152,7 +152,9 @@ class HBnBFacade:
 
         return self.booking_service.create_booking(
             booking_data,
-            repo=self.place_repo
+            self.booking_repo,
+            place_repo=self.place_repo,
+
         )
     
     def cancel_booking(self, booking_id: str):
@@ -191,12 +193,12 @@ class HBnBFacade:
         )
 
     """ payment methods """
-    def create_payment(self, payment: dict, amount: float):
+    def create_payment(self, payment: dict):
 
         return self.payment_service.create_payment(
             payment,
-            amount,
-            repo=self.payment_repo
+            repo=self.payment_repo,
+            booking_repo=self.booking_repo
         )
     
     def get_payment_info(self, payment_id: str) -> dict:
