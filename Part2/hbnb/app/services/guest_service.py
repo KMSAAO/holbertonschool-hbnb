@@ -1,9 +1,9 @@
-from app.models.guest import guest
+from app.models.guest import Guest
 
 
 class GuestService():
 
-    def register_as_guest(self,user_id,user_data: dict, repo, bio):
+    def register_as_guest(self,user_data: dict, repo, bio):
 
         user_id = user_data.get('user_id')
         if not user_id or not isinstance(user_id, str):
@@ -13,10 +13,10 @@ class GuestService():
         if not bio or not isinstance(bio, str) or len(bio) > 100:
             raise ValueError("bio is required and must be a string with max 100 characters")
         
-        guest = guest(bio = bio)
-        repo.add(guest)
-        return guest
-    
+        new_guest = Guest(bio = bio)
+        repo.add(new_guest)
+        return new_guest
+
     def get_guest_info(self, guest_id, repo):
             
         if not isinstance(guest_id, str):

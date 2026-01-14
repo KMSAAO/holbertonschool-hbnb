@@ -46,8 +46,7 @@ class RefundServices():
                 raise ValueError("Invalid status refund")
 
         refund.status = status_refund
-        repo.save()
-        return True
+        return repo.save()
     
     def get_refund_info(self, refund_id: str, repo) -> dict:
         refund = repo.get(refund_id)

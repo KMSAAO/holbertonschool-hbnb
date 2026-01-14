@@ -1,4 +1,4 @@
-from models.base_model import BaseModel
+from app.models.base_model import BaseModel
 from app.enums import booking_status
 
 class Booking(BaseModel):

@@ -139,13 +139,13 @@ class HBnBFacade:
         )
     
     """guest methods"""
-    def register_as_guest(self,user_id,user_data: dict, guest_repo, bio):
+    def register_as_guest(self, user_data: dict, bio):
 
-        return self.register_as_guest(user_id, user_data, guest_repo, bio)
+        return self.guest_service.register_as_guest(user_data, self.guest_repo, bio)
     
     def get_guest_info(self, guest_id):
 
-        return self.get_guest_info(guest_id, self.guest_repo)
+        return self.guest_service.get_guest_info(guest_id, self.guest_repo)
     
     """Booking Methods"""
     def create_booking(self, booking_data: dict):

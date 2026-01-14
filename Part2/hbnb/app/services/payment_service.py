@@ -1,8 +1,6 @@
 from app.models.payment import Payment
 from app.enums.payment_status import PaymentStatus
-from app.services.payment_service import PaymentService
-import datetime
-
+from app.enums.payment_type import MethodPayment 
 
 class PaymentService():
 
@@ -17,11 +15,11 @@ class PaymentService():
             raise ValueError("Amount must be a non-negative number")
 
         method_payment = payment.get('method_payment')
-        if isinstance(method_payment, PaymentService):
+        if isinstance(method_payment, MethodPayment):
             method = method_payment
         else:
             try:
-                method = PaymentService(method_payment)
+                method = MethodPayment(method_payment)
             except Exception:
                 raise ValueError("Invalid method payment")
             
