@@ -4,20 +4,26 @@ from app.services.place_service import PlaceService
 from app.services.amenity_service import AmenityService
 from app.services.review_service import ReviewService
 from app.services.guest_service import GuestService
+from app.services.booking_service import BookingService
 
 class HBnBFacade:
     def __init__(self):
 
+        """Repositories Initialization"""
         self.user_repo = InMemoryRepository()
         self.place_repo = InMemoryRepository()
         self.review_repo = InMemoryRepository()
         self.amenity_repo = InMemoryRepository()
+        self.guest_repo = InMemoryRepository()
+        self.booking_repo = InMemoryRepository()
 
+        """Services Initialization"""
         self.user_service = UserServices()
         self.place_service = PlaceService()
         self.review_service = ReviewService()
         self.amenity_service = AmenityService()
-        self.guest_service = GuestService
+        self.guest_service = GuestService()
+        self.booking_service = BookingService()
 
     """User Methods"""
     def register_user(self, user_data: dict) -> str:
@@ -127,10 +133,55 @@ class HBnBFacade:
         )
     
     """guest methods"""
-    def register_as_guest(self,user_id,user_data: dict, repo, bio):
+    def register_as_guest(self,user_id,user_data: dict, guest_repo, bio):
 
-        return GuestService.register_as_guest(user_id, user_data, repo, bio)
+        return self.register_as_guest(user_id, user_data, guest_repo, bio)
     
     def get_guest_info(self, guest_id):
 
-        return GuestService.get_guest_info(guest_id, self.repo)
+        return self.get_guest_info(guest_id, self.guest_repo)
+    
+    """Booking Methods"""
+    def create_booking(self, booking_data: dict):
+
+        return self.booking_service.create_booking(
+            booking_data,
+            repo=self.place_repo
+        )
+    
+    def cancel_booking(self, booking_id: str):
+        return self.booking_service.cancel_booking(
+            booking_id,
+            repo=self.place_repo
+        )
+    
+    def get_booking_info(self, booking_id: str):
+        return self.booking_service.get_booking_info(
+            booking_id,
+            repo=self.place_repo
+        )
+    
+    def update_booking_dates(self, booking_id: str, booking_data: dict):
+        return self.booking_service.update_booking_dates(
+            booking_id,
+            booking_data,
+            repo=self.place_repo
+        )
+    
+    def update_status(self, booking_id: str, new_status: str):
+        return self.booking_service.update_status(
+            booking_id,
+            new_status,
+            repo=self.place_repo
+        )
+    
+    def is_place_available(self, place_id: str, check_in: str, check_out: str):
+
+        return self.booking_service.is_place_available(
+            place_id,
+            check_in,
+            check_out,
+            repo=self.place_repo
+        )
+
+    
