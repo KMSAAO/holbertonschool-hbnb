@@ -13,7 +13,22 @@ class GuestService():
         if not bio or not isinstance(bio, str) or len(bio) > 100:
             raise ValueError("bio is required and must be a string with max 100 characters")
         
-        Guest = guest(bio = bio)
+        guest = guest(bio = bio)
         repo.add(guest)
         return guest
     
+    def get_guest_info(self, guest_id, repo):
+            
+        if not isinstance(guest_id, str):
+            raise ValueError("guest_id ID must be a string")
+
+        guest = repo.get(guest_id)
+        if not guest:
+            raise ValueError("guest not found")
+
+
+        return {
+            "id": guest.id,
+            "bio": guest.bio,
+            "created_at": guest.created_at.isoformat(),
+            "updated_at": guest.updated_at.isoformat()}
