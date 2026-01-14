@@ -6,6 +6,7 @@ from app.services.review_service import ReviewService
 from app.services.guest_service import GuestService
 from app.services.booking_service import BookingService
 from app.services.payment_service import PaymentService
+from app.services.refund_service import RefundServices
 
 class HBnBFacade:
     def __init__(self):
@@ -18,6 +19,7 @@ class HBnBFacade:
         self.guest_repo = InMemoryRepository()
         self.booking_repo = InMemoryRepository()
         self.payment_repo = InMemoryRepository()
+        self.refund_repo = InMemoryRepository()
     
         """Services Initialization"""
         self.user_service = UserServices()
@@ -27,6 +29,7 @@ class HBnBFacade:
         self.guest_service = GuestService()
         self.booking_service = BookingService()
         self.payment_service = PaymentService()
+        self.refund_service = RefundServices()
 
     """User Methods"""
     def register_user(self, user_data: dict) -> str:
@@ -212,3 +215,30 @@ class HBnBFacade:
         pass
 
     
+    """refund methods"""
+    def create_refund(self, refund_data: dict, amount_refund, method_payment, status):
+
+        return self.refund_service.create_refund(
+            refund_data,
+            amount_refund,
+            method_payment,
+            status,
+            repo=self.refund_repo
+        )
+    
+    def update_refund(self, refund_id: str, status: str):
+        return self.refund_service.update_payment(
+            refund_id,
+            status,
+            repo=self.refund_repo
+        )
+    
+    def get_refund_info(self, refund_id: str) -> dict:
+        
+        pass
+
+    def delete_refund(self, refund_id: str) -> bool:
+        pass
+
+    def get_refund_info_by_payment_id(self, payment_id: str) -> dict:
+        pass

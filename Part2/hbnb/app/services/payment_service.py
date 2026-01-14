@@ -13,8 +13,8 @@ class PaymentService():
             raise ValueError("Booking ID is required and must be a string")
         
         amount = amount.get('amount')
-        if not amount or not isinstance(amount, float):
-            raise ValueError("Amount is required and must be a float")
+        if not amount or not isinstance(amount, (int, float)) or amount <= 0:
+            raise ValueError("Amount must be a non-negative number")
 
         method_payment = payment.get('method_payment')
         if isinstance(method_payment, PaymentService):
