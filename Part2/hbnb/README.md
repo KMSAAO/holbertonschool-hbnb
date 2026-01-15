@@ -119,6 +119,6 @@ Separation of Concerns: This structure ensures that the facade.py remains clean 
 Scalability: By isolating enums and models, the system is prepared for complex state management (e.g., Booking and Payment statuses) and easy extension of business rules.
 
 # 👥 Authors & Collaboration
-- Nawaf Alzahrani
-- Khalid Alomari
-- Shatha Alsuwailm
+* **Khalid Alomari** - [@KMSAAO](https://github.com/KMSAAO)
+* **Nawaf Saleh** - [@NSF9](https://github.com/NSF9)
+* **Shatha ALswailam** - [@shathasultan](https://github.com/shathasultan)
