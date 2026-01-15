@@ -34,7 +34,7 @@ Explanatory Notes:
 - Persistence Layer: Responsible for all database interactions.
 
 ### 2. Detailed Class Diagram 
-![image alt] (https://github.com/KMSAAO/holbertonschool-hbnb/blob/46eefff490eb8dfc34488a133a4b72456562a75e/Part1/Class%20Diagram.drawio.png)
+<img width="1500" height="1920" alt="image" src="https://github.com/user-attachments/assets/46eefff490eb8dfc34488a133a4b72456562a75e/Part1/Class%20Diagram.drawio.png" />
 
 Explanatory Notes:
 - Core Entities: Defines user, place, review, amenity, guest, booking, payment, and refund. 
