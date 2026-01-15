@@ -1,4 +1,4 @@
-from models.base_model import BaseModel
+from app.models.base_model import BaseModel
 from app.enums import place_amenity_status
 
 
@@ -8,5 +8,5 @@ class PlaceAmenity(BaseModel):
         super().__init__()
 
         self.place_id = place_id
-        self.amenity = amenity_id
+        self.amenity_id = amenity_id
         self.status = status

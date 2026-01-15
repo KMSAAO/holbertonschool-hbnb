@@ -7,6 +7,7 @@ from app.services.guest_service import GuestService
 from app.services.booking_service import BookingService
 from app.services.payment_service import PaymentService
 from app.services.refund_service import RefundServices
+from app.services.place_amenity import PlaceAmenityService
 
 class HBnBFacade:
     def __init__(self):
@@ -20,6 +21,7 @@ class HBnBFacade:
         self.booking_repo = InMemoryRepository()
         self.payment_repo = InMemoryRepository()
         self.refund_repo = InMemoryRepository()
+        self.place_amenity_repo = InMemoryRepository()
     
         """Services Initialization"""
         self.user_service = UserServices()
@@ -30,6 +32,7 @@ class HBnBFacade:
         self.booking_service = BookingService()
         self.payment_service = PaymentService()
         self.refund_service = RefundServices()
+        self.place_amenity_service = PlaceAmenityService()
 
     """User Methods"""
     def register_user(self, user_data: dict) -> str:
@@ -183,6 +186,14 @@ class HBnBFacade:
             repo=self.place_repo
         )
     
+    def update_booking_payment(self, booking_id: str, payment_id: str, new_status: str):
+        return self.booking_service.update_booking_payment(
+            booking_id,
+            payment_id,
+            new_status,
+            repo=self.booking_repo
+        )
+    
     def is_place_available(self, place_id: str, check_in: str, check_out: str):
 
         return self.booking_service.is_place_available(
@@ -218,14 +229,12 @@ class HBnBFacade:
 
     
     """refund methods"""
-    def create_refund(self, refund_data: dict, amount_refund, method_payment, status):
+    def create_refund(self, refund_data: dict):
 
         return self.refund_service.create_refund(
             refund_data,
-            amount_refund,
-            method_payment,
-            status,
-            repo=self.refund_repo
+            repo=self.refund_repo,
+            payment_repo=self.payment_repo
         )
     
     def update_refund(self, refund_id: str, status: str):
@@ -244,3 +253,32 @@ class HBnBFacade:
 
     def get_refund_info_by_payment_id(self, payment_id: str) -> dict:
         pass
+
+    """ PlaceAmenity Methods """
+    def add_amenity_to_place(self, place_id: str, amenity_id: str):
+
+        return self.place_amenity_service.add_amenity_to_place(
+            place_id,
+            amenity_id,
+            repo=self.place_amenity_repo
+        )
+    
+    def remove_amenity_from_place(self, place_amenity_id: str):
+
+        return self.place_amenity_service.remove_amenity_from_place(
+            place_amenity_id,
+            repo=self.place_amenity_repo
+        )
+    def get_place_amenity_info(self, place_amenity_id: str) -> dict:
+
+        return self.place_amenity_service.get_place_amenity_info(
+            place_amenity_id,
+            repo=self.place_amenity_repo
+        )
+    def update_place_amenity_status(self, place_amenity_id: str, status: str) -> bool:
+
+        return self.place_amenity_service.update_place_amenity_status(
+            place_amenity_id,
+            status,
+            repo=self.place_amenity_repo
+        )

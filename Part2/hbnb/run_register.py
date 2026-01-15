@@ -5,6 +5,8 @@ from app.services.guest_service import GuestService
 from app.services.booking_service import BookingService
 from app.services.payment_service import PaymentService
 from app.services.refund_service import RefundServices
+from app.services.payment_service import PaymentService
+from app.services.amenity_service import AmenityService
 
 
 from app.enums.place_status import PlaceStatus
@@ -15,10 +17,13 @@ if __name__ == "__main__":
     facade = HBnBFacade()
     place_service = PlaceService()
     review_services = ReviewService()
+    
     guest_service = GuestService()
     booking_service = BookingService()
     payment_service = PaymentService()
     refund_service = RefundServices()
+    payment_service = PaymentService()
+    amenity_service = AmenityService()
 
     user = facade.register_user({
         "first_name": "Nawaf",
@@ -65,7 +70,7 @@ if __name__ == "__main__":
         "status": "pending"
     })
 
-    print("Booking created with ID:", booking.id, "for Guest Name:", booking.place.user.first_name + " " + booking.place.user.last_name, "at Place :", booking.place.title)
+    print("Booking created with ID:", booking.id, "for Guest Name:", booking.place.user.first_name + " " + booking.place.user.last_name, "at Place :", booking.place.title, "with Payment ID:", booking.payment_id,"status:", booking.status.name)
     print("-------------------------------------------------------------------")
 
     payment = facade.create_payment({
@@ -76,5 +81,42 @@ if __name__ == "__main__":
         "status": "pending"
     })
 
-    print("Payment created with ID:", payment.id, "for Booking :", payment.booking.place.title, "for Guest Name:", payment.booking.guest.user.first_name + " " + payment.booking.guest.user.last_name, "Amount:", payment.amount)
+    print("Payment created with ID:", payment.id, "for Booking :", payment.booking.place.title, "for Guest Name:", payment.booking.guest.user.first_name + " " + payment.booking.place.user.last_name, "Amount:", payment.amount)
     print("-------------------------------------------------------------------")
+
+    booking = facade.update_booking_payment(booking.id, payment.id, "confirmed")
+
+    print("Booking created with ID:", booking.id, "for Guest Name:", booking.place.user.first_name + " " + booking.place.user.last_name, "at Place :", booking.place.title, "with Payment ID:", booking.payment_id,"status:", booking.status.name, )
+    print("-------------------------------------------------------------------")
+
+
+    refund_service = facade.create_refund({
+        "payment_id": payment.id,
+        "payment": payment,
+        "amount_refund": payment.amount,
+        "method_payment": "Credit Card",
+        "status": "requested",
+    })
+
+    print("Refund created with ID:", refund_service.id,"Owner account: ", payment.booking.guest.user.first_name + " " + payment.booking.guest.user.last_name, "for Payment ID:", refund_service.payment_id, "Amount Refund:", refund_service.amount_refund, "Status:", refund_service.status.name)
+
+    print("-------------------------------------------------------------------")
+    
+    amenity = facade.create_amenity({
+    "amenity_name": "WiFi",
+    "description": "High-speed wireless internet access.",
+    "status": PlaceAmenityStatus.ACTIVE
+})
+
+
+    print("Amenity created with ID:", amenity.id, "Name:", amenity.amenity_name, "Description:", amenity.description)
+
+    print("-------------------------------------------------------------------")
+
+    place_amenity = facade.place_amenity_service.add_amenity_to_place(
+        place_id=place.id,
+        amenity_id= amenity.id,
+        repo=facade.place_amenity_repo
+    )  
+
+    print("PlaceAmenity created with ID:", place_amenity.id, "for Place ID:", place_amenity.place_id, "with Amenity ID:", place_amenity.amenity_id, "Status:", place_amenity.status.name)

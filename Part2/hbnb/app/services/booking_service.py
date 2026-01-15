@@ -38,6 +38,8 @@ class BookingService():
                 raise ValueError("Invalid booking status")
 
         booking = Booking(
+            guest.id,
+            place.id,
             guest,
             place,
             payment_id,
@@ -59,15 +61,14 @@ class BookingService():
         booking.status = BookingStatus.CANCELLED
         return repo.update(booking)  
     
-    def update_booking_payment(self, booking_id: str, new_status: BookingStatus, repo):
+    def update_booking_payment(self, booking_id: str, payment_id: str, new_status: BookingStatus, repo):
 
 
         booking = repo.get(booking_id)
         if not booking:
             raise ValueError("booking not found")
+        booking.payment_id = payment_id
 
-        
-        
         if not isinstance(new_status, BookingStatus):
             try:
                 new_status = BookingStatus(new_status)
@@ -75,7 +76,8 @@ class BookingService():
                 raise ValueError("Invalid booking status")
         
         booking.status = new_status
-        return repo.update(booking)
+        repo.update(booking_id, {"payment_id": payment_id, "status": new_status})
+        return booking
     
     def update_booking_dates(self, booking_id: str, new_check_in: datetime, new_check_out: datetime, repo):
 
