@@ -32,6 +32,7 @@ Explanatory Notes:
 - Presentation Layer: The entry point for the system via API calls.
 - Business Logic Layer: Contains core models and validation rules.
 - Persistence Layer: Responsible for all database interactions.
+![System Diagram](assets/images/erd.png)
 
 ### 2. Detailed Class Diagram 
 <img width="2600" height="3200" alt="image" src="https://github.com/user-attachments/assets/da4075a3-dc5e-4648-991c-ec6f1c97f4d7" />
