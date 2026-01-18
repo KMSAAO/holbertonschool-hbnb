@@ -153,3 +153,7 @@ class UserServices():
                 raise ValueError("Cannot delete user with existing places")
 
         return user_repo.delete(user_id)
+    
+    def get_all_users(self, repo):
+        users = repo.get_all()
+        return users

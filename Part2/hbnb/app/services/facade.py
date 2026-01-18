@@ -54,6 +54,9 @@ class HBnBFacade:
 
         return self.user_service.delete_user(user_id, self.user_repo, self.place_repo)
     
+    def get_all_users(self):
+        return self.user_service.get_all_users(self.user_repo)
+    
     """Place Methods"""
     def create_place(self, place_data: dict):
 

@@ -1,6 +1,6 @@
 # app/api/v1/users.py
 from flask_restx import Namespace, Resource, fields
-from app.services import facade  
+from app.services.facade import facade
 
 api = Namespace('users', description='User operations')
 
@@ -122,6 +122,14 @@ class UserDetail(Resource):
 
         user = facade.get_user(user_id)
         return user, 200
+    
+    @api.route('/')
+    class UserList(Resource):
+        @api.marshal_list_with(user_response_model, code=200)
+        def get(self):
+            """Get list of all users"""
+            users = facade.get_all_users()
+            return users, 200
 
     @api.response(204, 'User deleted')
     @api.response(400, 'Delete error')
