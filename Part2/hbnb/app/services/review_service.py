@@ -4,13 +4,13 @@ from app.models.place import Place
 
 class ReviewService():
 
-    def create_Review(self, review_data: dict, place_repo, review_repo):
+    def create_Review(self, review_data, place_repo, review_repo):
         place_id = review_data.get("place_id")
         rating   = review_data.get("rating")
         comment  = review_data.get("comment")
 
         if not isinstance(place_id, str):
-            raise ValueError("place_id must be a string")
+            raise ValueError("Place ID must be a string")
 
         place = place_repo.get(place_id)
         if place is None:
@@ -25,12 +25,7 @@ class ReviewService():
         review = Review(place=place, rating=rating, comment=comment)
         review_repo.add(review)
 
-        return {
-            "id": review.id,
-            "place_id": review.place_id,
-            "rating": review.rating,
-            "comment": review.comment,
-        }
+        return review_data
 
     def get_review_info(self, review_id: str, review_repo):
         if not isinstance(review_id, str):

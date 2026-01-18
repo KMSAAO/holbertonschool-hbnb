@@ -1,6 +1,6 @@
 from app.models.base_model import BaseModel
 from app.models.place import Place
-from app.models.user import User
+from app.models.guest import Guest
 
 class Review(BaseModel):
 
@@ -9,6 +9,7 @@ class Review(BaseModel):
         super().__init__()
 
         self.place_id = place.id
+        self.user_id = place.user.id
         self.place = place
         self.rating = rating
         self.comment = comment

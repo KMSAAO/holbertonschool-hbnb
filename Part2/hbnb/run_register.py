@@ -120,3 +120,15 @@ if __name__ == "__main__":
     )  
 
     print("PlaceAmenity created with ID:", place_amenity.id, "for Place ID:", place_amenity.place_id, "with Amenity ID:", place_amenity.amenity_id, "Status:", place_amenity.status.name)
+
+    print("-------------------------------------------------------------------")
+
+    review = facade.create_review({
+        "place": place.id,
+        "guest": guest.id,
+        "rating": 5,
+        "comment": "Amazing place! Had a wonderful time."
+    })
+
+    print("Review created with ID:", review.id, "for Place ID:", review.place.id, "by Guest Name:", review.guest.user.first_name + " " + review.guest.user.last_name, "Rating:", review.rating, "Comment:", review.comment)
+    print("-------------------------------------------------------------------")

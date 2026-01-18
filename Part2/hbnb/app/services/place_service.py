@@ -15,6 +15,10 @@ class PlaceService():
         title = place_data.get('title')
         if not title or not isinstance(title, str) or len(title) > 100:
             raise ValueError("Title is required and must be a string with max 100 characters")
+        
+        description = place_data.get('description')
+        if description and (not isinstance(description, str) or len(description) > 500):
+            raise ValueError("Description must be a string with max 500 characters")
 
         price = place_data.get('price')
         if price is None or not isinstance(price, (int, float)) or price < 0:
@@ -37,9 +41,6 @@ class PlaceService():
         if longitude is None or not isinstance(longitude, (int, float)) or not -180.0 <= longitude <= 180.0:
             raise ValueError("Longitude must be between -180 and 180")
 
-        description = place_data.get('description')
-        if description and (not isinstance(description, str) or len(description) > 500):
-            raise ValueError("Description must be a string with max 500 characters")
 
         place = Place(
             user=owner,
