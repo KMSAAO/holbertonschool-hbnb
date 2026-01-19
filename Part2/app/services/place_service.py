@@ -5,41 +5,13 @@ class PlaceService():
 
     def create_place(self, place_data: dict, repo, user_repo):
         owner_id = place_data.get('owner_id')
-        if not owner_id or not isinstance(owner_id, str):
-            raise ValueError("owner_id is required and must be a string")
-
         owner = user_repo.get(owner_id)
-        if not owner:
-            raise ValueError("Owner not found")
-
         title = place_data.get('title')
-        if not title or not isinstance(title, str) or len(title) > 100:
-            raise ValueError("Title is required and must be a string with max 100 characters")
-        
         description = place_data.get('description')
-        if description and (not isinstance(description, str) or len(description) > 500):
-            raise ValueError("Description must be a string with max 500 characters")
-
         price = place_data.get('price')
-        if price is None or not isinstance(price, (int, float)) or price < 0:
-            raise ValueError("Price must be a non-negative number")
-
-        raw_status = place_data.get('status')
-        if isinstance(raw_status, PlaceStatus):
-            status = raw_status
-        else:
-            try:
-                status = PlaceStatus(raw_status)
-            except Exception:
-                raise ValueError("Invalid place status")
-
+        status = place_data.get('status')
         latitude = place_data.get('latitude')
-        if latitude is None or not isinstance(latitude, (int, float)) or not -90.0 <= latitude <= 90.0:
-            raise ValueError("Latitude must be between -90 and 90")
-
         longitude = place_data.get('longitude')
-        if longitude is None or not isinstance(longitude, (int, float)) or not -180.0 <= longitude <= 180.0:
-            raise ValueError("Longitude must be between -180 and 180")
 
 
         place = Place(
