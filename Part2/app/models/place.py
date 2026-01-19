@@ -48,7 +48,7 @@ class Place(BaseModel):
         return self._description
     
     @description.setter
-    def descrition(self, value):
+    def description(self, value):
         if value and (not isinstance(value, str) or len(value) > 500):
             raise ValueError("Description must be a string with max 500 characters")
         else:
