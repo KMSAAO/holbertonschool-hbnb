@@ -3,6 +3,7 @@ from app.services import facade
 
 api = Namespace('places', description='Place operations')
 
+
 place_create_model = api.model('PlaceCreate', {
     'owner_id':    fields.String(required=True, description='ID of the owner (User)'),
     'title':       fields.String(required=True, description='Title of the place'),
@@ -26,6 +27,15 @@ place_response_model = api.model('PlaceResponse', {
     'updated_at':  fields.String,
 })
 
+
+place_summary_model = api.model('PlaceSummary', {
+    'id':        fields.String,
+    'title':     fields.String,
+    'latitude':  fields.Float,
+    'longitude': fields.Float,
+})
+
+
 place_update_model = api.model('PlaceUpdate', {
     'title':       fields.String(required=False),
     'description': fields.String(required=False),
@@ -35,6 +45,7 @@ place_update_model = api.model('PlaceUpdate', {
     'longitude':   fields.Float(required=False),
     'owner_id':    fields.String(required=False)
 })
+
 
 @api.route('/')
 class PlaceList(Resource):
@@ -52,6 +63,30 @@ class PlaceList(Resource):
             api.abort(400, str(e))
 
         return place, 201
+
+    @api.marshal_list_with(place_summary_model, code=200)
+    def get(self):
+        """Retrieve list of places (summary: id, title, lat, long)"""
+        try:
+            places = facade.get_all_places()
+
+            if places and hasattr(places[0], 'to_dict'):
+                return [
+                    {
+                        "id": p.id,
+                        "owner_id": p.user.id,
+                        "title": p.title,
+                        "description": p.description,
+                        "price": p.price,
+                        "status": p.status,
+                        "latitude": p.latitude,
+                        "longitude": p.longitude
+                    } for p in places
+                ], 200
+
+            return places, 200
+        except Exception as e:
+            api.abort(500, str(e))
 
 
 @api.route('/<string:place_id>')
@@ -77,7 +112,7 @@ class PlaceDetail(Resource):
 
         try:
             updated = facade.update_place(
-                place_id=place_id,
+                owner_id=place_id,
                 place_data=data
             )
         except ValueError as e:

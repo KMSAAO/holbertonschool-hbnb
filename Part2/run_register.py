@@ -53,6 +53,17 @@ if __name__ == "__main__":
 
     print("-------------------------------------------------------------------")
 
+    place = facade.update_place({
+        "title": "Cozy Cottage",
+        "description": "A cozy cottage in the countryside.",
+        "price": 120.00,
+        "latitude": 34.0522,
+        "longitude": -118.2437,
+        "owner_id": user.id,
+        "status": PlaceStatus.BOOKED,
+        "amenity_status": PlaceAmenityStatus.ACTIVE
+    }, place_data= place)
+
     guest = facade.register_as_guest(user, "I love traveling and exploring new places.")
 
     print("Guest Info:", guest.id,guest.user.first_name + " " + guest.user.last_name, guest.bio)
