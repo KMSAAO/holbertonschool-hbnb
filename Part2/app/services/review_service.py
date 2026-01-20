@@ -9,18 +9,17 @@ class ReviewService():
         rating   = review_data.get("rating")
         comment  = review_data.get("comment")
 
-        if not isinstance(place_id, str):
-            raise ValueError("Place ID must be a string")
-
         place = place_repo.get(place_id)
         if place is None:
             raise ValueError("Place not found")
 
-
-        review = Review(place=place, rating=rating, comment=comment)
+        user_id = place.user.id
+        review = Review(place_id=place_id, user_id=user_id, rating=rating, comment=comment)
         review_repo.add(review)
 
-        return review_data
+        return review
+
+
 
     def get_review_info(self, review_id: str, review_repo):
         if not isinstance(review_id, str):
@@ -67,6 +66,9 @@ class ReviewService():
 
 
     def delete_Review(self, review_id, repo):
+        if not review_id or not isinstance(review_id, str):
+            raise TypeError("review_id must be required")
+
         Deleted = repo.delete(review_id)
         return Deleted
 

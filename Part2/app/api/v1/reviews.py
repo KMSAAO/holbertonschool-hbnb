@@ -10,6 +10,11 @@ review_create_model = api.model('ReviewCreate', {
         required=True,
         description='ID of the place being reviewed'
     ),
+    'user_id': fields.String(
+        required=True,
+         description='ID of the user being reviewed'
+
+    ),
     'rating': fields.Integer(
         required=True,
         description='Rating value'
@@ -32,20 +37,13 @@ review_update_model = api.model('ReviewUpdate', {
 })
 
 review_response_model = api.model('ReviewResponse', {
-    'id': fields.String(
-        readonly=True,
-        description='Review ID'
-    ),
-    'place_id': fields.String(
-        description='ID of the place being reviewed'
-    ),
-    'rating': fields.Integer(
-        description='Rating value'
-    ),
-    'comment': fields.String(
-        description='Review comment'
-    ),
+   'id': fields.String,
+   'place_id' : fields.String,
+   'user_id'  : fields.String,
+   'rating'   : fields.Integer,
+   'comment'  : fields.String
 })
+
 
 
 @api.route('/')
