@@ -19,25 +19,11 @@ class ReviewService():
 
         return review
 
-
-
-    def get_review_info(self, review_id: str, review_repo):
-        if not isinstance(review_id, str):
-            raise ValueError("Review ID must be a string")
-
+    def get_review_info(self, review_id, review_repo):
         review = review_repo.get(review_id)
         if not review:
             raise ValueError("Review not found")
-
-        return {
-            "id": review.id,
-            "place_id": review.place_id,
-            "rating": review.rating,
-            "comment": review.comment,
-            "created_at": review.created_at,
-            "updated_at": review.updated_at,
-        }
-
+        return review.to_dict()
 
     def update_review(self, review_id: str, review_data: dict, review_repo):
 
@@ -64,12 +50,11 @@ class ReviewService():
 
         return review
 
-
-    def delete_Review(self, review_id, repo):
+    def delete_Review(self, review_id, review_repo):
         if not review_id or not isinstance(review_id, str):
             raise TypeError("review_id must be required")
 
-        Deleted = repo.delete(review_id)
+        Deleted = review_repo.delete(review_id)
         return Deleted
 
     def get_all_reviews(self, repo):

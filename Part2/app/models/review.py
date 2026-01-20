@@ -54,3 +54,13 @@ class Review(BaseModel):
         if len(value) >= 250:
             raise ValueError("comment must be 250 characters or less")
         self._comment = value
+    
+    def to_dict(self):
+        return {
+        "id": self.id,
+        "place_id": self.place_id,
+        "rating": self.rating,
+        "comment": self.comment,
+        "created_at": self.created_at.isoformat(),
+        "updated_at": self.updated_at.isoformat(),
+        }

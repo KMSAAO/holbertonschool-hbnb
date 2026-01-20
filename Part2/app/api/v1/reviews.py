@@ -68,7 +68,7 @@ class ReviewResource(Resource):
     @api.marshal_with(review_response_model)
     @api.response(404, 'Review not found')
     def get(self, review_id):
-        """Get a single review by ID"""
+        """Get review by ID"""
         try:
             review = facade.get_review_info(review_id)
             return review, 200
@@ -77,7 +77,9 @@ class ReviewResource(Resource):
 
     @api.expect(review_update_model, validate=False)
     @api.marshal_with(review_response_model, code=200)
+
     def put(self, review_id):
+        """ Update review """
         try:
             review_data = api.payload or {}
             review = facade.update_review(review_id, review_data)
@@ -92,5 +94,12 @@ class ReviewResource(Resource):
         try:
             facade.delete_review(review_id)
             return '', 204
+        except ValueError as e:
+            api.abort(400, str(e))
+
+    @api.marshal_list_with(review_response_model, code=200)
+    def get(self):
+        try:
+            return facade.get_all_reviews(), 200
         except ValueError as e:
             api.abort(400, str(e))

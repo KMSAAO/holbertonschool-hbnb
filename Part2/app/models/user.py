@@ -83,3 +83,15 @@ class User(BaseModel):
         if not isinstance(value, bool):
             raise ValueError("is_active must be boolean")
         self._is_active = value
+
+    def to_dict(self):
+        return {
+        "id": self.id,
+        "first_name": self.first_name,
+        "last_name": self.last_name,
+        "email": self.email,
+        "is_admin": self.is_admin,
+        "is_active": self.is_active,
+        "created_at": self.created_at.isoformat(),
+        "updated_at": self.updated_at.isoformat()
+        }

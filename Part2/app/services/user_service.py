@@ -51,71 +51,38 @@ class UserServices():
         return True
 
     def get_user_info(self, user_id, repo):
-            
-        if not isinstance(user_id, str):
-            raise ValueError("User ID must be a string")
-
         user = repo.get(user_id)
         if not user:
             raise ValueError("User not found")
+        return user.to_dict()
 
-
-        return {
-            "id": user.id,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "email": user.email,
-            "is_admin": user.is_admin,
-            "is_active": user.is_active,
-            "created_at": user.created_at.isoformat(),
-            "updated_at": user.updated_at.isoformat()}
 
     def update_user(self, user_id: str, user_data: dict, repo):
-
-        if not isinstance(user_id, str):
-            raise ValueError("User ID must be a string")
 
         user = repo.get(user_id)
         if not user:
             raise ValueError("User not found")
 
         if "first_name" in user_data:
-            if not isinstance(user_data["first_name"], str) or len(user_data["first_name"]) > 50:
-                raise ValueError("Invalid first name")
             user.first_name = user_data["first_name"]
 
         if "last_name" in user_data:
-            if not isinstance(user_data["last_name"], str) or len(user_data["last_name"]) > 50:
-                raise ValueError("Invalid last name")
             user.last_name = user_data["last_name"]
 
         if "email" in user_data:
-            email = user_data["email"]
-        if not isinstance(email, str):
-            raise ValueError("Invalid email")
-
-        pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        if not re.match(pattern, email):
-            raise ValueError("Invalid email format")
-
-        user.email = email
+            user.email = user_data["email"]
 
         if "password" in user_data:
-            if not isinstance(user_data["password"], str) or len(user_data["password"]) < 6:
-                raise ValueError("Password must be at least 6 characters")
-            user.password = (user_data["password"])
+            user.password = user_data["password"]
 
         if "is_admin" in user_data:
-            if not isinstance(user_data["is_admin"], bool):
-                raise ValueError("is_admin must be boolean")
             user.is_admin = user_data["is_admin"]
 
         if "is_active" in user_data:
-            if not isinstance(user_data["is_active"], bool):
-                raise ValueError("is_active must be boolean")
             user.is_active = user_data["is_active"]
 
         return True
+
     
     @staticmethod
     def delete_user(user_id: str, user_repo, place_repo):
@@ -127,11 +94,10 @@ class UserServices():
         if not user:
             raise ValueError("User not found")
         
-        places = place_repo.get_all()
-        for place in places:
-            if hasattr(place, "user") and place.user.id == user_id:
-                raise ValueError("Cannot delete user with existing places")
-
+        for place in place_repo.get_all():
+            if place.user.id == user_id:
+                raise ValueError("User owns places and cannot be deleted")
+            
         return user_repo.delete(user_id)
     
     def get_all_users(self, repo):
