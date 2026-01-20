@@ -73,10 +73,10 @@ class HBnBFacade:
             place_repo=self.place_repo
         )
 
-    def update_place(self, owner_id: str, place_data: dict) -> bool:
+    def update_place(self, place_id: str, place_data: dict) -> bool:
 
         return self.place_service.update_place(
-            owner_id=owner_id,
+            place_id=place_id,
             place_data=place_data,
             place_repo=self.place_repo,
             user_repo=self.user_repo

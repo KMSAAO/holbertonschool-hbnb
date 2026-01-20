@@ -1,5 +1,6 @@
 from app.models.place import Place
 from app.enums.place_status import PlaceStatus
+from datetime import datetime
 
 class PlaceService():
 
@@ -45,23 +46,30 @@ class PlaceService():
             "status": place.status.value,
             "latitude": place.latitude,
             "longitude": place.longitude,
-            "owner_id": place.user.id
+            "owner_id": place.user.id,
+            "created_at": place.created_at,
+            "updated_at": place.updated_at
         }
     
-    def update_place(self, owner_id: str, place_data: dict, place_repo, user_repo) -> bool:
+    def update_place(self, place_id: str, place_data: dict, place_repo, user_repo) -> bool:
 
-        place = place_repo.get(owner_id)
+        place = place_repo.get(place_id)
         if not place:
             raise ValueError("Place not found")
 
-        owner_id = place_data.get("owner_id")
 
-        if not isinstance(owner_id, str):
-            raise ValueError("owner_id must be a string")
-        owner = user_repo.get(owner_id)
-        if not owner:
-            raise ValueError("Owner not found")
-        place.user = owner
+        if 'owner_id' in place_data:
+            owner_id = place_data['owner_id']
+
+            if not isinstance(owner_id, str):
+                 raise ValueError("owner_id must be a string")
+            
+            owner = user_repo.get(owner_id)
+            if not owner:
+                raise ValueError(f"Owner with ID {owner_id} not found")
+            
+
+            place.user = owner
         place_data['user_id'] = owner_id
 
         if "title" in place_data:
@@ -111,7 +119,7 @@ class PlaceService():
             place.status = status
             place_data['status'] = status
 
-        place.update(place_data)
+        place.last_updated()
         return True
     
     def get_all_places(self, place_repo):

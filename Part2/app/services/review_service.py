@@ -16,11 +16,6 @@ class ReviewService():
         if place is None:
             raise ValueError("Place not found")
 
-        if not isinstance(rating, int):
-            raise ValueError("rating must be a integer")
-        
-        if rating <= 0 or rating >= 6:
-            raise ValueError("rating must be between 1 to 5")
 
         review = Review(place=place, rating=rating, comment=comment)
         review_repo.add(review)

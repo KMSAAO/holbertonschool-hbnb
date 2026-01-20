@@ -112,7 +112,7 @@ class PlaceDetail(Resource):
 
         try:
             updated = facade.update_place(
-                owner_id=place_id,
+                place_id=place_id,
                 place_data=data
             )
         except ValueError as e:

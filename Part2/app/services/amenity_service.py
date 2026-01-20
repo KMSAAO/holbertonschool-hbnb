@@ -7,20 +7,8 @@ class AmenityService:
 
     def create_amenity(self, amenity_data: dict, amenity_repo):
         amenity_name = amenity_data.get("amenity_name")
-        if not amenity_name or len(amenity_name) > 50:
-            raise ValueError("amenity_name is required and must be <= 50 chars")
-
         description = amenity_data.get("description")
-        if not description or not isinstance(description, str) or len(description) > 100:
-            raise ValueError("description must be <= 100 chars")
-        raw_status = amenity_data.get("status")
-        if isinstance(raw_status, PlaceAmenityStatus):
-            status = raw_status
-        else:
-            try:
-                status = PlaceAmenityStatus(raw_status)
-            except Exception:
-                raise ValueError("invalid amenity status")
+        status = amenity_data.get("status")
 
         amenity = Amenity(
             amenity_name=amenity_name,
