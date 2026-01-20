@@ -13,6 +13,9 @@ class UserServices():
         is_admin   = user_data.get("is_admin", False)
         is_active  = user_data.get("is_active", True)
 
+        if repo.get_by_attribute('email',email):
+            raise ValueError("email is already register")
+
         
         user = User(
             first_name=first_name,

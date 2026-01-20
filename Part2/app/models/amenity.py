@@ -19,7 +19,7 @@ class Amenity(BaseModel):
 
     @amenity_name.setter
     def amenity_name(self, value):
-        if isinstance(value, str):
+        if not isinstance(value, str):
             raise ValueError("amenity_name must be string")
         if not value or len(value) > 50:
             raise ValueError("amenity_name is required and must be <= 50 chars")
@@ -38,6 +38,7 @@ class Amenity(BaseModel):
             raise ValueError("description must be string")
          if not value or len(value) > 100:
             raise ValueError("description must be <= 100 chars")
+         self._description = value
          
     
     @property
