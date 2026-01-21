@@ -3,11 +3,11 @@ from app.services.user_service import UserServices
 from app.services.place_service import PlaceService
 from app.services.amenity_service import AmenityService
 from app.services.review_service import ReviewService
-from app.services.guest_service import GuestService
-from app.services.booking_service import BookingService
-from app.services.payment_service import PaymentService
-from app.services.refund_service import RefundServices
-from app.services.place_amenity import PlaceAmenityService
+# from app.services.guest_service import GuestService
+# from app.services.booking_service import BookingService
+# from app.services.payment_service import PaymentService
+# from app.services.refund_service import RefundServices
+# from app.services.place_amenity import PlaceAmenityService
 
 class HBnBFacade:
     def __init__(self):
@@ -33,11 +33,11 @@ class HBnBFacade:
         self.place_service = PlaceService()
         self.review_service = ReviewService()
         self.amenity_service = AmenityService()
-        self.guest_service = GuestService()
-        self.booking_service = BookingService()
-        self.payment_service = PaymentService()
-        self.refund_service = RefundServices()
-        self.place_amenity_service = PlaceAmenityService()
+        # self.guest_service = GuestService()
+        # self.booking_service = BookingService()
+        # self.payment_service = PaymentService()
+        # self.refund_service = RefundServices()
+        # self.place_amenity_service = PlaceAmenityService()
     
     """User Methods"""
     def register_user(self, user_data: dict) -> str:
