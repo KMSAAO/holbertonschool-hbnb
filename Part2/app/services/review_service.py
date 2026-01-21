@@ -27,9 +27,6 @@ class ReviewService():
 
     def update_review(self, review_id: str, review_data: dict, review_repo):
 
-        if not isinstance(review_id, str):
-            raise ValueError("review_id must be a string")
-
         review = review_repo.get(review_id)
         if not review:
             raise ValueError("Review not found")
@@ -39,14 +36,6 @@ class ReviewService():
 
         if "comment" in review_data:
             review.comment = review_data["comment"]
-
-        review_repo.update(
-            review_id,
-            {
-                "rating": review.rating,
-                "comment": review.comment
-            }
-        )
 
         return review
 

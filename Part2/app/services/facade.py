@@ -12,6 +12,10 @@ from app.services.place_amenity import PlaceAmenityService
 class HBnBFacade:
     def __init__(self):
 
+        self.repos_init()
+        self.service_init()
+
+    def repos_init(self):
         """Repositories Initialization"""
         self.user_repo = InMemoryRepository()
         self.place_repo = InMemoryRepository()
@@ -22,7 +26,8 @@ class HBnBFacade:
         self.payment_repo = InMemoryRepository()
         self.refund_repo = InMemoryRepository()
         self.place_amenity_repo = InMemoryRepository()
-    
+
+    def service_init(self):
         """Services Initialization"""
         self.user_service = UserServices()
         self.place_service = PlaceService()
@@ -33,7 +38,7 @@ class HBnBFacade:
         self.payment_service = PaymentService()
         self.refund_service = RefundServices()
         self.place_amenity_service = PlaceAmenityService()
-
+    
     """User Methods"""
     def register_user(self, user_data: dict) -> str:
 
@@ -73,13 +78,12 @@ class HBnBFacade:
             place_repo=self.place_repo
         )
 
-    def update_place(self, place_id: str, place_data: dict, user_repo: dict) -> bool:
+    def update_place(self, place_id: str, place_data: dict) -> bool:
 
         return self.place_service.update_place(
             place_id=place_id,
             place_data=place_data,
-            place_repo=self.place_repo,
-            user_repo=self.user_repo
+            place_repo=self.place_repo
         )
 
     def get_all_places(self):
