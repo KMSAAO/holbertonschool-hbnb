@@ -116,7 +116,13 @@ class HBnBFacade:
             review_id,
             review_data,
             self.review_repo
-        )   
+        )
+    
+    def get_all_reviews(self):
+        reviews = self.review_repo.get_all()
+        if not reviews:
+            return []
+        return reviews
 
     def delete_review(self, review_id: str) -> bool:
         return self.review_service.delete_Review(

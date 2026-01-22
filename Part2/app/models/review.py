@@ -59,6 +59,7 @@ class Review(BaseModel):
         return {
         "id": self.id,
         "place_id": self.place_id,
+        "user_id" : self.user_id,
         "rating": self.rating,
         "comment": self.comment,
         "created_at": self.created_at.isoformat(),

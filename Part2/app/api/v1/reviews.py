@@ -1,105 +1,108 @@
-# app/api/v1/reviews.py
 from flask_restx import Namespace, Resource, fields
-
-from app.services import facade
+import app.services.facade as facade
 
 api = Namespace('reviews', description='Review operations')
 
 review_create_model = api.model('ReviewCreate', {
-    'place_id': fields.String(
-        required=True,
-        description='ID of the place being reviewed'
-    ),
-    'user_id': fields.String(
-        required=True,
-         description='ID of the user being reviewed'
-
-    ),
-    'rating': fields.Integer(
-        required=True,
-        description='Rating value'
-    ),
-    'comment': fields.String(
-        required=True,
-        description='Review comment'
-    ),
+    'place_id': fields.String(required=True),
+    'user_id': fields.String(required=True),
+    'rating': fields.Integer(required=True),
+    'comment': fields.String(required=True),
 })
 
 review_update_model = api.model('ReviewUpdate', {
-    'rating': fields.Integer(
-        required=False,
-        description='Updated rating value'
-    ),
-    'comment': fields.String(
-        required=False,
-        description='Updated review comment'
-    ),
+    'rating': fields.Integer(required=False),
+    'comment': fields.String(required=False),
 })
 
 review_response_model = api.model('ReviewResponse', {
-   'id': fields.String,
-   'place_id' : fields.String,
-   'user_id'  : fields.String,
-   'rating'   : fields.Integer,
-   'comment'  : fields.String
+    'id': fields.String,
+    'place_id': fields.String,
+    'user_id': fields.String,
+    'rating': fields.Integer,
+    'comment': fields.String,
+    'created_at': fields.String,
+    'updated_at': fields.String,
 })
-
 
 
 @api.route('/')
 class ReviewList(Resource):
+
     @api.expect(review_create_model, validate=True)
     @api.marshal_with(review_response_model, code=201)
-    @api.response(201, 'Review successfully created')
-    @api.response(400, 'Validation / business error')
+    @api.response(400, 'Validation error')
     def post(self):
-        """Create a new review"""
-        review_data = api.payload
-
+        """Create new review"""
+        data = api.payload
         try:
-            review = facade.create_review(review_data)
-            return review, 201
+            review = facade.create_review(data)
         except ValueError as e:
             api.abort(400, str(e))
 
+        return review, 201
+
+
+    @api.marshal_list_with(review_response_model, code=200)
+    def get(self):
+        """Get all reviews"""
+        try:
+            reviews = facade.get_all_reviews()
+        except ValueError as e:
+            api.abort(400, str(e))
+
+        return reviews, 200
+
 
 @api.route('/<string:review_id>')
-class ReviewResource(Resource):
-    @api.marshal_with(review_response_model)
-    @api.response(404, 'Review not found')
+@api.response(404, 'Review not found')
+class ReviewDetail(Resource):
+
+    @api.marshal_with(review_response_model, code=200)
     def get(self, review_id):
         """Get review by ID"""
         try:
             review = facade.get_review_info(review_id)
-            return review, 200
         except ValueError as e:
             api.abort(404, str(e))
+
+        return review, 200
+
 
     @api.expect(review_update_model, validate=False)
     @api.marshal_with(review_response_model, code=200)
-
+    @api.response(400, 'Validation error')
     def put(self, review_id):
-        """ Update review """
+        """Update review by ID"""
+        data = api.payload or {}
+
         try:
-            review_data = api.payload or {}
-            review = facade.update_review(review_id, review_data)
-            return review, 200
+            updated = facade.update_review(review_id, data)
         except ValueError as e:
-            api.abort(404, str(e))
+            msg = str(e)
+            if "not found" in msg.lower():
+                api.abort(404, msg)
+            api.abort(400, msg)
+
+        if not updated:
+            api.abort(404, "Review not found")
+
+        return updated, 200
+
 
     @api.response(204, 'Review deleted')
     @api.response(400, 'Delete error')
     def delete(self, review_id):
-        """Delete a review"""
+        """Delete review by ID"""
         try:
-            facade.delete_review(review_id)
-            return '', 204
+            deleted = facade.delete_review(review_id)
         except ValueError as e:
-            api.abort(400, str(e))
+            msg = str(e)
+            if "not found" in msg.lower():
+                api.abort(404, msg)
+            api.abort(400, msg)
 
-    @api.marshal_list_with(review_response_model, code=200)
-    def get(self):
-        try:
-            return facade.get_all_reviews(), 200
-        except ValueError as e:
-            api.abort(400, str(e))
+        if not deleted:
+            api.abort(404, "Review not found")
+
+        return '', 204
