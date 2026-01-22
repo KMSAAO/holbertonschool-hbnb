@@ -37,6 +37,8 @@ class ReviewService():
         if "comment" in review_data:
             review.comment = review_data["comment"]
 
+        review.update(review_data)
+
         return review
 
     def delete_Review(self, review_id, review_repo):

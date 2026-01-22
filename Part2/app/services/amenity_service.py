@@ -38,52 +38,28 @@ class AmenityService:
         }
 
     def update_amenity(self, amenity_id: str, amenity_data: dict, amenity_repo) -> bool:
-        if not isinstance(amenity_id, str):
-            raise ValueError("amenity_id must be a string")
-
         amenity = amenity_repo.get(amenity_id)
         if not amenity:
             raise ValueError("Amenity not found")
 
         if "amenity_name" in amenity_data:
-            amenity_name = amenity_data["amenity_name"]
-            if not amenity_name or not isinstance(amenity_name, str) or len(amenity_name) > 100:
-                raise ValueError("invalid name")
-            amenity.amenity_name = amenity_name
+            amenity.amenity_name = amenity_data["amenity_name"]
 
         if "description" in amenity_data:
-            desc = amenity_data["description"]
-            if not isinstance(desc, str) or len(desc) > 500:
-                raise ValueError("invalid description")
-            amenity.description = desc
+            amenity.description = amenity_data["description"]
 
         if "status" in amenity_data:
-            raw_status = amenity_data["status"]
-            if isinstance(raw_status, PlaceAmenityStatus):
-                status = raw_status
-            else:
-                try:
-                    status = PlaceAmenityStatus(raw_status)
-                except Exception:
-                    raise ValueError("invalid amenity status")
-            amenity.status = status
+            amenity.status = amenity_data["status"]
+
+        amenity.save()
 
         return True
     
-    def get_all_amenities(self, amenity_repo) -> list:
+    def get_all_amenities(self, amenity_repo):
         amenities = amenity_repo.get_all()
-        amenity_list = []
-        for amenity in amenities:
-            if hasattr(amenity, "to_dict"):
-                amenity_list.append(amenity.to_dict())
-            else:
-                amenity_list.append({
-                    "id": amenity.id,
-                    "amenity_name": amenity.amenity_name,
-                    "description": amenity.description,
-                    "status": amenity.status.value if hasattr(amenity.status, "value") else amenity.status,
-                })
-        return amenity_list
+        if not amenities:
+            return []
+        return amenities
 
     @staticmethod
     def delete_amenity(amenity_id: str, amenity_repo) -> bool:

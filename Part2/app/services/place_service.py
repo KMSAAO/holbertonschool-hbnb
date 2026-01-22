@@ -75,6 +75,8 @@ class PlaceService():
         if "status" in place_data:
             place.status = place_data["status"]
 
+        place.update(place_data)
+
         return True
     
     def get_all_places(self, place_repo):

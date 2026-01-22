@@ -81,6 +81,8 @@ class UserServices():
         if "is_active" in user_data:
             user.is_active = user_data["is_active"]
 
+        user.update(user_data)
+
         return True
 
     

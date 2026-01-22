@@ -21,10 +21,11 @@ amenity_response_model = api.model('AmenityResponse', {
     'amenity_name': fields.String(required=True, description='Amenity name'),
     'description':  fields.String(required=False, description='Description'),
     'status':       fields.String(required=True, description='Status'),
+    'created_at':   fields.String(required=True, description='Created at'),
+    'updated_at':   fields.String(required=True, description='updated at'),
 })
 
 
-# ====== /api/v1/amenities ======
 
 @api.route('/')
 class AmenityList(Resource):
@@ -59,7 +60,6 @@ class AmenityList(Resource):
             api.abort(400, str(ex))
 
 
-# ====== /api/v1/amenities/<amenity_id> ======
 
 @api.route('/<string:amenity_id>')
 class AmenityDetail(Resource):

@@ -55,3 +55,13 @@ class Amenity(BaseModel):
                 self._status = PlaceAmenityStatus(value)
             except Exception:
                 raise ValueError("invalid amenity status")
+            
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "amenity_name": self.amenity_name,
+            "description": self.description,
+            "status": self.status.value if hasattr(self.status, "value") else self.status,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+        }

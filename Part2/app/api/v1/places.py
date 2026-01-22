@@ -29,10 +29,16 @@ place_response_model = api.model('PlaceResponse', {
 
 
 place_summary_model = api.model('PlaceSummary', {
-    'id':        fields.String,
-    'title':     fields.String,
-    'latitude':  fields.Float,
-    'longitude': fields.Float,
+    'id':          fields.String,
+    'owner_id':    fields.String,
+    'title':       fields.String,
+    'description': fields.String,
+    'price':       fields.Float,
+    'status':      fields.String,
+    'latitude':    fields.Float,
+    'longitude':   fields.Float,
+    'created_at':  fields.String,
+    'updated_at':  fields.String,
 })
 
 
@@ -66,23 +72,9 @@ class PlaceList(Resource):
 
     @api.marshal_list_with(place_summary_model, code=200)
     def get(self):
-        """Retrieve list of places (summary: id, title, lat, long)"""
+        """Retrieve list of places """
         try:
             places = facade.get_all_places()
-
-            if places and hasattr(places[0], 'to_dict'):
-                return [
-                    {
-                        "id": p.id,
-                        "owner_id": p.user.id,
-                        "title": p.title,
-                        "description": p.description,
-                        "price": p.price,
-                        "status": p.status,
-                        "latitude": p.latitude,
-                        "longitude": p.longitude
-                    } for p in places
-                ], 200
 
             return places, 200
         except Exception as e:
