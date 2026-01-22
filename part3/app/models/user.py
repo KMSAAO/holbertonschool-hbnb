@@ -1,5 +1,7 @@
 import re
 import hashlib
+
+import bcrypt
 from app.models.base_model import BaseModel
 
 
@@ -54,15 +56,15 @@ class User(BaseModel):
     def password(self):
         raise AttributeError("Password is write-only")
 
-    @password.setter
-    def password(self, value):
-        if not value or not isinstance(value, str) or len(value) < 6:
-            raise ValueError("Password must be at least 6 characters")
+    def hash_password(self, password):
+        """Hashes the password before storing it."""
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-        self.__password = hashlib.sha256(value.encode()).hexdigest()
+        self.__password = hashlib.sha256(password.encode()).hexdigest()
 
-    def check_password(self, plain_password):
-        return self.__password == hashlib.sha256(plain_password.encode()).hexdigest()
+    def verify_password(self, password):
+        """Verifies if the provided password matches the hashed password."""
+        return bcrypt.check_password_hash(self.password, password)
 
     @property
     def is_admin(self):
