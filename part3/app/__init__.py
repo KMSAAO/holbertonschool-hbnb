@@ -12,7 +12,7 @@ def create_app(config_class="config.DevelopmentConfig"):
 
     app.config.from_object(config_class)
 
-    bcrypt.init_app(app)
+    bcrypt = Bcrypt(app)
 
     api = Api(
         app,
