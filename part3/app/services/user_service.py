@@ -42,7 +42,7 @@ class UserServices():
             raise ValueError("Incorrect email or password")
 
 
-        if not user.check_password(password):
+        if not user.verify_password(password):
             raise ValueError("Incorrect email or password")
 
         if user.is_active != True:
