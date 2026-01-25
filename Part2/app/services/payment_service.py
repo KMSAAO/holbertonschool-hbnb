@@ -1,11 +1,11 @@
 from app.models.payment import Payment
 from app.enums.payment_status import PaymentStatus
-from app.enums.payment_type import MethodPayment 
+from app.enums.payment_type import MethodPayment
 
-class PaymentService():
+
+class PaymentService:
 
     def create_payment(self, payment: dict, repo, booking_repo) -> Payment:
-       
         booking_id = payment.get('book_id')
         if not booking_id:
             raise ValueError("booking_id is required")
@@ -13,65 +13,63 @@ class PaymentService():
         booking = booking_repo.get(booking_id)
         if not booking:
             raise ValueError("Invalid booking ID")
-        
-        amount = payment.get('amount')
-        if not amount or not isinstance(amount, (int, float)) or amount <= 0:
-            raise ValueError("Amount must be a non-negative number")
 
-        method_payment = payment.get('method_payment')
-        if isinstance(method_payment, MethodPayment):
-            method = method_payment
-        else:
-            try:
-                method = MethodPayment(method_payment)
-            except Exception:
-                raise ValueError("Invalid method payment")
-            
-        status = payment.get('status')
-        if not status:
-            raise ValueError("status is required")
+        amount = payment.get('amount')  # لا حاجة لفحص النوع، الـ Model مسؤول
 
-        if isinstance(status, PaymentStatus):
-            status_payment = status
-        else:
-            try:
-                status_payment = PaymentStatus(status)
-            except Exception:
-                raise ValueError("Invalid status payment")
+        raw_method = payment.get('method_payment')
+        try:
+            method = raw_method if isinstance(raw_method, MethodPayment) else MethodPayment(raw_method)
+        except Exception:
+            raise ValueError("Invalid method payment")
+
+        raw_status = payment.get('status')
+        try:
+            status = raw_status if isinstance(raw_status, PaymentStatus) else PaymentStatus(raw_status)
+        except Exception:
+            raise ValueError("Invalid payment status")
 
         new_payment = Payment(
             book_id=booking.id,
             booking=booking,
             amount=amount,
             method_payment=method,
-            status=status_payment
+            status=status
         )
 
         repo.add(new_payment)
         return new_payment
-    
+
     def get_payment_info(self, payment_id: str, repo) -> dict:
         payment = repo.get(payment_id)
         if not payment:
             raise ValueError("Payment not found")
-        return {
-            "id": payment.id,
-            "book_id": payment.book_id,
-            "amount": payment.amount,
-            "method_payment": payment.method_payment.value,
-            "status": payment.status.value
-        }
+        return payment.to_dict()
 
-    """ this method will implement later """
-    def update_payment_status(self, payment_id: str, status: str, repo  ) -> bool:
+    def update_payment_status(self, payment_id: str, status: str, repo) -> bool:
+        payment = repo.get(payment_id)
+        if not payment:
+            raise ValueError("Payment not found")
 
-        pass
+        try:
+            new_status = status if isinstance(status, PaymentStatus) else PaymentStatus(status)
+        except Exception:
+            raise ValueError("Invalid payment status")
+
+        payment.status = new_status
+        repo.update(payment)
+        return True
 
     def delete_payment(self, payment_id: str, repo) -> bool:
         payment = repo.get(payment_id)
         if not payment:
             raise ValueError("Payment not found")
+
         repo.delete(payment)
         return True
-    
-    
+
+    def get_all_payments(self, repo):
+        all_payments = repo.get_all()
+        if not all_payments:
+            return None
+
+        return all_payments
