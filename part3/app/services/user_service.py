@@ -103,3 +103,20 @@ class UserServices():
     def get_all_users(self, repo):
         users = repo.get_all()
         return users
+    
+
+    def get_by_attribute(self, attr_name, value, repo):
+        if not value:
+            raise ValueError("You must enter the value")
+
+        if not attr_name:
+            raise ValueError("You must Enter the email")
+        
+        if not isinstance(attr_name, str):
+            raise ValueError("attr_name is not correct")
+        
+        if not isinstance(value, str):
+            raise ValueError("The value is not correct")
+        
+        user = repo.get_by_attribute(attr_name, value)
+        return user

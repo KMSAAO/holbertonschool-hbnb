@@ -50,6 +50,9 @@ class HBnBFacade:
     def get_user(self, user_id: str) -> dict:
 
         return self.user_service.get_user_info(user_id, self.user_repo)
+    
+    def get_by_attribute(self, attr_name, value):
+        return self.user_service.get_by_attribute(attr_name, value, self.user_repo)
 
     def update_user(self, user_id: str, user_data: dict) -> bool:
         
