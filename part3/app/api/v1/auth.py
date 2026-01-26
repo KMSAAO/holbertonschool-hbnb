@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, decode_token
 import app.services.facade as facade
 from flask import jsonify
 
@@ -61,8 +61,15 @@ class protected (Resource):
     @jwt_required()
     def get(self):
         
-        current_user = get_jwt_identity()
-        if not current_user:
+        id_user = get_jwt_identity()
+
+        user = facade.get_user(id_user)
+        if not id_user:
             raise ValueError("No user exists with this token")
+        admin = user['is_admin']
+
+        if admin is True:
+            return {"message": f"Hello, Admin {id_user}"}, 200
+        elif admin is False:
+            return {"message": f"Hello, user {id_user}"}, 200
         
-        return {"message": f"Hello, {current_user}"}, 200

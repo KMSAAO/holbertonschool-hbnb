@@ -8,6 +8,7 @@ from app.api.v1.amenities import api as amenities_ns
 from app.api.v1.auth import api as auth_ns
 from app.bcrypt import bcrypt
 from app.JWTManger import jwt
+import app.services.facade as facade
 
 
 def create_app(config_class="config.DevelopmentConfig"):
@@ -46,3 +47,10 @@ def create_app(config_class="config.DevelopmentConfig"):
         return jsonify({"message": "HBnB API is running"})
 
     return app
+
+
+@jwt.user_lookup_loader
+def user_lookup_callback(_jwt_header, jwt_data):
+    identity = jwt_data["sub"]
+    
+    return facade.get_user(identity)
