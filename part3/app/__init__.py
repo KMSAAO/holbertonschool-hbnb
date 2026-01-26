@@ -30,7 +30,7 @@ def create_app(config_class="config.DevelopmentConfig"):
                 'type': 'apiKey',
                 'in': 'header',
                 'name': 'Authorization',
-                'description': "HBnB token"
+                'description': "Bearer <JWT>"
             }
         },
         security='Bearer Auth'

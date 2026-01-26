@@ -46,12 +46,10 @@ class AuthLogin(Resource):
                 id = user.id
                 full_name = user.first_name + " " + user.last_name
                 is_admin = user.is_admin
-                user_data = {
-                    "id": id,
-                    "name":full_name,
-                    "is_admin": is_admin
-                }
-                access_token = create_access_token(identity=user_data)
+                access_token = create_access_token(
+                    identity=str(id),
+                    additional_claims={"name": f"{full_name}", "is_amdin": is_admin}
+                )
         except ValueError as e:
             api.abort(400, str(e))
 
@@ -59,9 +57,7 @@ class AuthLogin(Resource):
     
 @api.route("/protected")
 class protected (Resource):
-    @api.expect(Auth_model, validate=True)
-    @api.marshal_with(Auth_response_model, code=200)
-    @api.response(400, 'No user exists with this token')
+    @api.marshal_list_with(Auth_response_model, code=200)
     @jwt_required()
     def get(self):
         
