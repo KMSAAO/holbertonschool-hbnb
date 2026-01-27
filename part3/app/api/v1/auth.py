@@ -1,11 +1,8 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, decode_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 import app.services.facade as facade
-from flask import jsonify
-
 
 api = Namespace('auth',  description='Authentication operations')
-
 
 login_model = api.model('UserLogin', {
     'email': fields.String(required=True, description='User Email'),
@@ -14,10 +11,6 @@ login_model = api.model('UserLogin', {
 
 login_response_model = api.model('UserLoginResponse', {
     'access_token': fields.String
-})
-
-Auth_model = api.model('JWT', {
-    'Authorization': fields.String(requried=True, description='JWT')
 })
 
 Auth_response_model = api.model('AuthResponse', {
@@ -38,39 +31,38 @@ class AuthLogin(Resource):
             success = facade.login_user(email, password)
             if not success:
                 api.abort(400, "Invalid credentials")
-            
+
             user = facade.get_by_attribute('email', email)
             if not user:
                 api.abort(400, "User not found")
-            else:
-                id = user.id
-                full_name = user.first_name + " " + user.last_name
-                is_admin = user.is_admin
-                access_token = create_access_token(
-                    identity=str(id),
-                    additional_claims={"name": f"{full_name}", "is_amdin": is_admin}
-                )
+
+            user_id = user.id
+            full_name = f"{user.first_name} {user.last_name}"
+            is_admin = user.is_admin
+
+            access_token = create_access_token(
+                identity=str(user_id),
+                additional_claims={
+                    "id": str(user_id),
+                    "name": full_name,
+                    "is_admin": bool(is_admin)
+                }
+            )
         except ValueError as e:
             api.abort(400, str(e))
 
         return {'access_token': access_token}, 200
-    
+
+
 @api.route("/protected")
-class protected (Resource):
-    @api.marshal_list_with(Auth_response_model, code=200)
+class Protected(Resource):
+    @api.marshal_with(Auth_response_model, code=200)
     @jwt_required()
     def get(self):
-        
-        id_user = get_jwt_identity()
+        claims = get_jwt()
+        user_id = get_jwt_identity()
 
-        user = facade.get_user(id_user)
-        if not id_user:
-            raise ValueError("No user exists with this token")
-        
-        admin = user['is_admin']
+        if claims.get("is_admin", False):
+            return {"message": f"Hello, Admin {user_id}"}, 200
 
-        if admin is True:
-            return {"message": f"Hello, Admin {id_user}"}, 200
-        elif admin is False:
-            return {"message": f"Hello, user {id_user}"}, 200
-        
+        return {"message": f"Hello, user {user_id}"}, 200
