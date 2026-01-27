@@ -66,6 +66,7 @@ class protected (Resource):
         user = facade.get_user(id_user)
         if not id_user:
             raise ValueError("No user exists with this token")
+        
         admin = user['is_admin']
 
         if admin is True:
