@@ -1,5 +1,5 @@
-# app/api/v1/amenities.py
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import jwt_required, get_jwt
 from app.services import facade
 
 api = Namespace('amenities', description='Amenity operations')
@@ -24,8 +24,6 @@ amenity_response_model = api.model('AmenityResponse', {
 })
 
 
-# ====== /api/v1/amenities ======
-
 @api.route('/')
 class AmenityList(Resource):
 
@@ -35,11 +33,17 @@ class AmenityList(Resource):
         amenities = facade.get_all_amenities()
         return amenities, 200
 
+    @jwt_required()
     @api.expect(amenity_create_model, validate=True)
     @api.marshal_with(amenity_response_model, code=201)
+    @api.response(403, 'Admin privileges required')
     @api.response(400, 'Validation / business error')
     def post(self):
-        """Create new amenity"""
+        """(Admin only) Create new amenity"""
+        claims = get_jwt() or {}
+        if not claims.get("is_admin", False):
+            api.abort(403, "Admin privileges required")
+
         amenity_data = api.payload
 
         try:
@@ -59,8 +63,6 @@ class AmenityList(Resource):
             api.abort(400, str(ex))
 
 
-# ====== /api/v1/amenities/<amenity_id> ======
-
 @api.route('/<string:amenity_id>')
 class AmenityDetail(Resource):
 
@@ -74,10 +76,16 @@ class AmenityDetail(Resource):
         except ValueError as ex:
             api.abort(404, str(ex))
 
+    @jwt_required()
     @api.expect(amenity_update_model, validate=False)
     @api.marshal_with(amenity_response_model, code=200)
+    @api.response(403, 'Admin privileges required')
     def put(self, amenity_id):
-        """Update amenity"""
+        """(Admin only) Update amenity"""
+        claims = get_jwt() or {}
+        if not claims.get("is_admin", False):
+            api.abort(403, "Admin privileges required")
+
         data = api.payload or {}
 
         try:
