@@ -5,12 +5,12 @@ from app.services import facade
 api = Namespace('places', description='Place operations')
 
 place_create_model = api.model('PlaceCreate', {
-    'title':       fields.String(required=True),
-    'description': fields.String(required=False),
-    'price':       fields.Float(required=True),
-    'status':      fields.String(required=False),
-    'latitude':    fields.Float(required=True),
-    'longitude':   fields.Float(required=True),
+    'title':       fields.String(required=True, description='Title of the place'),
+    'description': fields.String(required=False, description='Description of the place'),
+    'price':       fields.Float(required=True, description='Price of the place'),
+    'status':      fields.String(required=False, description='Status of the place'),
+    'latitude':    fields.Float(required=True, description='Latitude'),
+    'longitude':   fields.Float(required=True, description='Longitude'),
 })
 
 place_response_model = api.model('PlaceResponse', {
@@ -49,19 +49,29 @@ class PlaceList(Resource):
     @api.expect(place_create_model, validate=True)
     @api.marshal_with(place_response_model, code=201)
     def post(self):
-        claims = get_jwt()
+        claims = get_jwt() or {}
         user_id = claims.get("id")
 
-        data = api.payload
-        data["owner_id"] = user_id
+        if not user_id:
+            api.abort(401, "Invalid token")
 
-        place = facade.create_place(data)
+        data = api.payload or {}
+        data["owner_id"] = str(user_id)
+
+        try:
+            place = facade.create_place(place_data=data)
+        except ValueError as e:
+            api.abort(400, str(e))
+
         return place, 201
 
     @api.marshal_list_with(place_summary_model, code=200)
     def get(self):
-        places = facade.get_all_places()
-        return places, 200
+        try:
+            places = facade.get_all_places()
+            return places, 200
+        except Exception as e:
+            api.abort(500, str(e))
 
 
 @api.route('/<string:place_id>')
@@ -69,39 +79,69 @@ class PlaceDetail(Resource):
 
     @api.marshal_with(place_response_model, code=200)
     def get(self, place_id):
+        try:
+            place = facade.get_place_info(place_id)
+            return place, 200
+        except ValueError as e:
+            api.abort(404, str(e))
+
+    @jwt_required()
+    @api.expect(place_update_model, validate=False)
+    @api.marshal_with(place_response_model, code=200)
+    def put(self, place_id):
+        claims = get_jwt() or {}
+        user_id = claims.get("id")
+        is_admin = claims.get("is_admin", False)
+
+        if not user_id:
+            api.abort(401, "Invalid token")
+
+        try:
+            place = facade.get_place_info(place_id)
+        except ValueError as e:
+            api.abort(404, str(e))
+
+        owner_id = place["owner_id"]
+
+        if not is_admin and str(owner_id) != str(user_id):
+            api.abort(403, "Unauthorized action")
+
+        data = api.payload or {}
+
+        try:
+            updated = facade.update_place(place_id, data)
+            if not updated:
+                api.abort(404, "Place not found")
+        except ValueError as e:
+            api.abort(400, str(e))
+
         place = facade.get_place_info(place_id)
         return place, 200
 
     @jwt_required()
-    @api.expect(place_update_model, validate=True)
-    @api.marshal_with(place_response_model, code=200)
-    def put(self, place_id):
-        claims = get_jwt()
-        user_id = claims.get("id")
-        is_admin = claims.get("is_admin", False)
-
-        place = facade.get_place_info(place_id)
-        owner_id = place["owner_id"]
-
-        if not is_admin and owner_id != user_id:
-            api.abort(403, "Unauthorized action")
-
-        data = api.payload
-        facade.update_place(place_id, data)
-        updated_place = facade.get_place_info(place_id)
-        return updated_place, 200
-
-    @jwt_required()
     def delete(self, place_id):
-        claims = get_jwt()
+        claims = get_jwt() or {}
         user_id = claims.get("id")
         is_admin = claims.get("is_admin", False)
 
-        place = facade.get_place_info(place_id)
+        if not user_id:
+            api.abort(401, "Invalid token")
+
+        try:
+            place = facade.get_place_info(place_id)
+        except ValueError as e:
+            api.abort(404, str(e))
+
         owner_id = place["owner_id"]
 
-        if not is_admin and owner_id != user_id:
+        if not is_admin and str(owner_id) != str(user_id):
             api.abort(403, "Unauthorized action")
 
-        facade.delete_place(place_id)
+        try:
+            deleted = facade.delete_place(place_id)
+            if not deleted:
+                api.abort(404, "Place not found")
+        except ValueError as e:
+            api.abort(400, str(e))
+
         return '', 204
