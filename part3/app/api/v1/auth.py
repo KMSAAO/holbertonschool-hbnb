@@ -2,63 +2,73 @@ from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 import app.services.facade as facade
 
-api = Namespace('auth',  description='Authentication operations')
+api = Namespace('auth', description='Authentication operations')
 
-login_model = api.model('UserLogin', {
+login_model = api.model('Login', {
     'email': fields.String(required=True, description='User Email'),
     'password': fields.String(required=True, description='User Password'),
 })
 
-login_response_model = api.model('UserLoginResponse', {
+login_response_model = api.model('LoginResponse', {
     'access_token': fields.String
 })
 
-Auth_response_model = api.model('AuthResponse', {
+protected_response_model = api.model('ProtectedResponse', {
     'message': fields.String
 })
+
 
 @api.route('/login')
 class AuthLogin(Resource):
     @api.expect(login_model, validate=True)
     @api.marshal_with(login_response_model, code=200)
-    @api.response(400, 'Invalid credentials')
+    @api.response(401, 'Invalid credentials')
     def post(self):
-        data = api.payload
+        """Authenticate user and return a JWT token"""
+        data = api.payload or {}
         email = data.get('email')
         password = data.get('password')
 
         try:
             success = facade.login_user(email, password)
             if not success:
-                api.abort(400, "Invalid credentials")
+                return {"error": "Invalid credentials"}, 401
 
-            user = facade.get_by_attribute('email', email)
+            user = None
+            if hasattr(facade, "get_user_by_email"):
+                user = facade.get_user_by_email(email)
+            # fallback
             if not user:
-                api.abort(400, "User not found")
+                user = facade.get_by_attribute('email', email)
 
-            user_id = user.id
+            if not user:
+                return {"error": "User not found"}, 401
+
+            user_id = str(user.id)
             full_name = f"{user.first_name} {user.last_name}"
-            is_admin = user.is_admin
+            is_admin = bool(getattr(user, "is_admin", False))
 
             access_token = create_access_token(
-                identity=str(user_id),
+                identity=user_id, 
                 additional_claims={
-                    "id": str(user_id),
-                    "name": full_name,
-                    "is_admin": bool(is_admin)
+                    "is_admin": is_admin,
+                    "id": user_id,
+                    "name": full_name
                 }
             )
+
+            return {'access_token': access_token}, 200
+
         except ValueError as e:
             api.abort(400, str(e))
 
-        return {'access_token': access_token}, 200
 
-
-@api.route("/protected")
+@api.route('/protected')
 class Protected(Resource):
-    @api.marshal_with(Auth_response_model, code=200)
     @jwt_required()
+    @api.marshal_with(protected_response_model, code=200)
     def get(self):
+        """Protected endpoint that requires a valid JWT token"""
         claims = get_jwt()
         user_id = get_jwt_identity()
 
