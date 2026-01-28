@@ -13,11 +13,6 @@ user_register_model = api.model('UserRegister', {
     'is_active':  fields.Boolean(required=False, description='Is active', default=True),
 })
 
-login_model = api.model('UserLogin', {
-    'email':    fields.String(required=True, description='Email'),
-    'password': fields.String(required=True, description='Password'),
-})
-
 user_response_model = api.model('UserResponse', {
     'id':         fields.String,
     'first_name': fields.String,
@@ -38,13 +33,13 @@ user_update_model = api.model('UserUpdate', {
     'is_active':  fields.Boolean(required=False, description='Is active'),
 })
 
+
 @api.route('/register')
 class UserRegister(Resource):
     @api.expect(user_register_model, validate=True)
     @api.marshal_with(user_response_model, code=201)
     @api.response(400, 'Validation error')
     def post(self):
-        """Register new user"""
         data = api.payload
         try:
             user = facade.register_user(data)
@@ -53,32 +48,10 @@ class UserRegister(Resource):
         return user, 201
 
 
-@api.route('/login')
-class UserLogin(Resource):
-    @api.expect(login_model, validate=True)
-    @api.response(200, 'Login successful')
-    @api.response(400, 'Invalid credentials')
-    def post(self):
-        """Login user"""
-        data = api.payload
-        email = data.get('email')
-        password = data.get('password')
-
-        try:
-            success = facade.login_user(email, password)
-            if not success:
-                api.abort(400, "Invalid credentials")
-        except ValueError as e:
-            api.abort(400, str(e))
-
-        return {'message': 'Login successful'}, 200
-
-
 @api.route('/')
 class UserList(Resource):
     @api.marshal_list_with(user_response_model, code=200)
     def get(self):
-        """Get list of all users"""
         users = facade.get_all_users()
         return users, 200
 
@@ -88,7 +61,6 @@ class UserList(Resource):
     @api.response(403, 'Admin privileges required')
     @api.response(400, 'Validation error')
     def post(self):
-        """(Admin only) Create a new user"""
         claims = get_jwt() or {}
         if not claims.get("is_admin", False):
             api.abort(403, "Admin privileges required")
@@ -116,7 +88,6 @@ class UserDetail(Resource):
 
     @api.marshal_with(user_response_model, code=200)
     def get(self, user_id):
-        """Get user info by ID"""
         try:
             user = facade.get_user(user_id)
         except ValueError as e:
@@ -129,7 +100,6 @@ class UserDetail(Resource):
     @api.response(403, 'Admin privileges required')
     @api.response(400, 'Validation error')
     def put(self, user_id):
-        """(Admin only) Update user by ID (including email/password)"""
         claims = get_jwt() or {}
         if not claims.get("is_admin", False):
             api.abort(403, "Admin privileges required")
@@ -159,10 +129,15 @@ class UserDetail(Resource):
         user = facade.get_user(user_id)
         return user, 200
 
+    @jwt_required()
     @api.response(204, 'User deleted')
+    @api.response(403, 'Admin privileges required')
     @api.response(400, 'Delete error')
     def delete(self, user_id):
-        """Delete user by ID"""
+        claims = get_jwt() or {}
+        if not claims.get("is_admin", False):
+            api.abort(403, "Admin privileges required")
+
         try:
             deleted = facade.delete_user(user_id)
         except ValueError as e:
