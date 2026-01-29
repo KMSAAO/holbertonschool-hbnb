@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required, get_jwt, create_access_token
-from app.services import facade
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+import app.services.facade as facade
 
 api = Namespace('users', description='User operations')
 
@@ -11,11 +11,6 @@ user_register_model = api.model('UserRegister', {
     'password':   fields.String(required=True, description='Password'),
     'is_admin':   fields.Boolean(required=False, description='Is admin', default=False),
     'is_active':  fields.Boolean(required=False, description='Is active', default=True),
-})
-
-user_login_model = api.model('UserLogin', {
-    'email':    fields.String(required=True, description='Email'),
-    'password': fields.String(required=True, description='Password'),
 })
 
 user_response_model = api.model('UserResponse', {
@@ -32,21 +27,22 @@ user_response_model = api.model('UserResponse', {
 user_update_model = api.model('UserUpdate', {
     'first_name': fields.String(required=False, description='First name'),
     'last_name':  fields.String(required=False, description='Last name'),
-    'email':      fields.String(required=False, description='Email (admin only)'),
-    'password':   fields.String(required=False, description='Password (admin only)'),
-    'is_admin':   fields.Boolean(required=False, description='Is admin (admin only)'),
     'is_active':  fields.Boolean(required=False, description='Is active'),
 })
 
+admin_update_model = api.model('AdminUserUpdate', {
+    'first_name': fields.String(required=False),
+    'last_name':  fields.String(required=False),
+    'email':      fields.String(required=False),
+    'password':   fields.String(required=False),
+    'is_admin':   fields.Boolean(required=False),
+    'is_active':  fields.Boolean(required=False),
+})
 
-def _as_dict(obj):
-    return obj if isinstance(obj, dict) else getattr(obj, "to_dict", lambda: obj)()
 
-
-def _get_attr(obj, key, default=None):
-    if isinstance(obj, dict):
-        return obj.get(key, default)
-    return getattr(obj, key, default)
+def _is_admin():
+    claims = get_jwt() or {}
+    return bool(claims.get("is_admin", False))
 
 
 @api.route('/register')
@@ -63,37 +59,6 @@ class UserRegister(Resource):
         return user, 201
 
 
-@api.route('/login')
-class UserLogin(Resource):
-    @api.expect(user_login_model, validate=True)
-    @api.response(200, 'Login successful')
-    @api.response(401, 'Invalid credentials')
-    def post(self):
-        data = api.payload or {}
-        email = data.get("email")
-        password = data.get("password")
-
-        ok = facade.login_user(email=email, password=password)
-        if not ok:
-            api.abort(401, "Invalid credentials")
-
-        user = facade.get_user_by_email(email)
-        if not user:
-            api.abort(401, "Invalid credentials")
-
-        uid = str(_get_attr(user, "id"))
-        is_admin = bool(_get_attr(user, "is_admin", False))
-
-        access_token = create_access_token(
-            identity=uid,
-            additional_claims={
-                "id": uid,
-                "is_admin": is_admin
-            }
-        )
-        return {"access_token": access_token}, 200
-
-
 @api.route('/')
 class UserList(Resource):
     @api.marshal_list_with(user_response_model, code=200)
@@ -105,10 +70,8 @@ class UserList(Resource):
     @api.expect(user_register_model, validate=True)
     @api.marshal_with(user_response_model, code=201)
     @api.response(403, 'Admin privileges required')
-    @api.response(400, 'Validation error')
     def post(self):
-        claims = get_jwt() or {}
-        if not claims.get("is_admin", False):
+        if not _is_admin():
             api.abort(403, "Admin privileges required")
 
         data = api.payload or {}
@@ -141,33 +104,34 @@ class UserDetail(Resource):
         return user, 200
 
     @jwt_required()
-    @api.expect(user_update_model, validate=False)
+    @api.expect(admin_update_model, validate=False)  
     @api.marshal_with(user_response_model, code=200)
     @api.response(403, 'Unauthorized action')
     @api.response(400, 'Validation error')
     def put(self, user_id):
-        claims = get_jwt() or {}
-        is_admin = claims.get("is_admin", False)
-        requester_id = claims.get("id")
-
-        if not requester_id:
-            api.abort(401, "Invalid token: missing user id")
-
-        if not is_admin and str(requester_id) != str(user_id):
-            api.abort(403, "Unauthorized action")
+        current_user_id = get_jwt_identity()
+        if not current_user_id:
+            api.abort(401, "Missing/invalid token")
 
         data = api.payload or {}
 
-        if not is_admin:
-            data.pop("email", None)
-            data.pop("password", None)
-            data.pop("is_admin", None)
+        if not _is_admin():
+            if str(current_user_id) != str(user_id):
+                api.abort(403, "Unauthorized action.")
 
-        if is_admin and "email" in data and data["email"]:
-            existing = facade.get_by_attribute("email", data["email"])
-            if existing:
-                ex_id = str(_get_attr(existing, "id"))
-                if ex_id != str(user_id):
+            if "email" in data or "password" in data:
+                api.abort(400, "You cannot modify email or password.")
+
+            # فلترة أي مفاتيح غير مسموحة
+            allowed = {"first_name", "last_name", "is_active"}
+            data = {k: v for k, v in data.items() if k in allowed}
+
+        else:
+            # ✅ admin: يتأكد من عدم تكرار الإيميل لو غيره
+            email = data.get("email")
+            if email:
+                existing = facade.get_by_attribute("email", email)
+                if existing and str(existing.id) != str(user_id):
                     api.abort(400, "Email already in use")
 
         try:
@@ -178,9 +142,6 @@ class UserDetail(Resource):
                 api.abort(404, msg)
             api.abort(400, msg)
 
-        if isinstance(updated, dict):
-            return updated, 200
-
         if not updated:
             api.abort(404, "User not found")
 
@@ -190,10 +151,8 @@ class UserDetail(Resource):
     @jwt_required()
     @api.response(204, 'User deleted')
     @api.response(403, 'Admin privileges required')
-    @api.response(400, 'Delete error')
     def delete(self, user_id):
-        claims = get_jwt() or {}
-        if not claims.get("is_admin", False):
+        if not _is_admin():
             api.abort(403, "Admin privileges required")
 
         try:
