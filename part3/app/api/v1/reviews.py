@@ -1,27 +1,33 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required, get_jwt
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.services import facade
 
 api = Namespace('reviews', description='Review operations')
 
 review_create_model = api.model('ReviewCreate', {
-    'place_id': fields.String(required=True),
-    'rating': fields.Integer(required=True),
-    'comment': fields.String(required=True),
+    'place_id': fields.String(required=True, description='ID of the place being reviewed'),
+    'rating': fields.Integer(required=True, description='Rating value'),
+    'comment': fields.String(required=True, description='Review comment'),
 })
 
 review_update_model = api.model('ReviewUpdate', {
-    'rating': fields.Integer(required=False),
-    'comment': fields.String(required=False),
+    'rating': fields.Integer(required=False, description='Updated rating value'),
+    'comment': fields.String(required=False, description='Updated review comment'),
 })
 
 review_response_model = api.model('ReviewResponse', {
-   'id': fields.String,
-   'place_id': fields.String,
-   'user_id': fields.String,
-   'rating': fields.Integer,
-   'comment': fields.String
+    'id': fields.String,
+    'place_id': fields.String,
+    'user_id': fields.String,
+    'rating': fields.Integer,
+    'comment': fields.String
 })
+
+
+def _get_attr(obj, key, default=None):
+    if isinstance(obj, dict):
+        return obj.get(key, default)
+    return getattr(obj, key, default)
 
 
 @api.route('/')
@@ -29,64 +35,123 @@ class ReviewList(Resource):
 
     @api.marshal_list_with(review_response_model, code=200)
     def get(self):
-        return facade.get_all_reviews(), 200
+        """Get all reviews (public)"""
+        try:
+            return facade.get_all_reviews(), 200
+        except ValueError as e:
+            api.abort(400, str(e))
 
     @jwt_required()
     @api.expect(review_create_model, validate=True)
     @api.marshal_with(review_response_model, code=201)
+    @api.response(400, 'Validation / business error')
     def post(self):
-        claims = get_jwt()
-        user_id = claims.get("id")
+        """Create a new review (authenticated)
+        - user cannot review own place
+        - user can only create one review per place
+        """
+        current_user_id = get_jwt_identity()
+        if not current_user_id:
+            api.abort(401, "Missing/invalid token")
 
-        review_data = api.payload
-        review_data["user_id"] = user_id
+        data = api.payload or {}
+        place_id = data.get("place_id")
+        if not place_id:
+            api.abort(400, "place_id is required")
 
-        place = facade.get_place_info(review_data["place_id"])
-        if place["owner_id"] == user_id:
-            api.abort(400, "Cannot review your own place")
+        try:
+            place = facade.get_place_info(place_id=place_id)
+        except ValueError:
+            api.abort(400, "Place not found")
 
-        all_reviews = facade.get_all_reviews()
+        place_owner_id = _get_attr(place, "owner_id")
+        if str(place_owner_id) == str(current_user_id):
+            api.abort(400, "You cannot review your own place.")
+
+        try:
+            all_reviews = facade.get_all_reviews() or []
+        except ValueError:
+            all_reviews = []
+
         for r in all_reviews:
-            if r["place_id"] == review_data["place_id"] and r["user_id"] == user_id:
-                api.abort(400, "Already reviewed this place")
+            r_place_id = _get_attr(r, "place_id")
+            r_user_id = _get_attr(r, "user_id")
+            if str(r_place_id) == str(place_id) and str(r_user_id) == str(current_user_id):
+                api.abort(400, "You have already reviewed this place.")
 
-        review = facade.create_review(review_data)
-        return review, 201
+        payload = {
+            "place_id": str(place_id),
+            "user_id": str(current_user_id),
+            "rating": data.get("rating"),
+            "comment": data.get("comment"),
+        }
+
+        try:
+            review = facade.create_review(payload)
+            return review, 201
+        except ValueError as e:
+            api.abort(400, str(e))
 
 
 @api.route('/<string:review_id>')
 class ReviewResource(Resource):
 
     @api.marshal_with(review_response_model, code=200)
+    @api.response(404, 'Review not found')
     def get(self, review_id):
-        review = facade.get_review_info(review_id)
-        return review, 200
+        """Get review by ID (public)"""
+        try:
+            review = facade.get_review_info(review_id)
+            return review, 200
+        except ValueError as e:
+            api.abort(404, str(e))
 
     @jwt_required()
     @api.expect(review_update_model, validate=False)
     @api.marshal_with(review_response_model, code=200)
+    @api.response(403, 'Unauthorized action')
     def put(self, review_id):
-        claims = get_jwt()
-        user_id = claims.get("id")
-        is_admin = claims.get("is_admin", False)
+        """Update review (only author)"""
+        current_user_id = get_jwt_identity()
+        if not current_user_id:
+            api.abort(401, "Missing/invalid token")
 
-        review = facade.get_review_info(review_id)
-        if not is_admin and review["user_id"] != user_id:
-            api.abort(403, "Unauthorized action")
+        try:
+            review = facade.get_review_info(review_id)
+        except ValueError as e:
+            api.abort(404, str(e))
 
-        facade.update_review(review_id, api.payload)
-        updated = facade.get_review_info(review_id)
-        return updated, 200
+        owner_id = _get_attr(review, "user_id")
+        if str(owner_id) != str(current_user_id):
+            api.abort(403, "Unauthorized action.")
+
+        data = api.payload or {}
+        try:
+            updated = facade.update_review(review_id, data)
+            return updated, 200
+        except ValueError as e:
+            api.abort(400, str(e))
 
     @jwt_required()
+    @api.response(204, 'Review deleted')
+    @api.response(403, 'Unauthorized action')
     def delete(self, review_id):
-        claims = get_jwt()
-        user_id = claims.get("id")
-        is_admin = claims.get("is_admin", False)
+        """Delete review (only author)"""
+        current_user_id = get_jwt_identity()
+        if not current_user_id:
+            api.abort(401, "Missing/invalid token")
 
-        review = facade.get_review_info(review_id)
-        if not is_admin and review["user_id"] != user_id:
-            api.abort(403, "Unauthorized action")
+        try:
+            review = facade.get_review_info(review_id)
+        except ValueError as e:
+            api.abort(404, str(e))
 
-        facade.delete_review(review_id)
-        return '', 204
+        owner_id = _get_attr(review, "user_id")
+        if str(owner_id) != str(current_user_id):
+            api.abort(403, "Unauthorized action.")
+
+        try:
+            facade.delete_review(review_id)
+            return '', 204
+        except ValueError as e:
+            api.abort(400, str(e))
