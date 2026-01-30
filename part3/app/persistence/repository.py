@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from app.sqlalchemy import db
 
 class Repository(ABC):
     @abstractmethod
@@ -25,18 +26,20 @@ class Repository(ABC):
     def get_by_attribute(self, attr_name, value):
         pass
 
-class InMemoryRepository(Repository):
-    def __init__(self):
-        self._storage = {}
+class SQLAlchemyRepository(Repository):
+    def __init__(self, model):
+        self.model = model
 
     def add(self, obj):
-        self._storage[obj.id] = obj
+        db.session.add(obj)
+        db.session.commit()
+        return True
 
     def get(self, obj_id):
-        return self._storage.get(obj_id)
+        return self.model.query.get(obj_id)
 
     def get_all(self):
-        return list(self._storage.values())
+        return self.model.query.all()
 
     def update(self, obj_id, data):
         obj = self.get(obj_id)
@@ -46,13 +49,17 @@ class InMemoryRepository(Repository):
         for key, value in data.items():
             setattr(obj, key, value)
 
+        db.session.commit()
         return True
 
     def delete(self, obj_id):
-        if obj_id in self._storage:
-            del self._storage[obj_id]
-            return True
-        return False
+        obj = self.get(obj_id)
+        if not obj:
+            return False
+
+        db.session.delete(obj)
+        db.session.commit()
+        return True
 
     def get_by_attribute(self, attr_name, value):
-        return next((obj for obj in self._storage.values() if getattr(obj, attr_name) == value), None)
+        return self.model.query.filter_by(**{attr_name: value}).first()
