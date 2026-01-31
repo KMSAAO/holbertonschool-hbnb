@@ -7,7 +7,7 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     PROPAGATE_EXCEPTIONS = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///development.db'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:myStrongPassword123@localhost/hbnb_db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 config = {

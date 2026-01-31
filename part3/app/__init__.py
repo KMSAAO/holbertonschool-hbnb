@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, app, jsonify
 from flask_restx import Api
 
 from app.api.v1.users import api as users_ns
@@ -12,7 +12,6 @@ from app.JWTManger import jwt
 from app.sqlalchemy import db
 import app.services.facade as facade
 
-
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
     app.config.from_object(config_class)
@@ -20,6 +19,7 @@ def create_app(config_class="config.DevelopmentConfig"):
     bcrypt.init_app(app)
     jwt.init_app(app)
     db.init_app(app)
+
 
     api = Api(
         app,

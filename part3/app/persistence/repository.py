@@ -63,3 +63,8 @@ class SQLAlchemyRepository(Repository):
 
     def get_by_attribute(self, attr_name, value):
         return self.model.query.filter_by(**{attr_name: value}).first()
+
+class UserRepository(SQLAlchemyRepository):
+
+    def get_user_by_email(self, email):
+        return self.model.query.filter_by(email=email).first()

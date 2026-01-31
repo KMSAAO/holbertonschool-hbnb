@@ -1,4 +1,5 @@
 from app.persistence.repository import SQLAlchemyRepository
+from app.models.user import User
 from app.services.user_service import UserServices
 from app.services.place_service import PlaceService
 from app.services.amenity_service import AmenityService
@@ -17,15 +18,15 @@ class HBnBFacade:
 
     def repos_init(self):
         """Repositories Initialization"""
-        self.user_db = SQLAlchemyRepository()
-        self.place_db = SQLAlchemyRepository()
-        self.review_db = SQLAlchemyRepository()
-        self.amenity_db = SQLAlchemyRepository()
-        self.guest_db = SQLAlchemyRepository()
-        self.booking_db = SQLAlchemyRepository()
-        self.payment_db = SQLAlchemyRepository()
-        self.refund_db = SQLAlchemyRepository()
-        self.place_amenity_db = SQLAlchemyRepository()
+        self.user_db = SQLAlchemyRepository(User)
+        # self.place_db = SQLAlchemyRepository()
+        # self.review_db = SQLAlchemyRepository()
+        # self.amenity_db = SQLAlchemyRepository()
+        # self.guest_db = SQLAlchemyRepository()
+        # self.booking_db = SQLAlchemyRepository()
+        # self.payment_db = SQLAlchemyRepository()
+        # self.refund_db = SQLAlchemyRepository()
+        # self.place_amenity_db = SQLAlchemyRepository()
 
     def service_init(self):
         """Services Initialization"""
@@ -38,6 +39,9 @@ class HBnBFacade:
         # self.payment_service = PaymentService()
         # self.refund_service = RefundServices()
         # self.place_amenity_service = PlaceAmenityService()
+
+    
+    #user methods
 
     def register_user(self, user_data: dict) -> str:
         return self.user_service.register_users(user_data, self.user_db)
@@ -62,6 +66,10 @@ class HBnBFacade:
 
     def get_all_users(self):
         return self.user_service.get_all_users(self.user_db)
+    
+    
+    
+    #place methods
 
     def create_place(self, place_data: dict):
         return self.place_service.create_place(
@@ -91,6 +99,8 @@ class HBnBFacade:
             place_id=place_id,
             place_repo=self.place_db
         )
+    
+    #review methods
 
     def create_review(self, review_data: dict):
         return self.review_service.create_Review(
@@ -116,6 +126,8 @@ class HBnBFacade:
         return self.review_service.delete_Review(
             review_id, self.review_db
         )
+    
+    #amenity methods
 
     def create_amenity(self, amenity_data: dict):
         return self.amenity_service.create_amenity(
@@ -147,11 +159,14 @@ class HBnBFacade:
             self.amenity_db
         )
 
+    #guest methods
     def register_as_guest(self, user, bio=""):
         return self.guest_service.register_as_guest(user, self.guest_db, bio)
 
     def get_guest_info(self, guest_id):
         return self.guest_service.get_guest_info(guest_id, self.guest_db)
+    
+    #booking methods
 
     def create_booking(self, booking_data: dict):
         return self.booking_service.create_booking(
@@ -202,6 +217,7 @@ class HBnBFacade:
             repo=self.place_db
         )
 
+    #payment methods
 
     def create_payment(self, payment: dict):
         return self.payment_service.create_payment(
@@ -222,6 +238,7 @@ class HBnBFacade:
     def delete_payment(self, payment_id: str) -> bool:
         pass
 
+    #refund methods
     def create_refund(self, refund_data: dict):
         return self.refund_service.create_refund(
             refund_data,
@@ -244,6 +261,8 @@ class HBnBFacade:
 
     def get_refund_info_by_payment_id(self, payment_id: str) -> dict:
         pass
+
+    #place-amenity methods
 
     def add_amenity_to_place(self, place_id: str, amenity_id: str):
         return self.place_amenity_service.add_amenity_to_place(
