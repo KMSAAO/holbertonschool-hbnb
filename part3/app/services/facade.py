@@ -1,5 +1,6 @@
 from app.persistence.repository import SQLAlchemyRepository
 from app.models.user import User
+from app.models.place import Place
 from app.services.user_service import UserServices
 from app.services.place_service import PlaceService
 from app.services.amenity_service import AmenityService
@@ -19,7 +20,7 @@ class HBnBFacade:
     def repos_init(self):
         """Repositories Initialization"""
         self.user_db = SQLAlchemyRepository(User)
-        # self.place_db = SQLAlchemyRepository()
+        self.place_db = SQLAlchemyRepository(Place)
         # self.review_db = SQLAlchemyRepository()
         # self.amenity_db = SQLAlchemyRepository()
         # self.guest_db = SQLAlchemyRepository()
@@ -75,7 +76,7 @@ class HBnBFacade:
         return self.place_service.create_place(
             place_data=place_data,
             repo=self.place_db,
-            user_repo=self.user_db
+            user_db=self.user_db
         )
 
     def get_place_info(self, place_id: str) -> dict:

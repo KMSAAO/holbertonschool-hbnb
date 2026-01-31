@@ -2,8 +2,19 @@ from app.models.base_model import BaseModel
 from app.models.user import User
 from app.enums import place_status
 from app.enums.place_status import PlaceStatus
+from app.sqlalchemy import db
 
 class Place(BaseModel):
+
+    __tablename__ = 'places'
+
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    title = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    price = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(50), nullable=True)
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
 
     def __init__(self, user: User, title, description, price, status: place_status, latitude, longitude):
 

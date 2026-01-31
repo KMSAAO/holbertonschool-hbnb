@@ -4,9 +4,10 @@ from datetime import datetime
 
 class PlaceService():
 
-    def create_place(self, place_data: dict, repo, user_repo):
+    def create_place(self, place_data: dict, repo, user_db):
         owner_id = place_data.get('owner_id')
-        owner = user_repo.get(owner_id)
+        owner = user_db.get(owner_id)
+
         title = place_data.get('title')
         description = place_data.get('description')
         price = place_data.get('price')

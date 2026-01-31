@@ -5,9 +5,11 @@ from app.services import facade
 api = Namespace("places", description="Place operations")
 
 place_create_model = api.model("PlaceCreate", {
+    "owner_id": fields.String(required=True),
     "title": fields.String(required=True),
     "description": fields.String(required=False),
     "price": fields.Float(required=True),
+    "status": fields.String(required=False),
     "latitude": fields.Float(required=True),
     "longitude": fields.Float(required=True),
 })
@@ -16,6 +18,7 @@ place_update_model = api.model("PlaceUpdate", {
     "title": fields.String(required=False),
     "description": fields.String(required=False),
     "price": fields.Float(required=False),
+    "status": fields.String(required=False),
     "latitude": fields.Float(required=False),
     "longitude": fields.Float(required=False),
 })
@@ -26,6 +29,7 @@ place_response_model = api.model("PlaceResponse", {
     "title": fields.String,
     "description": fields.String,
     "price": fields.Float,
+    "status": fields.String,
     "latitude": fields.Float,
     "longitude": fields.Float,
     "created_at": fields.String,
