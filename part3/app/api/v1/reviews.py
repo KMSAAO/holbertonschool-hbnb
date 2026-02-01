@@ -48,7 +48,7 @@ class ReviewList(Resource):
         place_id = data.get("place_id")
 
         try:
-            place = facade.get_place(place_id)
+            place = facade.get_place_info(place_id)
         except ValueError:
             api.abort(400, "Invalid place_id")
 

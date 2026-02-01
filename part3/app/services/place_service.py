@@ -17,7 +17,7 @@ class PlaceService():
 
 
         place = Place(
-            user=owner,
+            user_id=owner.id,
             title=title,
             description=description,
             price=price,
@@ -44,7 +44,7 @@ class PlaceService():
             "title": place.title,
             "description": place.description,
             "price": place.price,
-            "status": place.status.value,
+            "status": place.status,
             "latitude": place.latitude,
             "longitude": place.longitude,
             "owner_id": place.user.id,

@@ -5,7 +5,6 @@ from app.services import facade
 api = Namespace("places", description="Place operations")
 
 place_create_model = api.model("PlaceCreate", {
-    "owner_id": fields.String(required=True),
     "title": fields.String(required=True),
     "description": fields.String(required=False),
     "price": fields.Float(required=True),
@@ -73,7 +72,7 @@ class PlaceResource(Resource):
     @api.marshal_with(place_response_model, code=200)
     def get(self, place_id):
         try:
-            return facade.get_place(place_id), 200
+            return facade.get_place_info(place_id), 200
         except ValueError as e:
             api.abort(404, str(e))
 
@@ -86,7 +85,7 @@ class PlaceResource(Resource):
             api.abort(401, "Invalid token")
 
         try:
-            place = facade.get_place(place_id)
+            place = facade.get_place_info(place_id)
         except ValueError as e:
             api.abort(404, str(e))
 
@@ -99,6 +98,10 @@ class PlaceResource(Resource):
 
         try:
             updated = facade.update_place(place_id, data)
-            return updated, 200
+            if not updated:
+                api.abort(400, "Update failed")
+
+            place = facade.get_place_info(place_id)
+            return place, 200
         except ValueError as e:
             api.abort(400, str(e))

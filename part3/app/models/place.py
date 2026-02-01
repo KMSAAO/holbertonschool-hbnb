@@ -3,23 +3,24 @@ from app.models.user import User
 from app.enums import place_status
 from app.enums.place_status import PlaceStatus
 from app.sqlalchemy import db
+from sqlalchemy.orm import relationship
 
 class Place(BaseModel):
-
     __tablename__ = 'places'
 
-    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
-    title = db.Column(db.String(128), nullable=False)
-    description = db.Column(db.Text, nullable=True)
-    price = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(50), nullable=True)
-    latitude = db.Column(db.Float, nullable=True)
-    longitude = db.Column(db.Float, nullable=True)
+    _user_id = db.Column("user_id", db.String(36), db.ForeignKey('users.id'), nullable=False)
+    _title = db.Column("title", db.String(128), nullable=False)
+    _description = db.Column("description", db.Text, nullable=True)
+    _price = db.Column("price", db.Float, nullable=False)
+    _status = db.Column("status", db.String(50), nullable=True)
+    _latitude = db.Column("latitude", db.Float, nullable=True)
+    _longitude = db.Column("longitude", db.Float, nullable=True)
 
-    def __init__(self, user_id, title, description, price, status: place_status, latitude, longitude):
+    user = relationship("User", backref="places")
 
+    def __init__(self, user_id, title, description, price, status, latitude, longitude):
         super().__init__()
-        self.user_id = user_id
+        self.owner_id = user_id
         self.title = title
         self.description = description
         self.price = price
@@ -29,91 +30,89 @@ class Place(BaseModel):
 
 
     @property
-    def user_id(self):
+    def owner_id(self):
         return self._user_id
-    
-    
-    @user_id.setter
-    def user_id(self, value):
+
+    @owner_id.setter
+    def owner_id(self, value):
         if not value:
             raise ValueError("Owner not found")
-        else:
-            self._user_id = value
-
+        self._user_id = value
 
     @property
     def title(self):
         return self._title
-    
+
     @title.setter
     def title(self, value):
         if not value or not isinstance(value, str) or len(value) > 100:
             raise ValueError("Title is required and must be a string with max 100 characters")
-        else:
-            self._title = value
-
+        self._title = value
 
     @property
     def description(self):
         return self._description
-    
+
     @description.setter
     def description(self, value):
         if value and (not isinstance(value, str) or len(value) > 500):
             raise ValueError("Description must be a string with max 500 characters")
-        else:
-            self._description = value
+        self._description = value
 
     @property
     def price(self):
         return self._price
-    
 
     @price.setter
     def price(self, value):
         if value is None or not isinstance(value, (int, float)) or value < 0:
             raise ValueError("Price must be a non-negative number")
-        else:
-            self._price = value
-
+        self._price = value
 
     @property
     def status(self):
         return self._status
-    
 
     @status.setter
     def status(self, value):
         if isinstance(value, PlaceStatus):
-            self._status = value
+            self._status = value.value
         else:
             try:
-                self._status = PlaceStatus(value)
+                self._status = PlaceStatus(value).value
             except Exception:
                 raise ValueError("Invalid place status")
-            
 
     @property
     def latitude(self):
         return self._latitude
-    
-    
+
     @latitude.setter
     def latitude(self, value):
         if value is None or not isinstance(value, (int, float)) or not -90.0 <= value <= 90.0:
             raise ValueError("Latitude must be between -90 and 90")
-        else:
-            self._latitude = value
-
+        self._latitude = value
 
     @property
     def longitude(self):
         return self._longitude
-    
 
     @longitude.setter
     def longitude(self, value):
         if value is None or not isinstance(value, (int, float)) or not -180.0 <= value <= 180.0:
             raise ValueError("Longitude must be between -180 and 180")
-        else:
-            self._longitude = value
+        self._longitude = value
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "owner_id": self.owner_id,
+            "title": self.title,
+            "description": self.description,
+            "price": self.price,
+            "status": self.status,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+        }

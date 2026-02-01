@@ -1,6 +1,7 @@
 from app.persistence.repository import SQLAlchemyRepository
 from app.models.user import User
 from app.models.place import Place
+from app.models.review import Review
 from app.services.user_service import UserServices
 from app.services.place_service import PlaceService
 from app.services.amenity_service import AmenityService
@@ -21,7 +22,7 @@ class HBnBFacade:
         """Repositories Initialization"""
         self.user_db = SQLAlchemyRepository(User)
         self.place_db = SQLAlchemyRepository(Place)
-        # self.review_db = SQLAlchemyRepository()
+        self.review_db = SQLAlchemyRepository(Review)
         # self.amenity_db = SQLAlchemyRepository()
         # self.guest_db = SQLAlchemyRepository()
         # self.booking_db = SQLAlchemyRepository()
@@ -86,11 +87,16 @@ class HBnBFacade:
         )
 
     def update_place(self, place_id: str, place_data: dict) -> bool:
-        return self.place_service.update_place(
+        updated = self.place_service.update_place(
             place_id=place_id,
             place_data=place_data,
             place_repo=self.place_db
         )
+
+        if updated:
+            self.place_db.commit()
+
+        return updated
 
     def get_all_places(self):
         return self.place_service.get_all_places(self.place_db)
@@ -127,6 +133,12 @@ class HBnBFacade:
         return self.review_service.delete_Review(
             review_id, self.review_db
         )
+    
+    def get_all_reviews(self):
+        reviews = self.review_db.get_all()
+        if not reviews:
+            return []
+        return reviews
     
     #amenity methods
 
