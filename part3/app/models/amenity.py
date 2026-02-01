@@ -1,8 +1,15 @@
 from app.models.base_model import BaseModel
 from app.enums.place_amenity_status import PlaceAmenityStatus
+from app.sqlalchemy import db
 
 class Amenity(BaseModel):
 
+    __tablename__ = 'amenities'
+
+    amenity_name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(50), nullable=True)
+    
     def __init__(self, amenity_name, description, status):
         
         super().__init__()

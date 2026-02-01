@@ -1,8 +1,15 @@
 from app.models.base_model import BaseModel
 from app.models.place import Place
 from app.models.guest import Guest
+from app.sqlalchemy import db
 
 class Review(BaseModel):
+
+    __tablename__ = 'reviews'
+    place_id = db.Column(db.String(36), db.ForeignKey('places.id'), nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    rating = db.Column(db.Float, nullable=False)
+    comment = db.Column(db.Text, nullable=True)
 
     def __init__(self, place_id, user_id, rating, comment):
         super().__init__()
