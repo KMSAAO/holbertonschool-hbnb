@@ -56,9 +56,19 @@ class Amenity(BaseModel):
     @status.setter
     def status(self, value):
         if isinstance(value, PlaceAmenityStatus):
-            self._status = value
+            self._status = value.value
         else:
             try:
-                self._status = PlaceAmenityStatus(value)
+                self._status = PlaceAmenityStatus(value).value
             except Exception:
                 raise ValueError("invalid amenity status")
+            
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "amenity_name": self.amenity_name,
+            "description": self.description,
+            "status": self.status,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at
+        }
