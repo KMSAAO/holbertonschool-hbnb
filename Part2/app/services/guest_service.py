@@ -7,7 +7,6 @@ class GuestService:
         if not user or not hasattr(user, "id"):
             raise ValueError("Valid user object is required")
 
-        # حذف التحقق من نوع bio، لأنه مفروض يتم داخل Guest model
         new_guest = Guest(user=user, user_id=user.id, bio=bio)
         repo.add(new_guest)
         return new_guest
