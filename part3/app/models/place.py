@@ -16,11 +16,10 @@ class Place(BaseModel):
     latitude = db.Column(db.Float, nullable=True)
     longitude = db.Column(db.Float, nullable=True)
 
-    def __init__(self, user: User, title, description, price, status: place_status, latitude, longitude):
+    def __init__(self, user_id, title, description, price, status: place_status, latitude, longitude):
 
         super().__init__()
-        self.user_id = user.id
-        self.user = user
+        self.user_id = user_id
         self.title = title
         self.description = description
         self.price = price
