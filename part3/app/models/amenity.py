@@ -1,6 +1,6 @@
 from app.models.base_model import BaseModel
 from app.enums.place_amenity_status import PlaceAmenityStatus
-from app.sqlalchemy import db
+from app.db import db
 
 class Amenity(BaseModel):
     __tablename__ = 'amenities'
@@ -23,7 +23,7 @@ class Amenity(BaseModel):
     def amenity_name(self, value):
         if not isinstance(value, str):
             raise ValueError("amenity_name must be a string")
-        if not value or len(value) > 50:
+        if not value or len(value) > 100:
             raise ValueError("amenity_name is required and must be <= 50 chars")
         self._amenity_name = value
 
@@ -33,10 +33,14 @@ class Amenity(BaseModel):
 
     @description.setter
     def description(self, value):
+        if value is None:
+            self._description = None
+            return
+            
         if not isinstance(value, str):
             raise ValueError("description must be a string")
-        if not value or len(value) > 100:
-            raise ValueError("description must be <= 100 chars")
+        if len(value) > 255:
+             raise ValueError("description must be <= 255 chars")
         self._description = value
 
     @property
@@ -59,6 +63,6 @@ class Amenity(BaseModel):
             "amenity_name": self.amenity_name,
             "description": self.description,
             "status": self.status,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }

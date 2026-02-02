@@ -1,9 +1,13 @@
 from app.models.base_model import BaseModel
-from app.models.user import User
 from app.enums import place_status
 from app.enums.place_status import PlaceStatus
-from app.sqlalchemy import db
+from app.db import db
 from sqlalchemy.orm import relationship
+
+place_amenity = db.Table('place_amenity',
+    db.Column('place_id', db.String(36), db.ForeignKey('places.id'), primary_key=True),
+    db.Column('amenity_id', db.String(36), db.ForeignKey('amenities.id'), primary_key=True)
+)
 
 class Place(BaseModel):
     __tablename__ = 'places'
@@ -17,6 +21,10 @@ class Place(BaseModel):
     _longitude = db.Column("longitude", db.Float, nullable=True)
 
     user = relationship("User", backref="places")
+
+    reviews = relationship("Review", backref="place", cascade="all, delete-orphan", lazy=True)
+
+    amenities = relationship("Amenity", secondary=place_amenity, backref="places", lazy=True)
 
     def __init__(self, user_id, title, description, price, status, latitude, longitude):
         super().__init__()

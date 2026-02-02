@@ -9,7 +9,7 @@ from app.api.v1.auth import api as auth_ns
 
 from app.bcrypt import bcrypt
 from app.JWTManger import jwt  
-from app.sqlalchemy import db
+from app.db import db
 import app.services.facade as facade
 
 def create_app(config_class="config.DevelopmentConfig"):

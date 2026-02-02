@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from app.sqlalchemy import db
+from app.db import db
 
 class Repository(ABC):
     @abstractmethod

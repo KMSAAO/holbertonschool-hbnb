@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from app.sqlalchemy import db
+from app.db import db
 
 class BaseModel(db.Model):
     __abstract__ = True

@@ -1,7 +1,5 @@
 from app.models.base_model import BaseModel
-from app.models.place import Place
-from app.models.guest import Guest
-from app.sqlalchemy import db
+from app.db import db
 
 class Review(BaseModel):
     __tablename__ = 'reviews'
@@ -68,6 +66,7 @@ class Review(BaseModel):
         return {
         "id": self.id,
         "place_id": self.place_id,
+        "user_id": self.user_id,
         "rating": self.rating,
         "comment": self.comment,
         "created_at": self.created_at.isoformat(),

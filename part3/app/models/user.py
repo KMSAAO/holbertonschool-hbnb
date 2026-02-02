@@ -1,7 +1,8 @@
 import re
 from app.bcrypt import bcrypt
-from app.sqlalchemy import db
+from app.db import db
 from app.models.base_model import BaseModel
+from sqlalchemy.orm import relationship
 
 
 class User(BaseModel):
@@ -13,6 +14,8 @@ class User(BaseModel):
     password = db.Column(db.String(128), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
+
+    reviews = relationship("Review", backref="user", cascade="all, delete-orphan", lazy=True)
 
     def __init__(self, first_name, last_name, email, password, is_admin=False, is_active=True):
         super().__init__()
