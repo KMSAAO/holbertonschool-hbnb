@@ -60,30 +60,30 @@ class UserRegister(Resource):
             api.abort(400, str(e))
 
 
-@api.route("/login")
-class UserLogin(Resource):
-    @api.expect(user_login_model, validate=True)
-    def post(self):
-        data = api.payload or {}
-        email = data.get("email")
-        password = data.get("password")
+# @api.route("/login")
+# class UserLogin(Resource):
+#     @api.expect(user_login_model, validate=True)
+#     def post(self):
+#         data = api.payload or {}
+#         email = data.get("email")
+#         password = data.get("password")
 
-        ok = facade.login_user(email=email, password=password)
-        if not ok:
-            api.abort(401, "Invalid credentials")
+#         ok = facade.login_user(email=email, password=password)
+#         if not ok:
+#             api.abort(401, "Invalid credentials")
 
-        user = facade.get_user_by_email(email)
-        if not user:
-            api.abort(401, "Invalid credentials")
+#         user = facade.get_user_by_email(email)
+#         if not user:
+#             api.abort(401, "Invalid credentials")
 
-        uid = str(_get_attr(user, "id"))
-        is_admin = bool(_get_attr(user, "is_admin", False))
+#         uid = str(_get_attr(user, "id"))
+#         is_admin = bool(_get_attr(user, "is_admin", False))
 
-        access_token = create_access_token(
-            identity=uid,
-            additional_claims={"id": uid, "is_admin": is_admin},
-        )
-        return {"access_token": access_token}, 200
+#         access_token = create_access_token(
+#             identity=uid,
+#             additional_claims={"id": uid, "is_admin": is_admin},
+#         )
+#         return {"access_token": access_token}, 200
 
 
 @api.route("/")

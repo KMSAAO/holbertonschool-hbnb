@@ -41,6 +41,7 @@ class ReviewList(Resource):
     @api.marshal_with(review_response_model, code=201)
     def post(self):
         current_user_id = get_jwt_identity()
+
         if not current_user_id:
             api.abort(401, "Invalid token")
 
@@ -52,7 +53,7 @@ class ReviewList(Resource):
         except ValueError:
             api.abort(400, "Invalid place_id")
 
-        place_owner_id = str(_get_attr(place, "owner_id"))
+        place_owner_id = str(_get_attr(place, "user_id"))
         if str(place_owner_id) == str(current_user_id):
             api.abort(400, "You cannot review your own place.")
 
@@ -61,6 +62,7 @@ class ReviewList(Resource):
         for r in all_reviews:
             r_place = str(_get_attr(r, "place_id"))
             r_user = str(_get_attr(r, "user_id"))
+
             if r_place == str(place_id) and r_user == str(current_user_id):
                 already = True
                 break

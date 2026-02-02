@@ -2,6 +2,7 @@ from app.persistence.repository import SQLAlchemyRepository
 from app.models.user import User
 from app.models.place import Place
 from app.models.review import Review
+from app.models.amenity import Amenity
 from app.services.user_service import UserServices
 from app.services.place_service import PlaceService
 from app.services.amenity_service import AmenityService
@@ -23,7 +24,7 @@ class HBnBFacade:
         self.user_db = SQLAlchemyRepository(User)
         self.place_db = SQLAlchemyRepository(Place)
         self.review_db = SQLAlchemyRepository(Review)
-        # self.amenity_db = SQLAlchemyRepository()
+        self.amenity_db = SQLAlchemyRepository(Amenity)
         # self.guest_db = SQLAlchemyRepository()
         # self.booking_db = SQLAlchemyRepository()
         # self.payment_db = SQLAlchemyRepository()

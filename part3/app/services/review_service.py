@@ -51,4 +51,4 @@ class ReviewService():
         if not all_reviews:
             return None
 
-        return all_reviews 
+        return all_reviews
