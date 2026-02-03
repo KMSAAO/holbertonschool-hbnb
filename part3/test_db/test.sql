@@ -1,4 +1,8 @@
 
+-- Create Data base
+CREATE DATABASE IF NOT EXISTS hbnb_db;
+
+USE hbnb_db;
 -- Create User table
 CREATE TABLE if not exists users (
     id CHAR(36) PRIMARY KEY,
@@ -8,8 +12,8 @@ CREATE TABLE if not exists users (
     password VARCHAR(255),
     is_admin BOOLEAN DEFAULT FALSE,
     is_active BOOLEAN DEFAULT TRUE,
-    Create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    Update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    create_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Create Place table
@@ -60,25 +64,26 @@ CREATE TABLE if not exists place_amenity (
     FOREIGN KEY (amenity_id) REFERENCES amenities(id)
 );
 
-insert into users (id, first_name, last_name, email, password, is_admin, is_active)
-values
-(id, 'Nawaf', 'Saleh', 'NA@gmail.com', '$2b$12$PK6MXIU39Sw2LAyS8VNnlOg8YiKbtOkbWJhIufaek2v9xVzv9yRum', TRUE, TRUE);
 
-insert into places (id, user_id, title, description, price, status, latitude, longitude)
-values
-(id, "830e5844-d44f-4f3b-8c2d-b347ef70fec4", 'Cozy Cottage', 'A cozy cottage in the countryside.', 120.00, 'available', 34.0522, -118.2437);
+SET @admin_id = '36c9050e-ddd3-4c3b-9731-9f487208bbc1';
+SET @place_id = UUID();
+SET @amenity_id = UUID();
 
-insert into reviews (id, "830e5844-d44f-4f3b-8c2d-b347ef70fec4", "830e5844-d44f-4f3b-8c2d-b347ef70fec4", 5, "Nice")
-values
-(id, user_id, place_id, 5, 'Amazing place! Had a wonderful time.');
 
-insert into amenities (id, 'WIFI', 'Speed WIFI', 'active');
-values
-(id, 'WiFi', 'High-speed wireless internet access.', 'active');
+INSERT INTO users (id, first_name, last_name, email, password, is_admin, is_active)
+VALUES (@admin_id, 'Nawaf', 'Saleh', 'NA@gmail.com', '$2b$12$ywfMB7Srq3o7T0nJVQ5i6ez2eTn5oI1jq/75FKHCQYCYqfldrxuLa', TRUE, TRUE);
 
-insert into place_amenity (place_id, amenity_id)
-values
-(place_id, amenity_id);
+INSERT INTO places (id, user_id, title, description, price, status, latitude, longitude)
+VALUES (@place_id, @admin_id, 'Cozy Cottage', 'A cozy cottage in the countryside.', 120.00, 'available', 34.0522, -118.2437);
+
+INSERT INTO reviews (id, user_id, place_id, rating, comment)
+VALUES (UUID(), @admin_id, @place_id, 5, 'Amazing place! Had a wonderful time.');
+
+INSERT INTO amenities (id, amenity_name, description, status)
+VALUES (@amenity_id, 'WiFi', 'High-speed wireless internet access.', 'active');
+
+INSERT INTO place_amenity (place_id, amenity_id)
+VALUES (@place_id, @amenity_id);
 
 -- Query to verify data insertion
 SELECT * FROM users;
@@ -87,39 +92,30 @@ SELECT * FROM reviews;
 SELECT * FROM amenities;
 SELECT * FROM place_amenity;
 
---update statements
+-- update statements
 UPDATE users
-SET first_name = 'Khalid', last_name = 'Mohammed', email = 'KO@gmail.com'
-WHERE id = id;
+SET first_name = 'Khalid'
+WHERE id = @admin_id;
 
 UPDATE places
-SET title = 'Modern Apartment', description = 'A modern apartment in the city center.', price = 150.00, status = 'booked'
-WHERE id = id;
-
-UPDATE reviews
-SET rating = 4, comment = 'Great place, but could be cleaner.'
-
-WHERE id = id;
-
-UPDATE amenities
-SET amenity_name = 'Pool', description = 'Outdoor swimming pool.', status = 'active'
-WHERE id = id;
-
-update place_amenity
-SET place_id = place_id, amenity_id = amenity_id
-WHERE place_id = place_id AND amenity_id = amenity_id;
+SET price = 150.00, status = 'booked'
+WHERE id = @place_id;
 
 --delete statements
-DELETE FROM users WHERE id = id;
-DELETE FROM places WHERE id = id;
-DELETE FROM reviews WHERE id = id;
-DELETE FROM amenities WHERE id = id;
-DELETE FROM place_amenity WHERE place_id = place_id AND amenity_id = amenity_id;
+
+-- DELETE FROM reviews WHERE place_id = @place_id;
+-- DELETE FROM place_amenity WHERE place_id = @place_id;
+-- DELETE FROM places WHERE id = @place_id;
+-- DELETE FROM users WHERE id = @admin_id;
+-- DELETE FROM amenities WHERE id = @amenity_id;
+
 
 
 -- Drop tables if they exist (for cleanup)
-DROP TABLE IF EXISTS place_amenity;
-DROP TABLE IF EXISTS amenities;
-DROP TABLE IF EXISTS reviews;
-DROP TABLE IF EXISTS places;
-DROP TABLE IF EXISTS users;
+
+
+-- DROP TABLE IF EXISTS place_amenity;
+-- DROP TABLE IF EXISTS amenities;
+-- DROP TABLE IF EXISTS reviews;
+-- DROP TABLE IF EXISTS places;
+-- DROP TABLE IF EXISTS users;
