@@ -39,6 +39,8 @@ class ReviewList(Resource):
     @jwt_required()
     @api.expect(review_create_model, validate=True)
     @api.marshal_with(review_response_model, code=201)
+    @api.response(401, "Invalid token")
+    @api.response(400, "Validation / business error")
     def post(self):
         current_user_id = get_jwt_identity()
         if not current_user_id:
@@ -53,7 +55,7 @@ class ReviewList(Resource):
             api.abort(400, "Invalid place_id")
 
         place_owner_id = str(_get_attr(place, "owner_id"))
-        if place_owner_id == str(current_user_id):
+        if str(place_owner_id) == str(current_user_id):
             api.abort(400, "You cannot review your own place.")
 
         all_reviews = facade.get_all_reviews() or []
@@ -75,6 +77,7 @@ class ReviewList(Resource):
 @api.route("/<string:review_id>")
 class ReviewResource(Resource):
     @api.marshal_with(review_response_model, code=200)
+    @api.response(404, "Review not found")
     def get(self, review_id):
         try:
             return facade.get_review_info(review_id), 200
@@ -84,6 +87,9 @@ class ReviewResource(Resource):
     @jwt_required()
     @api.expect(review_update_model, validate=False)
     @api.marshal_with(review_response_model, code=200)
+    @api.response(401, "Invalid token")
+    @api.response(403, "Unauthorized action")
+    @api.response(404, "Review not found")
     def put(self, review_id):
         current_user_id = get_jwt_identity()
         if not current_user_id:
@@ -109,6 +115,10 @@ class ReviewResource(Resource):
             api.abort(400, str(e))
 
     @jwt_required()
+    @api.response(204, "Review deleted")
+    @api.response(401, "Invalid token")
+    @api.response(403, "Unauthorized action")
+    @api.response(404, "Review not found")
     def delete(self, review_id):
         current_user_id = get_jwt_identity()
         if not current_user_id:
