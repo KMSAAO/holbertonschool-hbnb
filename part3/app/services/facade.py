@@ -46,8 +46,8 @@ class HBnBFacade:
     
     #user methods
 
-    def register_user(self, user_data: dict) -> str:
-        return self.user_service.register_users(user_data, self.user_db)
+    def create_user(self, user_data: dict) -> str:
+        return self.user_service.create_user(user_data, self.user_db)
 
     def login_user(self, email: str, password: str) -> bool:
         return self.user_service.login(email, password, self.user_db)

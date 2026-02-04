@@ -4,7 +4,7 @@ import re, hashlib, datetime
 class UserServices():
 
 
-    def register_users(self, user_data: dict, repo):
+    def create_user(self, user_data: dict, repo):
 
         first_name = user_data.get("first_name")
         last_name  = user_data.get("last_name")
@@ -14,7 +14,7 @@ class UserServices():
         is_active  = user_data.get("is_active", True)
 
         if repo.get_by_attribute('email',email):
-            raise ValueError("email is already register")
+            raise ValueError("email is already registered")
 
         
         user = User(

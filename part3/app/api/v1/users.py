@@ -8,7 +8,7 @@ from app.services import facade
 
 api = Namespace("users", description="User operations")
 
-user_register_model = api.model("UserRegister", {
+user_create_model = api.model("UserCreate", {
     "first_name": fields.String(required=True),
     "last_name":  fields.String(required=True),
     "email":      fields.String(required=True),
@@ -47,14 +47,14 @@ def _get_attr(obj, key, default=None):
     return getattr(obj, key, default)
 
 
-@api.route("/register")
-class UserRegister(Resource):
-    @api.expect(user_register_model, validate=True)
+@api.route("/create_user")
+class UserCreate(Resource):
+    @api.expect(user_create_model, validate=True)
     @api.marshal_with(user_response_model, code=201)
     def post(self):
         data = api.payload or {}
         try:
-            user = facade.register_user(data)
+            user = facade.create_user(data)
             return user, 201
         except ValueError as e:
             api.abort(400, str(e))
