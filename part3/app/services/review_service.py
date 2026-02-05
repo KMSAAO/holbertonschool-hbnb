@@ -6,6 +6,7 @@ class ReviewService():
 
     def create_Review(self, review_data, place_repo, review_repo):
         place_id = review_data.get("place_id")
+        user_id  = review_data.get("user_id")
         rating   = review_data.get("rating")
         comment  = review_data.get("comment")
 
@@ -13,9 +14,9 @@ class ReviewService():
         if place is None:
             raise ValueError("Place not found")
 
-        user_id = place.user.id
         review = Review(place_id=place_id, user_id=user_id, rating=rating, comment=comment)
         review_repo.add(review)
+
 
         return review
 
