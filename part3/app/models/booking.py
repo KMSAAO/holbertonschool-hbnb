@@ -6,14 +6,12 @@ from app.models.guest import Guest
 
 
 class Booking(BaseModel):
-    def __init__(self, guest_id: str, place_id: str, guest: Guest, place: Place,
-                 payment_id: str, check_in: datetime, check_out: datetime, status: booking_status):
+    def __init__(self, guest_id: str, place_id: str, guest: Guest, place: Place, check_in: datetime, check_out: datetime, status: booking_status):
         super().__init__()
         self.guest_id = guest_id
         self.place_id = place_id
         self.guest = guest
         self.place = place
-        self.payment_id = payment_id
         self.check_in = check_in
         self.check_out = check_out
         self.status = status
@@ -59,16 +57,6 @@ class Booking(BaseModel):
         self._place = value
 
     @property
-    def payment_id(self):
-        return self._payment_id
-
-    @payment_id.setter
-    def payment_id(self, value):
-        if not isinstance(value, str):
-            raise ValueError("payment_id must be a string")
-        self._payment_id = value
-
-    @property
     def check_in(self):
         return self._check_in
 
@@ -105,7 +93,6 @@ class Booking(BaseModel):
             "id": self.id,
             "guest_id": self.guest_id,
             "place_id": self.place_id,
-            "payment_id": self.payment_id,
             "check_in": self.check_in.isoformat(),
             "check_out": self.check_out.isoformat(),
             "status": self.status.value,

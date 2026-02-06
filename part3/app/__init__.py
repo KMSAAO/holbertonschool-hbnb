@@ -6,6 +6,7 @@ from app.api.v1.places import api as places_ns
 from app.api.v1.reviews import api as review_ns
 from app.api.v1.amenities import api as amenities_ns
 from app.api.v1.auth import api as auth_ns
+from app.api.v1.guests import api as guests_ns
 
 from app.bcrypt import bcrypt
 from app.JWTManger import jwt  
@@ -43,6 +44,7 @@ def create_app(config_class="config.DevelopmentConfig"):
     api.add_namespace(review_ns, path='/api/v1/reviews')
     api.add_namespace(amenities_ns, path='/api/v1/amenities')
     api.add_namespace(auth_ns, path='/api/v1/auth')
+    api.add_namespace(guests_ns,path= '/api/v1/guests')
 
     @app.route("/")
     def index():

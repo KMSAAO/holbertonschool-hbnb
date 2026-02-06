@@ -69,6 +69,8 @@ class User(BaseModel):
 
     @password_value.setter
     def password_value(self, password):
+        if not password or not isinstance(password, str) or not password.strip():
+            raise ValueError("Password must be non-empty.")
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
 

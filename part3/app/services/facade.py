@@ -7,8 +7,8 @@ from app.services.user_service import UserServices
 from app.services.place_service import PlaceService
 from app.services.amenity_service import AmenityService
 from app.services.review_service import ReviewService
-# from app.services.guest_service import GuestService
-# from app.services.booking_service import BookingService
+from app.services.guest_service import GuestService
+#from app.services.booking_service import BookingService
 # from app.services.payment_service import PaymentService
 # from app.services.refund_service import RefundServices
 # from app.services.place_amenity import PlaceAmenityService
@@ -25,8 +25,8 @@ class HBnBFacade:
         self.place_db = SQLAlchemyRepository(Place)
         self.review_db = SQLAlchemyRepository(Review)
         self.amenity_db = SQLAlchemyRepository(Amenity)
-        # self.guest_db = SQLAlchemyRepository()
-        # self.booking_db = SQLAlchemyRepository()
+        self.guest_db = SQLAlchemyRepository(GuestService)
+        #self.booking_db = SQLAlchemyRepository()
         # self.payment_db = SQLAlchemyRepository()
         # self.refund_db = SQLAlchemyRepository()
         # self.place_amenity_db = SQLAlchemyRepository()
@@ -37,8 +37,8 @@ class HBnBFacade:
         self.place_service = PlaceService()
         self.review_service = ReviewService()
         self.amenity_service = AmenityService()
-        # self.guest_service = GuestService()
-        # self.booking_service = BookingService()
+        self.guest_service = GuestService()
+        #self.booking_service = BookingService()
         # self.payment_service = PaymentService()
         # self.refund_service = RefundServices()
         # self.place_amenity_service = PlaceAmenityService()
@@ -174,8 +174,10 @@ class HBnBFacade:
         )
 
     #guest methods
-    def register_as_guest(self, user, bio=""):
-        return self.guest_service.register_as_guest(user, self.guest_db, bio)
+    def register_as_guest(self, user_data: dict, bio=""):
+        user = user_data
+        return self.guest_service.register_as_guest(user, bio)
+
 
     def get_guest_info(self, guest_id):
         return self.guest_service.get_guest_info(guest_id, self.guest_db)

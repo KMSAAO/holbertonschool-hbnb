@@ -3,7 +3,7 @@ from app.enums.payment_status import PaymentStatus
 from app.enums.payment_type import MethodPayment
 
 
-class PaymentService:
+class PaymentService():
 
     def create_payment(self, payment: dict, repo, booking_repo) -> Payment:
         booking_id = payment.get('book_id')

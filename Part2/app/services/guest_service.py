@@ -1,7 +1,7 @@
 from app.models.guest import Guest
 
 
-class GuestService:
+class GuestService():
 
     def register_as_guest(self, user, repo, bio=""):
         if not user or not hasattr(user, "id"):

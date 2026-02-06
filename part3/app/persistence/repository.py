@@ -71,3 +71,15 @@ class UserRepository(SQLAlchemyRepository):
 
     def get_user_by_email(self, email):
         return self.model.query.filter_by(email=email).first()
+    
+class GuestRepository(SQLAlchemyRepository):
+    def get_guest_by_user_id(self, user_id):
+        return self.model.query.filter_by(user_id=user_id).first()
+
+    def add(self, guest):
+        if not guest or not hasattr(guest, "user_id"):
+            raise ValueError("Guest must have a valid user_id")
+
+        db.session.add(guest)
+        db.session.commit()
+        return guest
