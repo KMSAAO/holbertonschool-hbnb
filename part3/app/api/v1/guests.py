@@ -27,7 +27,7 @@ class GuestRegister(Resource):
     def post(self):
         """Register user and create guest"""
         data = api.payload
-
+    
         try:
             user_data = {
                 "first_name": data["first_name"],
@@ -47,7 +47,4 @@ class GuestRegister(Resource):
         except ValueError as e:
             api.abort(400, str(e))
 
-        return {
-            "message": "Guest registered successfully",
-            "guest": guest
-        }, 201
+        return guest.to_dict(), 201

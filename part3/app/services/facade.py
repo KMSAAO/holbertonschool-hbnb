@@ -176,7 +176,7 @@ class HBnBFacade:
     #guest methods
     def register_as_guest(self, user_data: dict, bio=""):
         user = user_data
-        return self.guest_service.register_as_guest(user, bio)
+        return self.guest_service.register_as_guest(user, self.guest_db, bio)
 
 
     def get_guest_info(self, guest_id):

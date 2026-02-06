@@ -6,7 +6,7 @@ class Guest(BaseModel):
     __tablename__ = "guests"
 
     user_id = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
-    _bio = db.Column("bio", db.String(255), nullable=True)  # ← هذا التغيير المهم
+    _bio = db.Column("bio", db.String(255), nullable=True)
 
     user = db.relationship("User", backref="guest", lazy=True)
 
@@ -24,3 +24,12 @@ class Guest(BaseModel):
         if not isinstance(value, str):
             raise ValueError("Bio must be a string.")
         self._bio = value
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "bio": self.bio,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
+        }
