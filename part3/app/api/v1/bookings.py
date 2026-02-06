@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-import app.services.facade as facade
+from app.services import facade
 from app.enums.booking_status import BookingStatus  
 
 api = Namespace('bookings', description='Booking operations')
@@ -9,7 +9,7 @@ booking_create_model = api.model('BookingCreate', {
     'place_id':   fields.String(required=True, description='Place ID'),
     'check_in':   fields.String(required=True, description='Check-in datetime in ISO format'),
     'check_out':  fields.String(required=True, description='Check-out datetime in ISO format'),
-    'status':     fields.String(required=True, description='Booking status', enum=BookingStatus),
+    'status':     fields.String(required=True, description='Booking status', enum=[e.value for e in BookingStatus]),
 })
 
 booking_update_model = api.model('BookingUpdate', {
@@ -17,7 +17,7 @@ booking_update_model = api.model('BookingUpdate', {
     'place_id':   fields.String(required=False),
     'check_in':   fields.String(required=False),
     'check_out':  fields.String(required=False),
-    'status':     fields.String(required=False, enum=BookingStatus),
+    'status':     fields.String(required=False, enum=[e.value for e in BookingStatus]),
 })
 
 booking_response_model = api.model('BookingResponse', {
@@ -26,7 +26,7 @@ booking_response_model = api.model('BookingResponse', {
     'place_id':   fields.String,
     'check_in':   fields.String,
     'check_out':  fields.String,
-    'status':     fields.String(enum=BookingStatus),
+    'status':     fields.String(enum=[status.value for status in BookingStatus]),
     'created_at': fields.String,
     'updated_at': fields.String,
 })

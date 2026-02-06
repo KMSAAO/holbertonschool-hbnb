@@ -6,13 +6,13 @@ from app.enums.booking_status import BookingStatus
 class BookingService:
 
     def create_booking(self, booking_data, repo, place_repo):
-        guest = booking_data.get('guest')
-        if not guest:
-            raise ValueError("Invalid guest")
+        guest_id = booking_data.get('guest_id')
+        if not guest_id:
+            raise ValueError("Invalid guest_id")
 
-        place = booking_data.get('place')
-        if not place:
-            raise ValueError("Invalid place")
+        place_id = booking_data.get('place_id')
+        if not place_id:
+            raise ValueError("Invalid place_id")
 
         try:
             check_in = datetime.strptime(booking_data.get("start_date"), "%Y-%m-%d")
@@ -27,10 +27,8 @@ class BookingService:
             raise ValueError("Invalid booking status")
 
         booking = Booking(
-            guest.id,
-            place.id,
-            guest,
-            place,
+            guest_id,
+            place_id,
             check_in,
             check_out,
             status

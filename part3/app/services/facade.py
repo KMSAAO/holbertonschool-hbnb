@@ -8,7 +8,7 @@ from app.services.place_service import PlaceService
 from app.services.amenity_service import AmenityService
 from app.services.review_service import ReviewService
 from app.services.guest_service import GuestService
-#from app.services.booking_service import BookingService
+from app.services.booking_service import BookingService
 # from app.services.payment_service import PaymentService
 # from app.services.refund_service import RefundServices
 # from app.services.place_amenity import PlaceAmenityService
@@ -26,7 +26,7 @@ class HBnBFacade:
         self.review_db = SQLAlchemyRepository(Review)
         self.amenity_db = SQLAlchemyRepository(Amenity)
         self.guest_db = SQLAlchemyRepository(GuestService)
-        #self.booking_db = SQLAlchemyRepository()
+        self.booking_db = SQLAlchemyRepository(BookingService)
         # self.payment_db = SQLAlchemyRepository()
         # self.refund_db = SQLAlchemyRepository()
         # self.place_amenity_db = SQLAlchemyRepository()
@@ -38,7 +38,7 @@ class HBnBFacade:
         self.review_service = ReviewService()
         self.amenity_service = AmenityService()
         self.guest_service = GuestService()
-        #self.booking_service = BookingService()
+        self.booking_service = BookingService()
         # self.payment_service = PaymentService()
         # self.refund_service = RefundServices()
         # self.place_amenity_service = PlaceAmenityService()
@@ -185,11 +185,7 @@ class HBnBFacade:
     #booking methods
 
     def create_booking(self, booking_data: dict):
-        return self.booking_service.create_booking(
-            booking_data,
-            self.booking_db,
-            place_repo=self.place_db,
-        )
+        return self.booking_service.create_booking(booking_data, self.booking_db, self.place_db)
 
     def cancel_booking(self, booking_id: str):
         return self.booking_service.cancel_booking(

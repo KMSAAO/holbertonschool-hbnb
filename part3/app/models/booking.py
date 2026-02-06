@@ -6,12 +6,10 @@ from app.models.guest import Guest
 
 
 class Booking(BaseModel):
-    def __init__(self, guest_id: str, place_id: str, guest: Guest, place: Place, check_in: datetime, check_out: datetime, status: booking_status):
+    def __init__(self, guest_id: str, place_id: str, check_in: datetime, check_out: datetime, status: booking_status):
         super().__init__()
         self.guest_id = guest_id
         self.place_id = place_id
-        self.guest = guest
-        self.place = place
         self.check_in = check_in
         self.check_out = check_out
         self.status = status
@@ -39,22 +37,6 @@ class Booking(BaseModel):
     @property
     def guest(self):
         return self._guest
-
-    @guest.setter
-    def guest(self, value):
-        if not isinstance(value, Guest):
-            raise ValueError("guest must be a Guest instance")
-        self._guest = value
-
-    @property
-    def place(self):
-        return self._place
-
-    @place.setter
-    def place(self, value):
-        if not isinstance(value, Place):
-            raise ValueError("place must be a Place instance")
-        self._place = value
 
     @property
     def check_in(self):

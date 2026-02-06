@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from flask_jwt_extended import create_access_token
 
 api = Namespace('guests', description='Guest operations')
 
@@ -44,7 +45,15 @@ class GuestRegister(Resource):
 
             guest = facade.register_as_guest(guest_data)
 
+            access_token = create_access_token(
+                identity=user.id,
+                additional_claims={"role": "guest"}
+            )
+
+            response = guest.to_dict()
+            response['access_token'] = access_token
+
         except ValueError as e:
             api.abort(400, str(e))
 
-        return guest.to_dict(), 201
+        return response, 201
