@@ -1,8 +1,11 @@
 from app.persistence.repository import SQLAlchemyRepository
+from app.persistence.repository import GuestRepository, BookingRepository
+
 from app.models.user import User
 from app.models.place import Place
 from app.models.review import Review
 from app.models.amenity import Amenity
+
 from app.services.user_service import UserServices
 from app.services.place_service import PlaceService
 from app.services.amenity_service import AmenityService
@@ -25,8 +28,8 @@ class HBnBFacade:
         self.place_db = SQLAlchemyRepository(Place)
         self.review_db = SQLAlchemyRepository(Review)
         self.amenity_db = SQLAlchemyRepository(Amenity)
-        self.guest_db = SQLAlchemyRepository(GuestService)
-        self.booking_db = SQLAlchemyRepository(BookingService)
+        self.guest_db = GuestRepository()
+        self.booking_db = BookingRepository()
         # self.payment_db = SQLAlchemyRepository()
         # self.refund_db = SQLAlchemyRepository()
         # self.place_amenity_db = SQLAlchemyRepository()
@@ -196,6 +199,13 @@ class HBnBFacade:
     def get_booking_info(self, booking_id: str):
         return self.booking_service.get_booking_info(
             booking_id,
+            repo=self.place_db
+        )
+    
+    def update_booking_status(self, booking_id: str, new_status: str):
+        return self.booking_service.update_status(
+            booking_id,
+            new_status,
             repo=self.place_db
         )
 

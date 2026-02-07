@@ -68,7 +68,8 @@ class BookingDetail(Resource):
         """Update booking by ID"""
         data = api.payload or {}
         try:
-            updated = facade.update_booking(booking_id, data)
+            updated = facade.update_booking_status(booking_id, data.get("status")) if "status" in data else facade.update_booking_dates(booking_id, data)
+
         except ValueError as e:
             msg = str(e)
             if "not found" in msg.lower():

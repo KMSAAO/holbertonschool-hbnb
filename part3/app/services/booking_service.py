@@ -44,14 +44,27 @@ class BookingService:
 
         booking.status = BookingStatus.CANCELLED
         return repo.update(booking)
-
-    def update_booking_payment(self, booking_id: str, payment_id: str, new_status: BookingStatus, repo):
+    
+    def update_status(self, booking_id: str, new_status: BookingStatus, repo):
         booking = repo.get(booking_id)
         if not booking:
             raise ValueError("booking not found")
 
         try:
             booking.status = new_status if isinstance(new_status, BookingStatus) else BookingStatus(new_status)
+        except Exception:
+            raise ValueError("Invalid booking status")
+
+        return repo.update(booking)
+
+    def update_booking_dates(self, booking_id: str, new_check_in: datetime, new_check_out: datetime, repo):
+        booking = repo.get(booking_id)
+        if not booking:
+            raise ValueError("booking not found")
+
+        try:
+            booking.check_in = new_check_in
+            booking.check_out = new_check_out
         except Exception:
             raise ValueError("Invalid booking status")
 
@@ -91,7 +104,7 @@ class BookingService:
         return True
 
     def get_all_bookings(self, repo):
-        all_bookings = repo.get_all_bookings()
+        all_bookings = repo.get_all()
         if not all_bookings:
             return None
 
