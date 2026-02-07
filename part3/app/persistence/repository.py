@@ -83,3 +83,8 @@ class GuestRepository(SQLAlchemyRepository):
         db.session.add(guest)
         db.session.commit()
         return guest
+    
+class BookingRepository(SQLAlchemyRepository):
+    def get_all_bookings(self):
+        return self.model.query.all()
+

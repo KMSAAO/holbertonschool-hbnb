@@ -15,10 +15,10 @@ class BookingService:
             raise ValueError("Invalid place_id")
 
         try:
-            check_in = datetime.strptime(booking_data.get("start_date"), "%Y-%m-%d")
-            check_out = datetime.strptime(booking_data.get("end_date"), "%Y-%m-%d")
+            check_in = datetime.strptime(booking_data.get("check_in"), "%Y-%m-%d")
+            check_out = datetime.strptime(booking_data.get("check_out"), "%Y-%m-%d")
         except Exception:
-            raise ValueError("start_date and end_date must be in format YYYY-MM-DD")
+            raise ValueError("check_in and check_out must be in format YYYY-MM-DD")
 
         raw_status = booking_data.get('status')
         try:
@@ -91,7 +91,7 @@ class BookingService:
         return True
 
     def get_all_bookings(self, repo):
-        all_bookings = repo.get_all()
+        all_bookings = repo.get_all_bookings()
         if not all_bookings:
             return None
 

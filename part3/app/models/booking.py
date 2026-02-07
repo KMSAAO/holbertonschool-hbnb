@@ -1,12 +1,25 @@
 from datetime import datetime
 from app.models.base_model import BaseModel
-from app.enums import booking_status
+from app.enums.booking_status import BookingStatus
+from app.db import db
 from app.models.place import Place
 from app.models.guest import Guest
 
 
 class Booking(BaseModel):
-    def __init__(self, guest_id: str, place_id: str, check_in: datetime, check_out: datetime, status: booking_status):
+
+    __tablename__ = "bookings"
+
+    _guest_id = db.Column("guest_id", db.String(60), db.ForeignKey("guests.id"), nullable=False)
+    _place_id = db.Column("place_id", db.String(60), db.ForeignKey("places.id"), nullable=False)
+    _check_in = db.Column("check_in", db.DateTime, nullable=False)
+    _check_out = db.Column("check_out", db.DateTime, nullable=False)
+    _status = db.Column("status", db.Enum(BookingStatus), nullable=False)
+
+    guest = db.relationship("Guest", backref="bookings", foreign_keys=[_guest_id])
+    place = db.relationship("Place", backref="bookings", foreign_keys=[_place_id])
+
+    def __init__(self, guest_id: str, place_id: str, check_in: datetime, check_out: datetime, status: BookingStatus):
         super().__init__()
         self.guest_id = guest_id
         self.place_id = place_id
@@ -66,8 +79,15 @@ class Booking(BaseModel):
 
     @status.setter
     def status(self, value):
-        if not isinstance(value, booking_status):
-            raise ValueError("status must be an instance of booking_status enum")
+        if isinstance(value, str):
+            try:
+                value = BookingStatus(value)
+            except ValueError:
+                raise ValueError(f"{value} is not a valid BookingStatus")
+    
+        if not isinstance(value, BookingStatus):
+            raise ValueError("status must be an instance of BookingStatus enum")
+    
         self._status = value
 
     def to_dict(self):

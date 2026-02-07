@@ -7,8 +7,8 @@ api = Namespace('bookings', description='Booking operations')
 booking_create_model = api.model('BookingCreate', {
     'guest_id':   fields.String(required=True, description='Guest ID'),
     'place_id':   fields.String(required=True, description='Place ID'),
-    'check_in':   fields.String(required=True, description='Check-in datetime in ISO format'),
-    'check_out':  fields.String(required=True, description='Check-out datetime in ISO format'),
+    'check_in':   fields.String(required=True, description="YYYY-MM-DD"),
+    'check_out':  fields.String(required=True, description="YYYY-MM-DD"),
     'status':     fields.String(required=True, description='Booking status', enum=[e.value for e in BookingStatus]),
 })
 

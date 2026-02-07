@@ -212,21 +212,18 @@ class HBnBFacade:
             new_status,
             repo=self.place_db
         )
-
-    def update_booking_payment(self, booking_id: str, payment_id: str, new_status: str):
-        return self.booking_service.update_booking_payment(
-            booking_id,
-            payment_id,
-            new_status,
-            repo=self.booking_db
-        )
-
+    
     def is_place_available(self, place_id: str, check_in: str, check_out: str):
         return self.booking_service.is_place_available(
             place_id,
             check_in,
             check_out,
             repo=self.place_db
+        )
+    
+    def get_all_bookings(self):
+        return self.booking_service.get_all_bookings(
+            repo=self.booking_db
         )
 
     #payment methods
