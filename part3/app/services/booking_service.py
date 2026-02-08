@@ -36,76 +36,33 @@ class BookingService:
 
         repo.add(booking)
         return booking
-
-    def cancel_booking(self, booking_id: str, repo):
-        booking = repo.get(booking_id)
-        if not booking:
-            raise ValueError("booking not found")
-
-        booking.status = BookingStatus.CANCELLED
-        return repo.update(booking)
     
-    def update_status(self, booking_id: str, new_status: BookingStatus, repo):
-        booking = repo.get(booking_id)
-        if not booking:
-            raise ValueError("booking not found")
-
-        try:
-            booking.status = new_status if isinstance(new_status, BookingStatus) else BookingStatus(new_status)
-        except Exception:
-            raise ValueError("Invalid booking status")
-
-        return repo.update(booking)
-
-    def update_booking_dates(self, booking_id: str, new_check_in: datetime, new_check_out: datetime, repo):
-        booking = repo.get(booking_id)
-        if not booking:
-            raise ValueError("booking not found")
-
-        try:
-            booking.check_in = new_check_in
-            booking.check_out = new_check_out
-        except Exception:
-            raise ValueError("Invalid booking status")
-
-        return repo.update(booking)
-
-    def update_booking_dates(self, booking_id: str, new_check_in: datetime, new_check_out: datetime, repo):
-        booking = repo.get(booking_id)
-        if not booking:
-            raise ValueError("booking not found")
-
-        booking.check_in = new_check_in
-        booking.check_out = new_check_out
-
-        return repo.update(booking)
-
-    def get_booking_info(self, booking_id: str, repo):
-        booking = repo.get(booking_id)
-        if not booking:
-            raise ValueError("booking not found")
-
-        return {
-            "booking_id": booking.id,
-            "guest_id": booking.guest_id,
-            "place_id": booking.place_id,
-            "check_in": booking.check_in.isoformat(),
-            "check_out": booking.check_out.isoformat(),
-            "status": booking.status.name
-        }
-
-    def is_place_available(self, place_id: str, check_in: datetime, check_out: datetime, repo):
-        bookings = repo.filter_by(place_id=place_id)
-
-        for booking in bookings:
-            if (check_in < booking.check_out and check_out > booking.check_in):
-                return False
-
-        return True
-
     def get_all_bookings(self, repo):
-        all_bookings = repo.get_all()
+        all_bookings = repo.get_all_bookings()
         if not all_bookings:
-            return None
-
+            raise ValueError("No bookings found")
         return all_bookings
+
+    def get_booking_by_id(self, booking_id, repo):
+        booking_id = repo.get_booking_by_id(booking_id)
+        if not booking_id:
+            raise ValueError("Booking not found")
+        return booking_id
+    
+    def get_bookings_by_guest_id(self, guest_id: str, repo):
+        
+        bookings = repo.get_bookings_by_guest_id(guest_id)
+        if not bookings:
+            raise ValueError("No bookings found for this guest")
+        return bookings
+    
+    def update_booking_status(self, booking_id: str, new_status: str, repo):
+        booking = Booking.query.get(booking_id)
+        if not booking:
+            raise ValueError("Booking not found")
+
+        booking.status = new_status
+
+        repo.update_booking_status(booking_id, new_status)
+
+        return booking.status

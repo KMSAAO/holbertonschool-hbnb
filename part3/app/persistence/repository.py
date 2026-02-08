@@ -122,58 +122,28 @@ class GuestRepository:
 
     def get_by_user_id(self, user_id):
         return Guest.query.filter_by(user_id=user_id).first()
-
-    def update(self, guest_id, data):
-        guest = self.get(guest_id)
-        if not guest:
-            return None
-        for k, v in data.items():
-            setattr(guest, k, v)
-        db.session.commit()
-        return guest
-
-    def delete(self, guest_id):
-        guest = self.get(guest_id)
-        if not guest:
-            return False
-        db.session.delete(guest)
-        db.session.commit()
-        return True
-
     
 class BookingRepository:
     def add(self, booking):
         db.session.add(booking)
         db.session.commit()
         return booking
-
-    def get(self, booking_id):
-        return Booking.query.get(booking_id)
-
-    def get_all(self):
+    
+    def get_all_bookings(self):
         return Booking.query.all()
 
-    def get_by_guest_id(self, guest_id):
-        return Booking.query.filter_by(guest_id=guest_id).all()
+    def get_booking_by_id(self, booking_id):
+        return Booking.query.get(booking_id)
 
-    def get_by_status(self, status):
-        return Booking.query.filter_by(status=status).all()
-
-    def update(self, booking_id, data):
-        booking = self.get(booking_id)
+    def get_bookings_by_guest_id(self, guest_id: str):
+        return Booking.query.get(guest_id) 
+    
+    def update_booking_status(self, booking_id, new_status):
+        booking = self.get_booking_by_id(booking_id)
         if not booking:
-            return None
-        for k, v in data.items():
-            setattr(booking, k, v)
+            raise ValueError("booking not found")
+
+        booking.status = new_status
         db.session.commit()
         return booking
-
-    def delete(self, booking_id):
-        booking = self.get(booking_id)
-        if not booking:
-            return False
-        db.session.delete(booking)
-        db.session.commit()
-        return True
-
-
+    

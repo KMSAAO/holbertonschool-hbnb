@@ -20,6 +20,19 @@ booking_update_model = api.model('BookingUpdate', {
     'status':     fields.String(required=False, enum=[e.value for e in BookingStatus]),
 })
 
+booking_get_guest_by_id_model = api.model('BookingGetGuestById', {
+    'guest_id':   fields.String(required=True, description='Guest ID'),
+})
+
+
+booking_update_status_model = api.model('BookingUpdateStatus', {
+    'status':     fields.String(required=False, enum=[e.value for e in BookingStatus]),
+})
+
+booking_update_response_model = api.model('BookingUpdateResponse', {
+    'status':     fields.String(enum=[status.value for status in BookingStatus]),
+})
+
 booking_response_model = api.model('BookingResponse', {
     'id':         fields.String,
     'guest_id':   fields.String,
@@ -50,21 +63,46 @@ class BookingList(Resource):
         return facade.get_all_bookings(), 200
 
 
-@api.route('/<string:booking_id>')
-@api.response(404, 'Booking not found')
-class BookingDetail(Resource):
-    @api.marshal_with(booking_response_model, code=200)
-    def get(self, booking_id):
-        """Get booking by ID"""
+@api.route('/guest/<string:guest_id>')
+@api.response(404, 'Bookings not found for this guest')
+class BookingByGuest(Resource):
+    @api.marshal_list_with(booking_get_guest_by_id_model, code=200)
+    def get(self, guest_id: str):
+        """Get bookings by guest ID"""
         try:
-            booking = facade.get_booking(booking_id)
+            bookings = facade.get_bookings_by_guest_id(guest_id)
         except ValueError as e:
             api.abort(404, str(e))
-        return booking, 200
+        return bookings, 200
+    
 
+@api.route('/<string:booking_id>/status')
+@api.response(404, 'Booking not found')
+class BookingStatusUpdate(Resource):
+    @api.expect(booking_update_status_model, validate=True)
+    @api.marshal_with(booking_update_response_model, code=200)
+    def put(self, booking_id: str):
+        """Update booking status by ID"""
+        data = api.payload
+        status = facade.update_booking_status(booking_id, data.get("status"))
+        return {"status": status}, 200
+
+
+@api.route('/<string:booking_id>')
+@api.response(404, 'Booking not found')
+class Get_booking_by_id(Resource):
+    @api.marshal_with(booking_response_model, code=200)
+    def get(self, booking_id: str):
+        """Get booking by ID"""
+        booking = facade.get_bookings_by_id(booking_id)
+        if not booking:
+            api.abort(404, "Booking not found")
+        return booking, 200
+    
+class BookingUpdate(Resource):
     @api.expect(booking_update_model, validate=False)
     @api.marshal_with(booking_response_model, code=200)
-    def put(self, booking_id):
+    def put(self, booking_id: str):
         """Update booking by ID"""
         data = api.payload or {}
         try:
@@ -82,21 +120,5 @@ class BookingDetail(Resource):
         if not updated:
             api.abort(404, "Booking not found")
 
-        booking = facade.get_booking(booking_id)
+        booking = facade.get_bookings_by_id(booking_id)
         return booking, 200
-
-    @api.response(204, 'Booking deleted')
-    def delete(self, booking_id):
-        """Delete booking by ID"""
-        try:
-            deleted = facade.delete_booking(booking_id)
-        except ValueError as e:
-            msg = str(e)
-            if "not found" in msg.lower():
-                api.abort(404, msg)
-            api.abort(400, msg)
-
-        if not deleted:
-            api.abort(404, "Booking not found")
-
-        return '', 204

@@ -189,52 +189,18 @@ class HBnBFacade:
 
     def create_booking(self, booking_data: dict):
         return self.booking_service.create_booking(booking_data, self.booking_db, self.place_db)
-
-    def cancel_booking(self, booking_id: str):
-        return self.booking_service.cancel_booking(
-            booking_id,
-            repo=self.place_db
-        )
-
-    def get_booking_info(self, booking_id: str):
-        return self.booking_service.get_booking_info(
-            booking_id,
-            repo=self.place_db
-        )
-    
-    def update_booking_status(self, booking_id: str, new_status: str):
-        return self.booking_service.update_status(
-            booking_id,
-            new_status,
-            repo=self.place_db
-        )
-
-    def update_booking_dates(self, booking_id: str, booking_data: dict):
-        return self.booking_service.update_booking_dates(
-            booking_id,
-            booking_data,
-            repo=self.place_db
-        )
-
-    def update_status(self, booking_id: str, new_status: str):
-        return self.booking_service.update_status(
-            booking_id,
-            new_status,
-            repo=self.place_db
-        )
-    
-    def is_place_available(self, place_id: str, check_in: str, check_out: str):
-        return self.booking_service.is_place_available(
-            place_id,
-            check_in,
-            check_out,
-            repo=self.place_db
-        )
     
     def get_all_bookings(self):
-        return self.booking_service.get_all_bookings(
-            repo=self.booking_db
-        )
+        return self.booking_service.get_all_bookings(self.booking_db)
+
+    def get_bookings_by_id(self, booking_id):
+        return self.booking_service.get_booking_by_id(booking_id, self.booking_db)
+    
+    def get_bookings_by_guest_id(self, guest_id: str):
+        return self.booking_service.get_bookings_by_guest_id(guest_id, self.booking_db)
+    
+    def update_booking_status(self, booking_id: str, status: str):
+        return self.booking_service.update_booking_status(booking_id, status, self.booking_db)
 
     #payment methods
 
