@@ -48,10 +48,6 @@ class Booking(BaseModel):
         self._place_id = value
 
     @property
-    def guest(self):
-        return self._guest
-
-    @property
     def check_in(self):
         return self._check_in
 

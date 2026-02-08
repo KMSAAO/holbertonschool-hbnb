@@ -190,11 +190,15 @@ class HBnBFacade:
     def create_booking(self, booking_data: dict):
         return self.booking_service.create_booking(booking_data, self.booking_db, self.place_db)
     
-    def get_all_bookings(self):
-        return self.booking_service.get_all_bookings(self.booking_db)
+    def get_all_bookings(self, current_user):
+        return self.booking_service.get_all_bookings(
+        booking_repo=self.booking_db,
+        guest_repo=self.guest_db,
+        current_user=current_user
+    )
 
-    def get_bookings_by_id(self, booking_id):
-        return self.booking_service.get_booking_by_id(booking_id, self.booking_db)
+    def get_bookings_by_id(self, booking_id: str, current_user):
+        return self.booking_service.get_bookings_by_id(booking_id, current_user,repo=self.booking_db)
     
     def get_bookings_by_guest_id(self, guest_id: str):
         return self.booking_service.get_bookings_by_guest_id(guest_id, self.booking_db)

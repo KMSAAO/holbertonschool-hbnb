@@ -12,7 +12,7 @@ from app.api.v1.bookings import api as bookings_ns
 from app.bcrypt import bcrypt
 from app.JWTManger import jwt  
 from app.db import db
-import app.services.facade as facade
+from app.models.user import User
 
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
@@ -46,7 +46,7 @@ def create_app(config_class="config.DevelopmentConfig"):
     api.add_namespace(amenities_ns, path='/api/v1/amenities')
     api.add_namespace(auth_ns, path='/api/v1/auth')
     api.add_namespace(guests_ns,path= '/api/v1/guests')
-    api.add_namespace(bookings_ns,path='/apit/v1/bookings')
+    api.add_namespace(bookings_ns,path='/api/v1/bookings')
 
     @app.route("/")
     def index():
@@ -57,16 +57,8 @@ def create_app(config_class="config.DevelopmentConfig"):
 
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
-    """
-    Optional: used by flask-jwt-extended if you want current_user auto loading.
-    We keep it safe: return None if user not found.
-    """
-    identity = jwt_data.get("sub")
-    if not identity:
+    user_id = jwt_data.get("sub")
+    if not user_id:
         return None
 
-    try:
-        user = facade.get_user(identity)
-        return user  
-    except Exception:
-        return None
+    return User.query.get(user_id)

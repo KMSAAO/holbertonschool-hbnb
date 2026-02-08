@@ -1,4 +1,6 @@
 from datetime import datetime
+
+from flask_jwt_extended import current_user
 from app.models.booking import Booking
 from app.enums.booking_status import BookingStatus
 
@@ -37,17 +39,28 @@ class BookingService:
         repo.add(booking)
         return booking
     
-    def get_all_bookings(self, repo):
-        all_bookings = repo.get_all_bookings()
-        if not all_bookings:
-            raise ValueError("No bookings found")
-        return all_bookings
+    def get_all_bookings(self, booking_repo, guest_repo, current_user):
+        if current_user.is_admin:
+            return booking_repo.get_all_bookings()
 
-    def get_booking_by_id(self, booking_id, repo):
-        booking_id = repo.get_booking_by_id(booking_id)
-        if not booking_id:
+        guest = guest_repo.get_by_user_id(current_user.id)
+        if not guest:
+            return []
+
+        return booking_repo.get_bookings_by_guest_id(guest.id)
+
+    def get_bookings_by_id(self, booking_id: str, current_user, repo):
+        booking = repo.get_booking_by_id(booking_id)
+        if not booking:
             raise ValueError("Booking not found")
-        return booking_id
+
+        if current_user.is_admin:
+            return booking
+
+        if booking.guest.user_id != current_user.id:
+            raise PermissionError("Forbidden")
+
+        return booking
     
     def get_bookings_by_guest_id(self, guest_id: str, repo):
         
@@ -57,7 +70,7 @@ class BookingService:
         return bookings
     
     def update_booking_status(self, booking_id: str, new_status: str, repo):
-        booking = Booking.query.get(booking_id)
+        booking = repo.get_booking_by_id(booking_id)
         if not booking:
             raise ValueError("Booking not found")
 

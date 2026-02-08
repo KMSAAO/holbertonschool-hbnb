@@ -1,6 +1,8 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
 from app.enums.booking_status import BookingStatus  
+from flask_jwt_extended import jwt_required, current_user
+
 
 api = Namespace('bookings', description='Booking operations')
 
@@ -44,24 +46,6 @@ booking_response_model = api.model('BookingResponse', {
     'updated_at': fields.String,
 })
 
-@api.route('/')
-class BookingList(Resource):
-    @api.expect(booking_create_model, validate=True)
-    @api.marshal_with(booking_response_model, code=201)
-    def post(self):
-        """Create a new booking"""
-        data = api.payload
-        try:
-            booking = facade.create_booking(data)
-        except ValueError as e:
-            api.abort(400, str(e))
-        return booking, 201
-
-    @api.marshal_list_with(booking_response_model, code=200)
-    def get(self):
-        """Get all bookings"""
-        return facade.get_all_bookings(), 200
-
 
 @api.route('/guest/<string:guest_id>')
 @api.response(404, 'Bookings not found for this guest')
@@ -74,7 +58,6 @@ class BookingByGuest(Resource):
         except ValueError as e:
             api.abort(404, str(e))
         return bookings, 200
-    
 
 @api.route('/<string:booking_id>/status')
 @api.response(404, 'Booking not found')
@@ -90,14 +73,42 @@ class BookingStatusUpdate(Resource):
 
 @api.route('/<string:booking_id>')
 @api.response(404, 'Booking not found')
-class Get_booking_by_id(Resource):
+@api.route('/<string:booking_id>')
+class GetBookingById(Resource):
+
+    @jwt_required()
     @api.marshal_with(booking_response_model, code=200)
-    def get(self, booking_id: str):
-        """Get booking by ID"""
-        booking = facade.get_bookings_by_id(booking_id)
-        if not booking:
-            api.abort(404, "Booking not found")
-        return booking, 200
+    def get(self, booking_id):
+
+        try:
+            booking = facade.get_bookings_by_id(
+                booking_id,
+                current_user
+            )
+            return booking, 200
+
+        except ValueError as e:
+            api.abort(404, str(e))
+
+        except PermissionError as e:
+            api.abort(403, str(e))
+
+@api.route('/my')
+class GetMyBookings(Resource):
+
+    @jwt_required()
+    @api.marshal_list_with(booking_response_model, code=200)
+    def get(self):
+        """Get my bookings (from JWT)"""
+        try:
+            bookings = facade.get_all_bookings(current_user)
+            return bookings, 200
+
+        except PermissionError as e:
+            api.abort(403, str(e))
+
+        except ValueError as e:
+            api.abort(400, str(e))
     
 class BookingUpdate(Resource):
     @api.expect(booking_update_model, validate=False)
