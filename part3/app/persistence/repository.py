@@ -123,8 +123,6 @@ class GuestRepository:
     def get_all(self):
         return Guest.query.all()
 
-    def get_by_user_id(self, user_id):
-        return Guest.query.filter_by(user_id=user_id).first()
     
 class BookingRepository:
     def add(self, booking):
@@ -139,7 +137,7 @@ class BookingRepository:
         return Booking.query.get(booking_id)
 
     def get_bookings_by_guest_id(self, guest_id: str):
-        return Booking.query.filter_by(guest_id=guest_id).all()
+        return Booking.query.filter_by(_guest_id=guest_id).all()
     
     def update_booking_status(self, booking_id, new_status):
         booking = self.get_booking_by_id(booking_id)

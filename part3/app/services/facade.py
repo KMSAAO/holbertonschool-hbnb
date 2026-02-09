@@ -187,8 +187,8 @@ class HBnBFacade:
     
     #booking methods
 
-    def create_booking(self, booking_data: dict):
-        return self.booking_service.create_booking(booking_data, self.booking_db, self.place_db)
+    def create_booking(self, booking_data: dict, current_user):
+        return self.booking_service.create_booking(booking_data, self.guest_db, current_user)
     
     def get_all_bookings(self, current_user):
         return self.booking_service.get_all_bookings(

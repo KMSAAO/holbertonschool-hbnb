@@ -17,6 +17,8 @@ protected_response_model = api.model('ProtectedResponse', {
     'message': fields.String
 })
 
+def get_current_user():
+    return get_jwt_identity()
 
 @api.route('/login')
 class AuthLogin(Resource):

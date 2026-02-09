@@ -7,10 +7,13 @@ from app.enums.booking_status import BookingStatus
 
 class BookingService:
 
-    def create_booking(self, booking_data, repo, place_repo):
-        guest_id = booking_data.get('guest_id')
-        if not guest_id:
-            raise ValueError("Invalid guest_id")
+    def create_booking(self, booking_data, repo, current_user):
+
+        guest = repo.get_by_user_id(current_user)
+ 
+        if guest is None:
+            raise ValueError("Guest not found for current user")
+
 
         place_id = booking_data.get('place_id')
         if not place_id:
@@ -22,18 +25,18 @@ class BookingService:
         except Exception:
             raise ValueError("check_in and check_out must be in format YYYY-MM-DD")
 
-        raw_status = booking_data.get('status')
+        raw_status = booking_data.get('status', BookingStatus.PENDING)
         try:
             status = raw_status if isinstance(raw_status, BookingStatus) else BookingStatus(raw_status)
         except Exception:
             raise ValueError("Invalid booking status")
-
+        
         booking = Booking(
-            guest_id,
-            place_id,
-            check_in,
-            check_out,
-            status
+            guest_id=guest.id,
+            place_id=place_id,
+            check_in=check_in,
+            check_out=check_out,
+            status=status
         )
 
         repo.add(booking)
