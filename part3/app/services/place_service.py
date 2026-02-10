@@ -80,7 +80,8 @@ class PlaceService():
     
     def get_all_places(self, place_repo):
         return place_repo.get_all()
-
+   
+    
     @staticmethod
     def delete_place(place_id: str, place_repo) -> bool:
         if not isinstance(place_id, str):

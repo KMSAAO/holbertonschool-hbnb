@@ -181,6 +181,9 @@ class HBnBFacade:
         user = user_data
         return self.guest_service.register_as_guest(user, self.guest_db, bio)
 
+    def get_guest_by_user_id(self, user_id):
+        return self.guest_service.get_guest_by_user_id(user_id, self.guest_db)
+    
 
     def get_guest_info(self, guest_id):
         return self.guest_service.get_guest_info(guest_id, self.guest_db)
@@ -191,17 +194,13 @@ class HBnBFacade:
         return self.booking_service.create_booking(booking_data, self.guest_db, self.booking_db, self.place_db, current_user)
     
     def get_all_bookings(self, current_user):
-        return self.booking_service.get_all_bookings(
-        booking_repo=self.booking_db,
-        guest_repo=self.guest_db,
-        current_user=current_user
-    )
+        return self.booking_service.get_all_bookings(self.booking_db, self.guest_db, self.user_db, current_user)
 
-    def get_bookings_by_id(self, booking_id: str, current_user):
-        return self.booking_service.get_bookings_by_id(booking_id, current_user,repo=self.booking_db)
+    def get_booking_by_id(self, booking_id: str, current_user):
+        return self.booking_service.get_booking_by_id(booking_id, current_user, self.booking_db, self.user_db, self.guest_db)
     
-    def get_bookings_by_guest_id(self, guest_id: str):
-        return self.booking_service.get_bookings_by_guest_id(guest_id, self.booking_db)
+    def get_bookings_by_guest_id(self, guest_id: str, current_user):
+        return self.booking_service.get_bookings_by_guest_id(guest_id, current_user, self.booking_db, self.user_db, self.guest_db)
     
     def update_booking_status(self, booking_id: str, status: str):
         return self.booking_service.update_booking_status(booking_id, status, self.booking_db)

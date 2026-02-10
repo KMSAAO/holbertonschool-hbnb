@@ -66,7 +66,7 @@ class SQLAlchemyRepository(Repository):
         return True
     
     def get_available_place_by_status(self, status):
-        return self.model.query.filter_by(_status=status).all()
+        return self.model.query.filter_by(_status=status).first()
 
     def get_by_attribute(self, attr_name, value):
         return self.model.query.filter_by(**{attr_name: value}).first()
