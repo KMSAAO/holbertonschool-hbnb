@@ -8,7 +8,6 @@ place_create_model = api.model("PlaceCreate", {
     "title": fields.String(required=True),
     "description": fields.String(required=False),
     "price": fields.Float(required=True),
-    "status": fields.String(required=False),
     "latitude": fields.Float(required=True),
     "longitude": fields.Float(required=True),
 })

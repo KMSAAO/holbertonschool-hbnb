@@ -65,8 +65,8 @@ class SQLAlchemyRepository(Repository):
         db.session.commit()
         return True
     
-    def get_available_place_by_status(self, status):
-        return self.model.query.filter_by(_status=status).first()
+    def get_active_places(self):
+        return self.model.query.filter_by(status="active").all()
 
     def get_by_attribute(self, attr_name, value):
         return self.model.query.filter_by(**{attr_name: value}).first()
@@ -151,3 +151,9 @@ class BookingRepository:
         db.session.commit()
         return booking
     
+    def has_overlapping_booking(self, place_id, check_in, check_out):
+        return self.filter(
+            self.place_id == place_id,
+            self.check_in < check_out,
+            self.check_out > check_in
+        ).first()

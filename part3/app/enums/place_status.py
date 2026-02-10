@@ -1,7 +1,6 @@
 from enum import Enum
 
 class PlaceStatus(Enum):
-    AVAILABLE = "available"
-    BOOKED = "booked"
-    UNAVAILABLE = "unavailable"
-    UNDER_MAINTENANCE = "Under Maintenance"
+    ACTIVE = "active"
+    UNDER_MAINTENANCE = "under_maintenance"
+    DISABLED = "disabled"

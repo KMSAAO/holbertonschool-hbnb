@@ -21,7 +21,7 @@ class PlaceService():
             title=title,
             description=description,
             price=price,
-            status=status,
+            status=PlaceStatus(status) if status else PlaceStatus.ACTIVE,
             latitude=latitude,
             longitude=longitude
         )
@@ -44,7 +44,7 @@ class PlaceService():
             "title": place.title,
             "description": place.description,
             "price": place.price,
-            "status": place.status,
+            "status": place.status.value,
             "latitude": place.latitude,
             "longitude": place.longitude,
             "owner_id": place.user.id,
@@ -74,7 +74,7 @@ class PlaceService():
             place.longitude = place_data["longitude"]
 
         if "status" in place_data:
-            place.status = place_data["status"]
+            place.status = PlaceStatus(place_data["status"])
 
         return True
     
