@@ -7,7 +7,7 @@ from app.enums.booking_status import BookingStatus
 
 class BookingService:
 
-    def create_booking(self, booking_data, guest_repo, booking_repo, current_user):
+    def create_booking(self, booking_data, guest_repo, booking_repo, place_repo, current_user):
 
         guest = guest_repo.get_by_user_id(current_user)
  
@@ -15,7 +15,8 @@ class BookingService:
             raise ValueError("Guest not found for current user")
 
 
-        place_id = booking_data.get('place_id')
+        place_id = place_repo.get_available_place_by_status('available')
+        print("place_id:", place_id)
         if not place_id:
             raise ValueError("Invalid place_id")
 
@@ -30,8 +31,7 @@ class BookingService:
             status = raw_status if isinstance(raw_status, BookingStatus) else BookingStatus(raw_status)
         except Exception:
             raise ValueError("Invalid booking status")
-        
-        print(guest.id)
+    
         
         booking = Booking(
             guest_id=guest.id,

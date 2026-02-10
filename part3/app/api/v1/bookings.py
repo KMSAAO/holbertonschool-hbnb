@@ -9,7 +9,6 @@ api = Namespace('bookings', description='Booking operations')
 
 
 booking_create_model = api.model('BookingCreate', {
-    'place_id':   fields.String(required=True, description='Place ID'),
     'check_in':   fields.String(required=True, description="YYYY-MM-DD"),
     'check_out':  fields.String(required=True, description="YYYY-MM-DD"),
     'status':     fields.String(
