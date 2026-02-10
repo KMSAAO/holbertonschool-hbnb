@@ -181,13 +181,12 @@ class HBnBFacade:
         user = user_data
         return self.guest_service.register_as_guest(user, self.guest_db, bio)
 
-    def get_guest_by_user_id(self, user_id):
-        return self.guest_service.get_guest_by_user_id(user_id, self.guest_db)
+    def get_guest_by_user_id(self, user_id, current_user):
+        return self.guest_service.get_guest_by_user_id(user_id, current_user, self.guest_db, self.user_db)
     
+    def get_all_guests(self, current_user):
+        return self.guest_service.get_all_guests(current_user, self.guest_db, self.user_db)
 
-    def get_guest_info(self, guest_id):
-        return self.guest_service.get_guest_info(guest_id, self.guest_db)
-    
     #booking methods
 
     def create_booking(self, booking_data: dict, current_user):

@@ -1,6 +1,7 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required
+from app.api.v1.auth import get_current_user
 
 api = Namespace('guests', description='Guest operations')
 
@@ -57,3 +58,35 @@ class GuestRegister(Resource):
             api.abort(400, str(e))
 
         return response, 201
+
+@api.route('/<string:user_id>')
+class GuestInfo(Resource):
+    @api.response(200, 'Success', guest_response_model)
+    @api.response(404, 'Guest not found')
+    @jwt_required()
+    def get(self, user_id):
+        """Get guest info by user_id"""
+        current_user = get_current_user()
+        try:
+            guest = facade.get_guest_by_user_id(user_id, current_user)
+            if not guest:
+                api.abort(404, "Guest not found")
+            return guest.to_dict(), 200
+        except ValueError as e:
+            api.abort(404, str(e))
+    
+@api.route('/')
+class GuestList(Resource):
+    @api.response(200, 'Success', [guest_response_model])
+    @api.response(403, 'Forbidden')
+    @jwt_required()
+    def get(self):
+        """Get all guests"""
+        current_user = get_current_user()
+
+        try:
+            guests = facade.get_all_guests(current_user)
+            return [guest.to_dict() for guest in guests], 200
+
+        except PermissionError as e:
+            api.abort(403, str(e))

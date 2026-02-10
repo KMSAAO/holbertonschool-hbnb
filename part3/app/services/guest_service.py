@@ -1,3 +1,4 @@
+from flask_jwt_extended import current_user
 from app.models.guest import Guest
 
 
@@ -13,14 +14,31 @@ class GuestService():
         guest_db.add(new_guest)
         return new_guest
     
-    def get_guest_by_user_id(self, user_id, repo):
-        guest = repo.get_by_user_id(user_id)
+    def get_guest_by_user_id(self, user_id, current_user, guest_repo, user_repo):
+
+        user = user_repo.get(current_user)
+        if not user:
+            raise PermissionError("Forbidden")
+
+        if user.is_admin:
+            guest = guest_repo.get_by_user_id(user_id)
+            if not guest:
+                raise ValueError("Guest not found")
+            return guest
+
+        if current_user != user_id:
+            raise PermissionError("Forbidden")
+
+        guest = guest_repo.get_by_user_id(user_id)
         if not guest:
             raise ValueError("Guest not found")
+
         return guest
 
-    def get_all_guests(self, repo):
-        all_guests = repo.get_all()
-        if not all_guests:
-            return None
-        return all_guests
+    def get_all_guests(self, current_user, guest_repo, user_repo):
+
+        user = user_repo.get(current_user)
+        if not user or not user.is_admin:
+            raise PermissionError("Forbidden")
+
+        return guest_repo.get_all()
