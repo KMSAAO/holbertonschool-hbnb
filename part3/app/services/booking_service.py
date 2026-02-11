@@ -33,7 +33,7 @@ class BookingService:
             place_id=place_id,
             check_in=check_in,
             check_out=check_out,
-            status=BookingStatus.CONFIRMED
+            status=BookingStatus.PENDING.value
         )
 
         booking_repo.add(booking)

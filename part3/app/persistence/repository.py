@@ -68,7 +68,7 @@ class SQLAlchemyRepository(Repository):
         return True
     
     def get_active_places(self):
-        return self.model.query.filter_by(status="active").all()
+        return self.model.query.filter(self.model._status == "active").all()
 
     def get_by_attribute(self, attr_name, value):
         return self.model.query.filter_by(**{attr_name: value}).first()
@@ -130,6 +130,9 @@ class GuestRepository:
 
     
 class BookingRepository:
+    def __init__(self):
+        self.model = Booking
+
     def add(self, booking):
         db.session.add(booking)
         db.session.commit()
@@ -149,16 +152,16 @@ class BookingRepository:
         if not booking:
             raise ValueError("booking not found")
 
-        booking.status = new_status
+        booking._status = new_status
         db.session.commit()
         return booking
     
     def has_overlapping_booking(self, place_id, check_in, check_out):
-        return self.filter(
-            self.place_id == place_id,
-            self.check_in < check_out,
-            self.check_out > check_in
-        ).first()
+        return self.model.query.filter(
+            self.model._place_id == place_id,
+            self.model._check_in < check_out,
+            self.model._check_out > check_in
+        ).first() is not None
 
 
 class PaymentRepository:

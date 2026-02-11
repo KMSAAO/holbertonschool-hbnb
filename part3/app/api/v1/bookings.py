@@ -11,10 +11,6 @@ api = Namespace('bookings', description='Booking operations')
 booking_create_model = api.model('BookingCreate', {
     'check_in':   fields.String(required=True, description="YYYY-MM-DD"),
     'check_out':  fields.String(required=True, description="YYYY-MM-DD"),
-    'status':     fields.String(
-        required=True,
-        enum=[e.value for e in BookingStatus]
-    ),
 })
 
 
