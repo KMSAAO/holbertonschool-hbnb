@@ -1,14 +1,23 @@
 from app.models.base_model import BaseModel
 from app.models.booking import Booking
-from app.enums import payment_type, payment_status
+from app.db import db
+from app.enums.payment_type import MethodPayment
+from app.enums.payment_status import PaymentStatus
 
 
 class Payment(BaseModel):
-    def __init__(self, book_id: str, booking: Booking, amount: float,
-                 method_payment: payment_type, status: payment_status):
+    __tablename__ = "payments"
+    _book_id = db.Column("book_id", db.String(60), db.ForeignKey("bookings.id"), nullable=False)
+    _amount = db.Column("amount", db.Float, nullable=False)
+    _method_payment = db.Column("method_payment", db.Enum(MethodPayment), nullable=False)
+    _status = db.Column("status", db.Enum(PaymentStatus), nullable=False)
+
+    booking = db.relationship("Booking", backref="payment", foreign_keys=[_book_id])
+
+
+    def __init__(self, book_id: str, amount: float,method_payment: MethodPayment, status: PaymentStatus):
         super().__init__()
         self.book_id = book_id
-        self.booking = booking
         self.amount = amount
         self.method_payment = method_payment
         self.status = status
@@ -49,8 +58,8 @@ class Payment(BaseModel):
 
     @method_payment.setter
     def method_payment(self, value):
-        if not isinstance(value, payment_type):
-            raise ValueError("method_payment must be an instance of payment_type Enum")
+        if not isinstance(value, MethodPayment):
+            raise ValueError("method_payment must be an instance of MethodPayment Enum")
         self._method_payment = value
 
     @property
@@ -59,8 +68,8 @@ class Payment(BaseModel):
 
     @status.setter
     def status(self, value):
-        if not isinstance(value, payment_status):
-            raise ValueError("status must be an instance of payment_status Enum")
+        if not isinstance(value, PaymentStatus):
+            raise ValueError("status must be an instance of PaymentStatus Enum")
         self._status = value
 
     def to_dict(self):

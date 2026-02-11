@@ -12,7 +12,7 @@ from app.services.amenity_service import AmenityService
 from app.services.review_service import ReviewService
 from app.services.guest_service import GuestService
 from app.services.booking_service import BookingService
-# from app.services.payment_service import PaymentService
+from app.services.payment_service import PaymentServices
 # from app.services.refund_service import RefundServices
 # from app.services.place_amenity import PlaceAmenityService
 
@@ -30,7 +30,7 @@ class HBnBFacade:
         self.amenity_db = SQLAlchemyRepository(Amenity)
         self.guest_db = GuestRepository()
         self.booking_db = BookingRepository()
-        # self.payment_db = SQLAlchemyRepository()
+        self.payment_db = PaymentServices()
         # self.refund_db = SQLAlchemyRepository()
         # self.place_amenity_db = SQLAlchemyRepository()
 
@@ -42,7 +42,7 @@ class HBnBFacade:
         self.amenity_service = AmenityService()
         self.guest_service = GuestService()
         self.booking_service = BookingService()
-        # self.payment_service = PaymentService()
+        self.payment_service = PaymentServices()
         # self.refund_service = RefundServices()
         # self.place_amenity_service = PlaceAmenityService()
 
@@ -206,25 +206,43 @@ class HBnBFacade:
 
     #payment methods
 
-    def create_payment(self, payment: dict):
+    def create_payment(self, payment_data: dict, current_user):
         return self.payment_service.create_payment(
-            payment,
+            payment_data,
             repo=self.payment_db,
-            booking_repo=self.booking_db
+            current_user=current_user
         )
-
-    def get_payment_info(self, payment_id: str) -> dict:
-        return self.payment_service.get_payment_info(
+    
+    def get_payment_by_payment_id(self, payment_id: str):
+        return self.payment_service.get_payment_by_payment_id(
             payment_id,
             repo=self.payment_db
         )
-
-    def update_payment_status(self, payment_id: str, status: str) -> bool:
-        pass
-
-    def delete_payment(self, payment_id: str) -> bool:
-        pass
-
+    
+    def get_payment_by_booking_id(self, booking_id: str):
+        return self.payment_service.get_payment_by_booking_id(
+            booking_id,
+            repo=self.payment_db
+        )
+    
+    def get_payments_by_booking_id(self, booking_id: str):
+        return self.payment_service.get_payments_by_booking_id(
+            booking_id,
+            repo=self.payment_db
+        )
+    
+    def get_all_payments(self):
+        return self.payment_service.get_all_payments(
+            repo=self.payment_db
+        )
+    
+    def update_payment_status(self, payment_id: str, new_status: str):
+        return self.payment_service.update_payment_status(
+            payment_id,
+            new_status,
+            repo=self.payment_db
+        )
+    
     #refund methods
     def create_refund(self, refund_data: dict):
         return self.refund_service.create_refund(

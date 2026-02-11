@@ -8,6 +8,7 @@ from app.api.v1.amenities import api as amenities_ns
 from app.api.v1.auth import api as auth_ns
 from app.api.v1.guests import api as guests_ns
 from app.api.v1.bookings import api as bookings_ns
+from app.api.v1.payments import api as payments_ns
 
 from app.bcrypt import bcrypt
 from app.JWTManger import jwt  
@@ -47,7 +48,7 @@ def create_app(config_class="config.DevelopmentConfig"):
     api.add_namespace(auth_ns, path='/api/v1/auth')
     api.add_namespace(guests_ns,path= '/api/v1/guests')
     api.add_namespace(bookings_ns,path='/api/v1/bookings')
-
+    api.add_namespace(payments_ns, path='/api/v1/payments')
     @app.route("/")
     def index():
         return jsonify({"message": "HBnB API is running"})
