@@ -165,55 +165,62 @@ class BookingRepository:
 
 
 class PaymentRepository:
+
+    def __init__(self):
+        self.model = Payment
+    
     def add(self, payment):
         db.session.add(payment)
         db.session.commit()
         return payment
     
     def get_payment_by_id(self, payment_id):
-        return Payment.query.get(payment_id)
+        return self.model.query.get(payment_id)
     
     def get_payment_by_booking_id(self, booking_id):
-        return Payment.query.filter_by(booking_id=booking_id).first()
+        return self.model.query.filter_by(booking_id=booking_id).first()
 
     def get_payments_by_booking_id(self, booking_id):
-        return Payment.query.filter_by(booking_id=booking_id).all()
+        return self.model.query.filter_by(booking_id=booking_id).all()
     
     def get_all_payments(self):
-        return Payment.query.all()
+        return self.model.query.all()
     
     def update_payment_status(self, payment_id, new_status):
         payment = self.get_payment_by_id(payment_id)
         if not payment:
             raise ValueError("Payment not found")
 
-        payment.status = new_status
+        payment._status = new_status
         db.session.commit()
         return payment
 
 class RefundRepository:
+    def __init__(self):
+        self.model = Refund
+
     def add(self, refund):
         db.session.add(refund)
         db.session.commit()
         return refund
     
     def get_refund_by_id(self, refund_id):
-        return Refund.query.get(refund_id)
+        return self.model.query.get(refund_id)
     
     def get_refund_by_payment_id(self, payment_id):
-        return Refund.query.filter_by(payment_id=payment_id).first()
+        return self.model.query.filter_by(payment_id=payment_id).first()
     
     def get_refunds_by_payment_id(self, payment_id):
-        return Refund.query.filter_by(payment_id=payment_id).all()
+        return self.model.query.filter_by(payment_id=payment_id).all()
     
     def get_all_refunds(self):
-        return Refund.query.all()
+        return self.model.query.all()
     
     def update_refund_status(self, refund_id, new_status):
         refund = self.get_refund_by_id(refund_id)
         if not refund:
             raise ValueError("Refund not found")
 
-        refund.status = new_status
+        refund._status = new_status
         db.session.commit()
         return refund

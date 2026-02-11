@@ -43,3 +43,18 @@ class PaymentList(Resource):
         except PermissionError as e:
             api.abort(403, str(e))
 
+@api.route('/<string:payment_id>')
+class PaymentResource(Resource):
+    @api.marshal_with(payment_response_model)
+    @jwt_required()
+    def get(self, payment_id):
+        """Get a payment by its ID"""
+        current_user = get_current_user()
+
+        try:
+            payment = facade.get_payment_by_payment_id(payment_id, current_user)
+            return payment
+        except ValueError as e:
+            api.abort(404, str(e))
+        except PermissionError as e:
+            api.abort(403, str(e))

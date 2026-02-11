@@ -7,12 +7,12 @@ from app.enums.payment_status import PaymentStatus
 
 class Payment(BaseModel):
     __tablename__ = "payments"
-    _book_id = db.Column("book_id", db.String(60), db.ForeignKey("bookings.id"), nullable=False)
+    _booking_id = db.Column("booking_id", db.String(60), db.ForeignKey("bookings.id"), nullable=False)
     _amount = db.Column("amount", db.Float, nullable=False)
     _method_payment = db.Column("method_payment", db.Enum(MethodPayment), nullable=False)
     _status = db.Column("status", db.Enum(PaymentStatus), nullable=False)
 
-    booking = db.relationship("Booking", backref="payment", foreign_keys=[_book_id])
+    booking = db.relationship("Booking", backref="payment", foreign_keys=[_booking_id])
 
 
     def __init__(self, booking_id: str, amount: float,method_payment: MethodPayment, status: PaymentStatus):
@@ -24,13 +24,13 @@ class Payment(BaseModel):
 
     @property
     def booking_id(self):
-        return self._book_id
+        return self._booking_id
 
     @booking_id.setter
     def booking_id(self, value):
         if not isinstance(value, str):
             raise ValueError("booking_id must be a string")
-        self._book_id = value
+        self._booking_id = value
 
     @property
     def booking(self):
@@ -75,7 +75,7 @@ class Payment(BaseModel):
     def to_dict(self):
         return {
             "id": self.id,
-            "book_id": self.book_id,
+            "booking_id": self.booking_id,
             "amount": self.amount,
             "method_payment": self.method_payment.value,
             "status": self.status.value,

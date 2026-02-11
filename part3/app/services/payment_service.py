@@ -33,13 +33,15 @@ class PaymentServices():
         new_payment = Payment(
             booking_id=booking_id,
             amount=amount,
-            method_payment=method_payment.value,
-            status=status_payment.value
+            method_payment=method_payment,
+            status=status_payment
         )
         repo.add(new_payment)
         return new_payment
     
-    def get_payment_by_payment_id(self, payment_id, repo):
+    def get_payment_by_payment_id(self, payment_id, repo, current_user):
+        if not current_user:
+            raise PermissionError("Authentication required")
         payment = repo.get_payment_by_id(payment_id)
         if not payment:
             raise ValueError("Payment not found")
