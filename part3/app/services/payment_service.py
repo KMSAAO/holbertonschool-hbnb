@@ -33,8 +33,8 @@ class PaymentServices():
         new_payment = Payment(
             booking_id=booking_id,
             amount=amount,
-            method_payment=method_payment,
-            status=status_payment
+            method_payment=method_payment.value,
+            status=status_payment.value
         )
         repo.add(new_payment)
         return new_payment
