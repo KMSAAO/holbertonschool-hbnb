@@ -15,21 +15,21 @@ class Payment(BaseModel):
     booking = db.relationship("Booking", backref="payment", foreign_keys=[_book_id])
 
 
-    def __init__(self, book_id: str, amount: float,method_payment: MethodPayment, status: PaymentStatus):
+    def __init__(self, booking_id: str, amount: float,method_payment: MethodPayment, status: PaymentStatus):
         super().__init__()
-        self.book_id = book_id
+        self.booking_id = booking_id
         self.amount = amount
         self.method_payment = method_payment
         self.status = status
 
     @property
-    def book_id(self):
+    def booking_id(self):
         return self._book_id
 
-    @book_id.setter
-    def book_id(self, value):
+    @booking_id.setter
+    def booking_id(self, value):
         if not isinstance(value, str):
-            raise ValueError("book_id must be a string")
+            raise ValueError("booking_id must be a string")
         self._book_id = value
 
     @property

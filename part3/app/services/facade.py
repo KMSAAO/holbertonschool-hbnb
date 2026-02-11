@@ -1,5 +1,5 @@
 from app.persistence.repository import SQLAlchemyRepository
-from app.persistence.repository import GuestRepository, BookingRepository
+from app.persistence.repository import GuestRepository, BookingRepository,PaymentRepository
 
 from app.models.user import User
 from app.models.place import Place
@@ -30,7 +30,7 @@ class HBnBFacade:
         self.amenity_db = SQLAlchemyRepository(Amenity)
         self.guest_db = GuestRepository()
         self.booking_db = BookingRepository()
-        self.payment_db = PaymentServices()
+        self.payment_db = PaymentRepository()
         # self.refund_db = SQLAlchemyRepository()
         # self.place_amenity_db = SQLAlchemyRepository()
 

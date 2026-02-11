@@ -1,5 +1,5 @@
 from app.models.payment import Payment
-from app.enums.refund_status import RefundStatus
+from app.enums.payment_status import PaymentStatus
 from app.enums.payment_type import MethodPayment
 
 
@@ -10,9 +10,9 @@ class PaymentServices():
         if not current_user:
             raise PermissionError("Authentication required")
 
-        book_id = payment_data.get("book_id")
-        if not book_id or not isinstance(book_id, str):
-            raise ValueError("book_id is required and must be a string")
+        booking_id = payment_data.get("booking_id")
+        if not booking_id or not isinstance(booking_id, str):
+            raise ValueError("booking_id is required and must be a string")
 
         amount = payment_data.get("amount")
         if not amount or not isinstance(amount, (int, float)) or amount <= 0:
@@ -26,12 +26,12 @@ class PaymentServices():
 
         raw_status = payment_data.get('status')
         try:
-            status_payment = raw_status if isinstance(raw_status, RefundStatus) else RefundStatus(raw_status)
+            status_payment = raw_status if isinstance(raw_status, PaymentStatus) else PaymentStatus(raw_status)
         except Exception:
             raise ValueError("Invalid payment status")
 
         new_payment = Payment(
-            book_id=book_id,
+            booking_id=booking_id,
             amount=amount,
             method_payment=method_payment,
             status=status_payment
@@ -61,7 +61,7 @@ class PaymentServices():
         return repo.get_all_payments()
     
     def update_payment_status(self, payment_id, new_status, repo):
-        if not isinstance(new_status, RefundStatus):
+        if not isinstance(new_status, PaymentStatus):
             raise ValueError("Invalid payment status")
         return repo.update_payment_status(payment_id, new_status)
     
