@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نُزل - تجربة فاخرة بروح الديرة</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="loading.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preload" as="image" href="images/logo.png">
+    <link rel="preload" as="image" href="images/slider1.jpg">
+</head>
+<body>
+    <!-- شريط التنقل العلوي -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <!-- اللوقو على اليسار -->
+            <div class="logo">
+                <img src="images/logo.png" alt="نُزل" class="logo-img">
+            </div>
+            
+            <!-- القائمة في المنتصف -->
+            <div class="nav-menu">
+                <a href="#" class="nav-link active">الرئيسية</a>
+                <a href="places.html" class="nav-link">الوجهات</a>
+                <a href="admin.html" class="nav-link">إدارة النُزل</a>
+                <a href="#bookings" class="nav-link" id="bookingsLink">حجوزاتي</a>
+                <a href="#" class="nav-link" id="logoutLink" onclick="logout(); return false;">خروج</a>
+                <a href="login.html" class="nav-link" id="loginLink" style="display:none;">تسجيل دخول</a>
+            </div>
+            
+            <!-- صورة الملف الشخصي على اليمين -->
+            <div class="profile">
+                <a href="profile.html" class="profile-circle">
+                    <i class="fas fa-user"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- الهيدر المتحرك بالصور -->
+    <header class="hero-slider">
+        <div class="slider-container">
+            <div class="slide active">
+                <img src="images/slider1.jpg" alt="صحراء 1" class="slide-img">
+                <div class="slide-content">
+                    <h1 class="hero-title">اكتشف الإقامة في قلب الصحراء</h1>
+                    <p class="hero-subtitle">نُزل... تجربة فاخرة بروح الديرة</p>
+                    <button class="hero-btn">ابدأ رحلتك</button>
+                </div>
+            </div>
+            <div class="slide">
+                <img src="images/slider2.jpg" alt="صحراء 2" class="slide-img">
+                <div class="slide-content">
+                    <h1 class="hero-title">اكتشف الإقامة في قلب الصحراء</h1>
+                    <p class="hero-subtitle">نُزل... تجربة فاخرة بروح الديرة</p>
+                    <button class="hero-btn">ابدأ رحلتك</button>
+                </div>
+            </div>
+            <div class="slide">
+                <img src="images/slider3.jpg" alt="صحراء 3" class="slide-img">
+                <div class="slide-content">
+                    <h1 class="hero-title">اكتشف الإقامة في قلب الصحراء</h1>
+                    <p class="hero-subtitle">نُزل... تجربة فاخرة بروح الديرة</p>
+                    <button class="hero-btn">ابدأ رحلتك</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- مؤشرات السلايدر -->
+        <div class="slider-dots">
+            <span class="dot active" onclick="currentSlide(1)"></span>
+            <span class="dot" onclick="currentSlide(2)"></span>
+            <span class="dot" onclick="currentSlide(3)"></span>
+        </div>
+    </header>
+
+    <!-- قسم العنوان الرئيسي -->
+    <section class="intro-section">
+        <h2 class="section-title">الإقامات الفاخرة المميزة</h2>
+        <p class="section-subtitle">وجهات صحراوية مختارة بعناية لعشاق التميز</p>
+    </section>
+
+    <!-- قسم الفنادق -->
+    <section class="hotels-section">
+        <div class="hotels-container">
+            <!-- فندق 1 -->
+            <div class="hotel-card">
+                <div class="hotel-image">
+                    <img src="images/hotel1.jpg" alt="منتجع شيبارا">
+                    <div class="hotel-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <div class="hotel-info">
+                    <h3 class="hotel-name">منتجع شيبارا</h3>
+                    <div class="hotel-price">
+                        <span class="price-amount">9,700</span>
+                        <span class="price-currency">ر.س</span>
+                        <span class="price-per">/الليلة</span>
+                    </div>
+                    <button class="details-btn" onclick="showLoadingScreen('hotel-details.html?hotel=shebara')">عرض التفاصيل</button>
+                </div>
+            </div>
+
+            <!-- فندق 2 -->
+            <div class="hotel-card">
+                <div class="hotel-image">
+                    <img src="images/hotel2.jpg" alt="منتجع ديزرت روك">
+                    <div class="hotel-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <div class="hotel-info">
+                    <h3 class="hotel-name">منتجع ديزرت روك</h3>
+                    <div class="hotel-price">
+                        <span class="price-amount">11,500</span>
+                        <span class="price-currency">ر.س</span>
+                        <span class="price-per">/الليلة</span>
+                    </div>
+                    <button class="details-btn" onclick="showLoadingScreen('hotel-details.html?hotel=desertrock')">عرض التفاصيل</button>
+                </div>
+            </div>
+
+            <!-- فندق 3 -->
+            <div class="hotel-card">
+                <div class="hotel-image">
+                    <img src="images/hotel3.jpg" alt="منتجع شادن">
+                    <div class="hotel-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <div class="hotel-info">
+                    <h3 class="hotel-name">منتجع شادن</h3>
+                    <div class="hotel-price">
+                        <span class="price-amount">4,360</span>
+                        <span class="price-currency">ر.س</span>
+                        <span class="price-per">/الليلة</span>
+                    </div>
+                    <button class="details-btn" onclick="showLoadingScreen('hotel-details.html?hotel=shaden')">عرض التفاصيل</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم تجربة نُزل -->
+    <section class="experience-section">
+        <h2 class="section-title">تجربة نُزل</h2>
+        <p class="section-subtitle">عِش تجربة فاخرة تجمع بين الأصالة والراحة العصرية</p>
+        
+        <div class="features-container">
+            <!-- ميزة 1 -->
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-crown"></i>
+                </div>
+                <h3 class="feature-title">ضيافة أصيلة</h3>
+                <p class="feature-desc">تجربة دفء الضيافة العربية مع خدمة عالمية</p>
+            </div>
+
+            <!-- ميزة 2 -->
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3 class="feature-title">فخامة بمعنى جديد</h3>
+                <p class="feature-desc">إقامة راقية مصممة لأصحاب الذوق الرفيع</p>
+            </div>
+
+            <!-- ميزة 3 -->
+            <div class="feature">
+                <div class="feature-icon">
+                    <i class="fas fa-gem"></i>
+                </div>
+                <h3 class="feature-title">لحظات لا تُنسى</h3>
+                <p class="feature-desc">اصنع ذكريات في قلب جمال الصحراء الخالد</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- الفوتر -->
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- اللوقو -->
+            <div class="footer-section">
+                <img src="images/logo.png" alt="نُزل" class="footer-logo">
+            </div>
+
+            <!-- الشركة -->
+            <div class="footer-section">
+                <h4 class="footer-heading">الشركة</h4>
+                <ul class="footer-links">
+                    <li><a href="#about">من نحن</a></li>
+                    <li><a href="#contact">تواصل معنا</a></li>
+                </ul>
+            </div>
+
+            <!-- استكشف -->
+            <div class="footer-section">
+                <h4 class="footer-heading">استكشف</h4>
+                <ul class="footer-links">
+                    <li><a href="places.html">الوجهات</a></li>
+                    <li><a href="#experiences">التجارب</a></li>
+                    <li><a href="#offers">العروض الخاصة</a></li>
+                </ul>
+            </div>
+
+            <!-- مواقع التواصل -->
+            <div class="footer-section">
+                <h4 class="footer-heading">تابعنا</h4>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- حقوق النشر -->
+        <div class="footer-bottom">
+            <p>جميع الحقوق محفوظة © نُزل 2026</p>
+        </div>
+    </footer>
+
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+    <script src="loading.js"></script>
+</body>
+</html>

@@ -1,0 +1,487 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Amiri', serif;
+    overflow: hidden;
+    position: relative;
+    height: 100vh;
+}
+
+/* الخلفية */
+.background-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('images/login-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1;
+}
+
+/* الحاوية الرئيسية */
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+/* اللوقو */
+.logo-container {
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.logo-white {
+    width: 300px;
+    height: auto;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
+}
+
+/* صندوق التسجيل */
+.auth-box {
+    background: #EFE2CF;
+    border-radius: 25px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 480px;
+    overflow: hidden;
+    margin-top: -1.5rem;
+}
+
+/* الجملة التسويقية */
+.tagline {
+    margin-top: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    letter-spacing: 0.5px;
+}
+
+/* التبويبات */
+.tabs {
+    display: flex;
+    background: #EFE2CF;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 1.2rem;
+    border: none;
+    background: #EFE2CF;
+    color: rgba(129, 91, 47, 0.5);
+    font-family: 'Amiri', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.tab-btn:hover {
+    color: rgba(129, 91, 47, 0.8);
+}
+
+.tab-btn.active {
+    background: #EFE2CF;
+    color: #815B2F;
+    border-bottom-color: #D4AF37;
+}
+
+/* محتوى التبويب */
+.tab-content {
+    display: none;
+    padding: 1.2rem 1.8rem;
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* النموذج */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+/* نموذج تسجيل الدخول - أحجام أكبر */
+.auth-form-login {
+    gap: 1.5rem;
+}
+
+.auth-form-login .form-group {
+    gap: 0.5rem;
+}
+
+.auth-form-login .form-label {
+    font-size: 1.1rem;
+    gap: 0.5rem;
+}
+
+.auth-form-login .form-label i {
+    font-size: 1rem;
+}
+
+.auth-form-login .form-input {
+    padding: 0.9rem 1.2rem;
+    font-size: 1.1rem;
+    border-radius: 12px;
+}
+
+.auth-form-login .submit-btn {
+    padding: 1rem;
+    font-size: 1.3rem;
+    margin-top: 0.5rem;
+}
+
+.auth-form-login .forgot-password a {
+    font-size: 1rem;
+}
+
+.tab-content::-webkit-scrollbar-track {
+    background: rgba(129, 91, 47, 0.1);
+    border-radius: 10px;
+}
+
+.tab-content::-webkit-scrollbar-thumb {
+    background: #CBA760;
+    border-radius: 10px;
+}
+
+.tab-content::-webkit-scrollbar-thumb:hover {
+    background: #815B2F;
+}
+
+/* النموذج */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* صف الأسماء */
+.name-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.half-width {
+    flex: 1;
+}
+
+.half-width .form-input {
+    font-size: 0.95rem;
+    padding: 0.65rem 0.9rem;
+}
+
+/* مجموعة الحقول */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+/* مؤشر قوة كلمة المرور */
+.password-strength {
+    height: 3px;
+    border-radius: 2px;
+    margin-top: 0.3rem;
+    transition: all 0.3s ease;
+}
+
+.password-strength.weak {
+    background: #f44336;
+    width: 33%;
+}
+
+.password-strength.medium {
+    background: #ff9800;
+    width: 66%;
+}
+
+.password-strength.strong {
+    background: #4CAF50;
+    width: 100%;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #815B2F;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.form-label i {
+    color: #D4AF37;
+    font-size: 0.85rem;
+}
+
+/* الحقول */
+.form-input {
+    padding: 0.65rem 0.9rem;
+    border: 2px solid white;
+    border-radius: 10px;
+    font-family: 'Amiri', serif;
+    font-size: 0.95rem;
+    background: white;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: white;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+}
+
+/* حاوية كلمة المرور */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper .form-input {
+    flex: 1;
+    padding-left: 3rem;
+}
+
+.toggle-password-btn {
+    position: absolute;
+    left: 1rem;
+    background: none;
+    border: none;
+    color: #815B2F;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+.toggle-password-btn:hover {
+    color: #D4AF37;
+}
+
+/* نسيت كلمة المرور */
+.forgot-password {
+    text-align: left;
+    margin-top: -0.5rem;
+}
+
+.forgot-password a {
+    color: #815B2F;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.forgot-password a:hover {
+    color: #D4AF37;
+}
+
+/* مجموعة Checkbox */
+.checkbox-group {
+    margin-top: 0.5rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    cursor: pointer;
+    position: relative;
+    padding-right: 2rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    right: 0;
+    width: 22px;
+    height: 22px;
+}
+
+.checkmark {
+    position: absolute;
+    right: 0;
+    top: 2px;
+    height: 22px;
+    width: 22px;
+    background-color: white;
+    border: 2px solid #815B2F;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.checkbox-label:hover input ~ .checkmark {
+    border-color: #D4AF37;
+}
+
+.checkbox-label input:checked ~ .checkmark {
+    background-color: #815B2F;
+    border-color: #815B2F;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkbox-label input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.checkbox-label .checkmark:after {
+    right: 6px;
+    top: 2px;
+    width: 6px;
+    height: 11px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-text {
+    color: #815B2F;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* الروابط */
+.link {
+    color: #D4AF37;
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.3s ease;
+}
+
+.link:hover {
+    color: #815B2F;
+}
+
+/* زر الإرسال */
+.submit-btn {
+    padding: 0.75rem;
+    background: linear-gradient(90deg, #CBA760 0%, #815B2F 100%);
+    color: #EFE2CF;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Amiri', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.2rem;
+    box-shadow: 0 4px 15px rgba(129, 91, 47, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.submit-btn:hover::before {
+    left: 100%;
+}
+
+.submit-btn:hover {
+    background: linear-gradient(90deg, #B8964D 0%, #6B4A26 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(129, 91, 47, 0.4);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+/* نص التبديل */
+.switch-text {
+    text-align: center;
+    color: #815B2F;
+    font-size: 0.95rem;
+    margin-top: 0.3rem;
+}
+
+/* الاستجابة للأجهزة المحمولة */
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 1rem;
+    }
+
+    .logo-white {
+        width: 140px;
+    }
+
+    .auth-box {
+        max-width: 100%;
+    }
+
+    .tab-content {
+        padding: 1.5rem;
+    }
+
+    .tab-btn {
+        font-size: 1.1rem;
+        padding: 1rem;
+    }
+
+    .form-label {
+        font-size: 1rem;
+    }
+
+    .form-input {
+        font-size: 1rem;
+        padding: 0.8rem 1rem;
+    }
+
+    .submit-btn {
+        font-size: 1.2rem;
+    }
+
+    .checkbox-text {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-white {
+        width: 120px;
+    }
+
+    .tab-content {
+        padding: 1.2rem;
+    }
+
+    .auth-form {
+        gap: 1.2rem;
+    }
+
+    .form-group {
+        gap: 0.4rem;
+    }
+}

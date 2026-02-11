@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إتمام الحجز - نُزل</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="reservation.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="images/logo.png" alt="نُزل" class="logo-img">
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="places.html" class="nav-link">الوجهات</a>
+                <a href="#bookings" class="nav-link" id="bookingsLink">حجوزاتي</a>
+                <a href="#" class="nav-link" id="logoutLink" onclick="logout(); return false;">خروج</a>
+                <a href="login.html" class="nav-link" id="loginLink" style="display:none;">تسجيل دخول</a>
+            </div>
+            <div class="profile">
+                <a href="profile.html" class="profile-circle">
+                    <i class="fas fa-user"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- محتوى الحجز -->
+    <section class="booking-section" id="bookingSection">
+        <div class="booking-container">
+            <!-- الجزء الأيمن - نموذج الحجز -->
+            <div class="booking-form-section">
+                <!-- عنوان الفندق -->
+                <div class="hotel-header">
+                    <h1 class="hotel-name">Shebara Resort</h1>
+                    <div class="hotel-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <span>منتجع 5 نجوم</span>
+                    </div>
+                    <p class="hotel-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        جزيرة شبارة، البحر الأحمر
+                    </p>
+                </div>
+
+                <!-- التواريخ -->
+                <div class="booking-section-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        اختر تواريخ الإقامة
+                    </h2>
+                    <div class="dates-row">
+                        <div class="date-input-group">
+                            <label>تاريخ الوصول</label>
+                            <input type="date" id="checkInDate" class="date-input">
+                        </div>
+                        <div class="date-input-group">
+                            <label>تاريخ المغادرة</label>
+                            <input type="date" id="checkOutDate" class="date-input">
+                        </div>
+                        <div class="nights-display">
+                            <span class="nights-label">عدد الليالي</span>
+                            <span class="nights-count" id="nightsCount">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- اختيار نوع الغرفة -->
+                <div class="booking-section-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-bed"></i>
+                        اختر نوع الغرفة
+                    </h2>
+
+                    <!-- فيلا شاطئية -->
+                    <div class="room-option" data-price="10300" data-name="فيلا شاطئية من غرفة نوم واحدة">
+                        <div class="room-option-header">
+                            <div class="room-option-info">
+                                <h3>فيلا شاطئية من غرفة نوم واحدة</h3>
+                                <div class="room-features">
+                                    <span><i class="fas fa-swimmer"></i> مسبح لامتناهي</span>
+                                    <span><i class="fas fa-water"></i> إطلالة على المسبح</span>
+                                    <span><i class="fas fa-users"></i> يستوعب 2</span>
+                                </div>
+                                <p class="room-size">104 متر مربع</p>
+                            </div>
+                            <div class="room-option-price">
+                                <span class="price-value">10,300 ر.س</span>
+                                <span class="price-label">لليلة</span>
+                            </div>
+                        </div>
+                        <div class="room-option-select">
+                            <div class="quantity-selector">
+                                <label>عدد الغرف:</label>
+                                <div class="quantity-controls">
+                                    <button class="qty-btn" onclick="updateRoomQuantity(this, -1)">-</button>
+                                    <input type="number" class="qty-input" value="0" min="0" max="10" readonly>
+                                    <button class="qty-btn" onclick="updateRoomQuantity(this, 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- فيلا فوق المياه -->
+                    <div class="room-option" data-price="14000" data-name="فيلا من غرفة نوم واحدة فوق المياه">
+                        <div class="room-option-header">
+                            <div class="room-option-info">
+                                <h3>فيلا من غرفة نوم واحدة فوق المياه</h3>
+                                <div class="room-features">
+                                    <span><i class="fas fa-swimmer"></i> مسبح لامتناهي</span>
+                                    <span><i class="fas fa-water"></i> إطلالة على البحر</span>
+                                    <span><i class="fas fa-users"></i> يستوعب 2</span>
+                                </div>
+                                <p class="room-size">104 متر مربع</p>
+                            </div>
+                            <div class="room-option-price">
+                                <span class="price-value">14,000 ر.س</span>
+                                <span class="price-label">لليلة</span>
+                            </div>
+                        </div>
+                        <div class="room-option-select">
+                            <div class="quantity-selector">
+                                <label>عدد الغرف:</label>
+                                <div class="quantity-controls">
+                                    <button class="qty-btn" onclick="updateRoomQuantity(this, -1)">-</button>
+                                    <input type="number" class="qty-input" value="0" min="0" max="10" readonly>
+                                    <button class="qty-btn" onclick="updateRoomQuantity(this, 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- فيلا بغرفتين -->
+                    <div class="room-option" data-price="19200" data-name="فيلا فوق الماء بغرفتي نوم">
+                        <div class="room-option-header">
+                            <div class="room-option-info">
+                                <h3>فيلا فوق الماء بغرفتي نوم</h3>
+                                <div class="room-features">
+                                    <span><i class="fas fa-swimmer"></i> مسبح لامتناهي</span>
+                                    <span><i class="fas fa-water"></i> إطلالة على البحر</span>
+                                    <span><i class="fas fa-users"></i> يستوعب 4</span>
+                                </div>
+                                <p class="room-size">189 متر مربع</p>
+                            </div>
+                            <div class="room-option-price">
+                                <span class="price-value">19,200 ر.س</span>
+                                <span class="price-label">لليلة</span>
+                            </div>
+                        </div>
+                        <div class="room-option-select">
+                            <div class="quantity-selector">
+                                <label>عدد الغرف:</label>
+                                <div class="quantity-controls">
+                                    <button class="qty-btn" onclick="updateRoomQuantity(this, -1)">-</button>
+                                    <input type="number" class="qty-input" value="0" min="0" max="10" readonly>
+                                    <button class="qty-btn" onclick="updateRoomQuantity(this, 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- عدد النزلاء -->
+                <div class="booking-section-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-users"></i>
+                        عدد النزلاء
+                    </h2>
+                    <div class="guests-row">
+                        <div class="guest-control">
+                            <div class="guest-label">
+                                <span class="label-main">البالغون</span>
+                                <span class="label-sub">13 سنة فأكثر</span>
+                            </div>
+                            <div class="quantity-controls">
+                                <button class="qty-btn" onclick="updateGuests('adults', -1)">-</button>
+                                <input type="number" id="adultsCount" class="qty-input" value="1" min="1" max="20" readonly>
+                                <button class="qty-btn" onclick="updateGuests('adults', 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="guest-control">
+                            <div class="guest-label">
+                                <span class="label-main">الأطفال</span>
+                                <span class="label-sub">0-12 سنة</span>
+                            </div>
+                            <div class="quantity-controls">
+                                <button class="qty-btn" onclick="updateGuests('children', -1)">-</button>
+                                <input type="number" id="childrenCount" class="qty-input" value="0" min="0" max="10" readonly>
+                                <button class="qty-btn" onclick="updateGuests('children', 1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الجزء الأيسر - ملخص الحجز -->
+            <div class="booking-summary-section">
+                <div class="summary-card">
+                    <h2 class="summary-title">ملخص الحجز</h2>
+                    
+                    <div class="summary-item">
+                        <span class="summary-label">الفندق</span>
+                        <span class="summary-value">Shebara Resort</span>
+                    </div>
+
+                    <div class="summary-divider"></div>
+
+                    <div class="summary-item">
+                        <span class="summary-label">تاريخ الوصول</span>
+                        <span class="summary-value" id="summaryCheckIn">-</span>
+                    </div>
+
+                    <div class="summary-item">
+                        <span class="summary-label">تاريخ المغادرة</span>
+                        <span class="summary-value" id="summaryCheckOut">-</span>
+                    </div>
+
+                    <div class="summary-item">
+                        <span class="summary-label">عدد الليالي</span>
+                        <span class="summary-value" id="summaryNights">0</span>
+                    </div>
+
+                    <div class="summary-divider"></div>
+
+                    <div id="selectedRoomsList"></div>
+
+                    <div class="summary-item">
+                        <span class="summary-label">البالغون</span>
+                        <span class="summary-value" id="summaryAdults">1</span>
+                    </div>
+
+                    <div class="summary-item">
+                        <span class="summary-label">الأطفال</span>
+                        <span class="summary-value" id="summaryChildren">0</span>
+                    </div>
+
+                    <div class="summary-divider"></div>
+
+                    <div class="summary-item">
+                        <span class="summary-label">المجموع الفرعي</span>
+                        <span class="summary-value" id="summarySubtotal">0 ر.س</span>
+                    </div>
+
+                    <div class="summary-item">
+                        <span class="summary-label">الضرائب والرسوم (20.75%)</span>
+                        <span class="summary-value" id="summaryTax">0 ر.س</span>
+                    </div>
+
+                    <div class="summary-divider"></div>
+
+                    <div class="summary-total">
+                        <span class="total-label">المجموع الإجمالي</span>
+                        <span class="total-value" id="summaryTotal">0 ر.س</span>
+                    </div>
+
+                    <button class="complete-booking-btn" onclick="completeBooking()">
+                        <i class="fas fa-check-circle"></i>
+                        أكمل الحجز
+                    </button>
+
+                    <div class="booking-notes">
+                        <i class="fas fa-info-circle"></i>
+                        <p>يشمل السعر الإفطار الكونتيننتال • غير قابل للاسترداد</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم الدفع (مخفي في البداية) -->
+    <section class="payment-section" id="paymentSection" style="display: none;">
+        <div class="payment-container">
+            <button class="back-btn" onclick="backToBooking()">
+                <i class="fas fa-arrow-right"></i> العودة للحجز
+            </button>
+
+            <h2 class="payment-title">إتمام الدفع</h2>
+
+            <div class="payment-grid">
+                <!-- ملخص الطلب -->
+                <div class="order-summary">
+                    <h3>ملخص الطلب</h3>
+                    <div id="paymentSummary">
+                        <!-- سيتم ملؤها من JavaScript -->
+                    </div>
+                </div>
+
+                <!-- نموذج الدفع -->
+                <div class="payment-form-card">
+                    <h3>طريقة الدفع</h3>
+                    
+                    <div class="payment-methods">
+                        <button type="button" class="payment-method active" onclick="selectPaymentMethod('card')">
+                            <i class="fas fa-credit-card"></i>
+                            <span>بطاقة ائتمانية</span>
+                        </button>
+                        <button type="button" class="payment-method" onclick="selectPaymentMethod('mada')">
+                            <i class="fas fa-money-check"></i>
+                            <span>مدى</span>
+                        </button>
+                        <button type="button" class="payment-method" onclick="selectPaymentMethod('applepay')">
+                            <i class="fab fa-apple-pay"></i>
+                            <span>Apple Pay</span>
+                        </button>
+                    </div>
+
+                    <form id="paymentForm" onsubmit="processPayment(event)">
+                        <!-- حقول البطاقة الائتمانية -->
+                        <div id="cardFields">
+                            <div class="form-group">
+                                <label>اسم حامل البطاقة</label>
+                                <input type="text" id="cardName" placeholder="الاسم كما هو مكتوب على البطاقة">
+                            </div>
+
+                            <div class="form-group">
+                                <label>رقم البطاقة</label>
+                                <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCardNumber(this)">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>تاريخ الانتهاء</label>
+                                    <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5" oninput="formatExpiryDate(this)">
+                                </div>
+                                <div class="form-group">
+                                    <label>CVV</label>
+                                    <input type="text" id="cvv" placeholder="123" maxlength="3" oninput="validateCVV(this)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- رسالة Apple Pay -->
+                        <div id="applePayMessage" style="display: none;">
+                            <div class="apple-pay-container">
+                                <i class="fab fa-apple-pay" style="font-size: 4rem; color: #000;"></i>
+                                <p style="font-size: 1.2rem; color: #815B2F; margin: 1rem 0;">جاهز للدفع عبر Apple Pay</p>
+                                <p style="color: #666;">سيتم فتح نافذة Apple Pay عند الضغط على زر الدفع</p>
+                            </div>
+                        </div>
+
+                        <div class="form-checkbox">
+                            <input type="checkbox" id="agreeTerms" required>
+                            <label for="agreeTerms">أوافق على الشروط والأحكام</label>
+                        </div>
+
+                        <button type="submit" class="pay-btn" id="submitPayBtn">
+                            <i class="fas fa-lock" id="payBtnIcon"></i>
+                            <span id="payBtnText">تأكيد الدفع</span>
+                            <span id="payBtnAmount" class="pay-amount">0 ر.س</span>
+                        </button>
+
+                        <p class="secure-note">
+                            <i class="fas fa-shield-alt"></i>
+                            دفع آمن ومشفّر 100%
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- الفوتر -->
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- اللوقو -->
+            <div class="footer-section">
+                <img src="images/logo.png" alt="نُزل" class="footer-logo">
+            </div>
+
+            <!-- الشركة -->
+            <div class="footer-section">
+                <h4 class="footer-heading">الشركة</h4>
+                <ul class="footer-links">
+                    <li><a href="#about">من نحن</a></li>
+                    <li><a href="#contact">تواصل معنا</a></li>
+                </ul>
+            </div>
+
+            <!-- استكشف -->
+            <div class="footer-section">
+                <h4 class="footer-heading">استكشف</h4>
+                <ul class="footer-links">
+                    <li><a href="places.html">الوجهات</a></li>
+                    <li><a href="#experiences">التجارب</a></li>
+                    <li><a href="#offers">العروض الخاصة</a></li>
+                </ul>
+            </div>
+
+            <!-- مواقع التواصل -->
+            <div class="footer-section">
+                <h4 class="footer-heading">تابعنا</h4>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- حقوق النشر -->
+        <div class="footer-bottom">
+            <p>جميع الحقوق محفوظة © نُزل 2026</p>
+        </div>
+    </footer>
+
+    <script src="auth.js"></script>
+    <script src="reservation.js"></script>
+</body>
+</html>

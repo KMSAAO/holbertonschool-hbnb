@@ -1,0 +1,406 @@
+/**
+ * ملف: admin.css
+ * الوصف: تنسيقات صفحة إدارة النُزل
+ * المكونات: النماذج، الأزرار، البطاقات، الاستجابة للشاشات الصغيرة
+ */
+
+/* ==================== التنسيقات العامة ==================== */
+
+body {
+    font-family: 'Amiri', serif;
+}
+
+.admin-container {
+    max-width: 1200px;
+    margin: 200px auto 50px;
+    padding: 0 20px;
+}
+
+.admin-title {
+    font-size: 2.5rem;
+    color: #815B2F;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.admin-subtitle {
+    text-align: center;
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 40px;
+}
+
+.admin-form-container {
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    margin-bottom: 40px;
+}
+
+.form-title {
+    font-size: 1.8rem;
+    color: #815B2F;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.form-section {
+    margin-bottom: 40px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    color: #333;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.section-title i {
+    color: #815B2F;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600;
+}
+
+.required {
+    color: #e74c3c;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #815B2F;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+/* أقسام الوصف */
+.about-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.about-item {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+/* المرافق */
+.amenities-list,
+.rooms-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.amenity-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.amenity-icon,
+.amenity-text {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+}
+
+.amenity-icon {
+    max-width: 200px;
+}
+
+/* الغرف */
+.room-item {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+}
+
+/* الأزرار */
+.add-btn {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.3s;
+    margin-top: 15px;
+}
+
+.add-btn:hover {
+    background: #229954;
+}
+
+.remove-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.remove-btn:hover {
+    background: #c0392b;
+}
+
+/* معاينة الصور */
+.images-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.preview-image {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+}
+
+.preview-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-image {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(231, 76, 60, 0.9);
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* أزرار الإرسال */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.submit-btn {
+    background: #815B2F;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.3s;
+}
+
+.submit-btn:hover {
+    background: #6d5210;
+}
+
+.reset-btn {
+    background: #95a5a6;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.3s;
+}
+
+.reset-btn:hover {
+    background: #7f8c8d;
+}
+
+/* الفنادق المضافة */
+.hotels-list-container {
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.user-hotels-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.user-hotel-card {
+    background: #f9f9f9;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.user-hotel-card:hover {
+    transform: translateY(-5px);
+}
+
+.user-hotel-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.user-hotel-info {
+    padding: 20px;
+}
+
+.user-hotel-name {
+    font-size: 1.3rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.user-hotel-location {
+    color: #666;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.user-hotel-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.edit-hotel-btn,
+.delete-hotel-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.edit-hotel-btn {
+    background: #3498db;
+    color: white;
+}
+
+.edit-hotel-btn:hover {
+    background: #2980b9;
+}
+
+.delete-hotel-btn {
+    background: #e74c3c;
+    color: white;
+}
+
+.delete-hotel-btn:hover {
+    background: #c0392b;
+}
+
+.help-text {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.empty-message {
+    text-align: center;
+    color: #999;
+    padding: 40px;
+    font-size: 1.1rem;
+}
+
+/* استجابة للشاشات الصغيرة */
+@media (max-width: 768px) {
+    .admin-container {
+        margin-top: 80px;
+    }
+    
+    .admin-form-container,
+    .hotels-list-container {
+        padding: 20px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .amenity-item {
+        flex-direction: column;
+    }
+    
+    .amenity-icon {
+        max-width: 100%;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .submit-btn,
+    .reset-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

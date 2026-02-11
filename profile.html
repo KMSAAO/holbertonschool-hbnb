@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نُزل - الملف الشخصي</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- شريط التنقل العلوي -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <!-- اللوقو على اليسار -->
+            <div class="logo">
+                <img src="images/logo.png" alt="نُزل" class="logo-img">
+            </div>
+            
+            <!-- القائمة في المنتصف -->
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="places.html" class="nav-link">الوجهات</a>
+                <a href="#bookings" class="nav-link" id="bookingsLink">حجوزاتي</a>
+                <a href="#" class="nav-link" id="logoutLink" onclick="logout(); return false;">خروج</a>
+                <a href="login.html" class="nav-link" id="loginLink" style="display:none;">تسجيل دخول</a>
+            </div>
+            
+            <!-- صورة الملف الشخصي على اليمين -->
+            <div class="profile">
+                <a href="profile.html" class="profile-circle">
+                    <i class="fas fa-user"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- قسم الملف الشخصي -->
+    <section class="profile-section">
+        <div class="profile-container">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h1 class="profile-title">الملف الشخصي</h1>
+            </div>
+
+            <div class="profile-content">
+                <form class="profile-form">
+                    <!-- الاسم الأول -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i>
+                            الاسم الأول
+                        </label>
+                        <input type="text" class="form-input" id="firstNameInput" value="" readonly>
+                    </div>
+
+                    <!-- اسم العائلة -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i>
+                            اسم العائلة
+                        </label>
+                        <input type="text" class="form-input" id="lastNameInput" value="" readonly>
+                    </div>
+
+                    <!-- البريد الإلكتروني -->
+                    <div class="form-group editable">
+                        <label class="form-label">
+                            <i class="fas fa-envelope"></i>
+                            البريد الإلكتروني
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="email" class="form-input" id="emailInput" value="" readonly>
+                            <button type="button" class="edit-btn" onclick="enableEdit('email')">
+                                <i class="fas fa-edit"></i>
+                                تعديل
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- الجنس -->
+                    <div class="form-group editable">
+                        <label class="form-label">
+                            <i class="fas fa-venus-mars"></i>
+                            الجنس
+                        </label>
+                        <div class="input-wrapper">
+                            <select class="form-input form-select" id="genderInput" disabled>
+                                <option value="female" selected>أنثى</option>
+                                <option value="male">ذكر</option>
+                                <option value="other">آخر</option>
+                            </select>
+                            <button type="button" class="edit-btn" onclick="enableEdit('gender')">
+                                <i class="fas fa-edit"></i>
+                                تعديل
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- تغيير كلمة المرور -->
+                    <div class="form-group password-section">
+                        <label class="form-label">
+                            <i class="fas fa-lock"></i>
+                            تغيير كلمة المرور
+                        </label>
+                        <button type="button" class="change-password-btn" onclick="togglePasswordSection()">
+                            <i class="fas fa-key"></i>
+                            تغيير كلمة المرور
+                        </button>
+                    </div>
+
+                    <!-- قسم تغيير كلمة المرور (مخفي) -->
+                    <div id="passwordChangeSection" class="password-change-section" style="display: none;">
+                        <!-- كلمة المرور الحالية -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-lock"></i>
+                                كلمة المرور الحالية
+                            </label>
+                            <div class="password-input-wrapper">
+                                <input type="password" class="form-input" id="currentPassword" placeholder="أدخل كلمة المرور الحالية">
+                                <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('currentPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- كلمة المرور الجديدة -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-lock"></i>
+                                كلمة المرور الجديدة
+                            </label>
+                            <div class="password-input-wrapper">
+                                <input type="password" class="form-input" id="newPassword" placeholder="أدخل كلمة المرور الجديدة">
+                                <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('newPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-requirements">
+                                <p>يجب أن تحتوي كلمة المرور على:</p>
+                                <ul>
+                                    <li id="req-length"><i class="fas fa-circle"></i> 8 أحرف على الأقل</li>
+                                    <li id="req-uppercase"><i class="fas fa-circle"></i> حرف كبير واحد على الأقل (A-Z)</li>
+                                    <li id="req-lowercase"><i class="fas fa-circle"></i> حرف صغير واحد على الأقل (a-z)</li>
+                                    <li id="req-number"><i class="fas fa-circle"></i> رقم واحد على الأقل (0-9)</li>
+                                    <li id="req-special"><i class="fas fa-circle"></i> رمز خاص واحد على الأقل (!@#$%)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- تأكيد كلمة المرور الجديدة -->
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-lock"></i>
+                                تأكيد كلمة المرور الجديدة
+                            </label>
+                            <div class="password-input-wrapper">
+                                <input type="password" class="form-input" id="confirmPassword" placeholder="أعد إدخال كلمة المرور الجديدة">
+                                <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('confirmPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- أزرار حفظ وإلغاء كلمة المرور -->
+                        <div class="password-actions">
+                            <button type="button" class="save-password-btn" onclick="savePassword()">
+                                <i class="fas fa-check"></i>
+                                حفظ كلمة المرور
+                            </button>
+                            <button type="button" class="cancel-password-btn" onclick="cancelPasswordChange()">
+                                <i class="fas fa-times"></i>
+                                إلغاء
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- أزرار الحفظ والإلغاء -->
+                    <div class="form-actions" id="formActions" style="display: none;">
+                        <button type="button" class="save-btn" onclick="saveChanges()">
+                            <i class="fas fa-check"></i>
+                            حفظ التغييرات
+                        </button>
+                        <button type="button" class="cancel-btn" onclick="cancelEdit()">
+                            <i class="fas fa-times"></i>
+                            إلغاء
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- الفوتر -->
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- اللوقو -->
+            <div class="footer-section">
+                <img src="images/logo.png" alt="نُزل" class="footer-logo">
+            </div>
+
+            <!-- الشركة -->
+            <div class="footer-section">
+                <h4 class="footer-heading">الشركة</h4>
+                <ul class="footer-links">
+                    <li><a href="#about">من نحن</a></li>
+                    <li><a href="#contact">تواصل معنا</a></li>
+                </ul>
+            </div>
+
+            <!-- استكشف -->
+            <div class="footer-section">
+                <h4 class="footer-heading">استكشف</h4>
+                <ul class="footer-links">
+                    <li><a href="places.html">الوجهات</a></li>
+                    <li><a href="#experiences">التجارب</a></li>
+                    <li><a href="#offers">العروض الخاصة</a></li>
+                </ul>
+            </div>
+
+            <!-- مواقع التواصل -->
+            <div class="footer-section">
+                <h4 class="footer-heading">تابعنا</h4>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- حقوق النشر -->
+        <div class="footer-bottom">
+            <p>جميع الحقوق محفوظة © نُزل 2026</p>
+        </div>
+    </footer>
+
+    <script src="auth.js"></script>
+    <script src="profile.js"></script>
+</body>
+</html>
