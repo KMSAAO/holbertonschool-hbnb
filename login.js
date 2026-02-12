@@ -1,100 +1,77 @@
+// login.js - النسخة النهائية (شاملة التحقق والربط الصحيح)
+
+// ==========================================
+// 1. دوال الواجهة (UI Functions)
+// ==========================================
+
 // التبديل بين تسجيل الدخول وإنشاء الحساب
 function switchTab(tabName) {
-    // إخفاء جميع المحتويات
-    const tabContents = document.querySelectorAll('.tab-content');
-    tabContents.forEach(content => {
+    document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.remove('active');
     });
 
-    // إلغاء تفعيل جميع الأزرار
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    tabBtns.forEach(btn => {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.remove('active');
     });
 
-    // تفعيل التبويب المطلوب
-    document.getElementById(tabName).classList.add('active');
-    const activeBtn = document.querySelector(`[data-tab="${tabName}"]`);
-    if (activeBtn) {
-        activeBtn.classList.add('active');
-    }
+    const targetContent = document.getElementById(tabName);
+    const targetBtn = document.querySelector(`[data-tab="${tabName}"]`);
+
+    if (targetContent) targetContent.classList.add('active');
+    if (targetBtn) targetBtn.classList.add('active');
 }
 
 // إظهار/إخفاء كلمة المرور
 function togglePasswordVisibility(inputId) {
     const input = document.getElementById(inputId);
-    const button = input.parentElement.querySelector('.toggle-password-btn i');
+    const icon = input.nextElementSibling.querySelector('i');
     
     if (input.type === 'password') {
         input.type = 'text';
-        button.classList.remove('fa-eye');
-        button.classList.add('fa-eye-slash');
+        if(icon) {
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
     } else {
         input.type = 'password';
-        button.classList.remove('fa-eye-slash');
-        button.classList.add('fa-eye');
+        if(icon) {
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
     }
 }
 
-// عرض إشعار
-function showNotification(message, type) {
+// دالة عرض الإشعارات
+function showNotification(message, type = 'error') {
+    // إزالة أي إشعار قديم إن وجد
+    const oldNotification = document.querySelector('.notification');
+    if (oldNotification) oldNotification.remove();
+
     const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-        <span>${message}</span>
-    `;
-    
+    notification.className = `notification ${type}`;
     notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
+        position: fixed; top: 20px; right: 20px;
         background: ${type === 'success' ? '#4CAF50' : '#f44336'};
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-        display: flex;
-        align-items: center;
-        gap: 0.8rem;
-        font-family: 'Amiri', serif;
-        font-size: 1.1rem;
-        z-index: 10000;
-        animation: slideInRight 0.3s ease;
+        color: white; padding: 15px 20px; border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10000;
+        font-family: 'Amiri', serif; font-size: 1.1rem;
+        transition: opacity 0.5s ease;
     `;
-    
+    notification.textContent = message;
+
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease';
-        setTimeout(() => {
-            if (document.body.contains(notification)) {
-                document.body.removeChild(notification);
-            }
-        }, 300);
-    }, 1500);
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 500);
+    }, 3000);
 }
 
-// التحقق من صحة البريد الإلكتروني
-function validateEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
+// ==========================================
+// 2. دوال الاتصال بالسيرفر (API Logic)
+// ==========================================
 
-// التحقق من صحة كلمة المرور
-function validatePassword(password) {
-    // 8 أحرف على الأقل، حرف كبير، حرف صغير، رقم، رمز خاص
-    const lengthValid = password.length >= 8;
-    const uppercaseValid = /[A-Z]/.test(password);
-    const lowercaseValid = /[a-z]/.test(password);
-    const numberValid = /[0-9]/.test(password);
-    const specialValid = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    
-    return lengthValid && uppercaseValid && lowercaseValid && numberValid && specialValid;
-}
-
-// معالجة تسجيل الدخول
-function handleLogin(event) {
+async function handleLogin(event) {
     event.preventDefault();
     
     const email = document.getElementById('loginEmail').value.trim();
@@ -104,39 +81,31 @@ function handleLogin(event) {
         showNotification('الرجاء ملء جميع الحقول', 'error');
         return;
     }
-    
-    if (!validateEmail(email)) {
-        showNotification('الرجاء إدخال بريد إلكتروني صحيح', 'error');
-        return;
-    }
-    
-    // هنا سيتم التحقق من البيانات مع قاعدة البيانات
-    // مثال: إذا كانت البيانات صحيحة
-    
-    // حفظ بيانات المستخدم في localStorage
-    if (typeof saveUserSession === 'function') {
-        saveUserSession({
-            firstName: 'أميرة', // سيتم استبدالها ببيانات من قاعدة البيانات
-            lastName: 'السلطان',
-            email: email,
-            gender: 'female'
+
+    try {
+        const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login', { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
         });
-    }
-    
-    showNotification('تم تسجيل الدخول بنجاح', 'success');
-    
-    // إظهار شاشة التحميل والتوجيه للصفحة الرئيسية
-    setTimeout(() => {
-        if (typeof showLoadingScreen === 'function') {
-            showLoadingScreen('index.html');
+
+        const data = await response.json();
+
+        if (response.ok) {
+            localStorage.setItem('access_token', data.access_token);
+            showNotification('تم تسجيل الدخول بنجاح', 'success');
+            setTimeout(() => { window.location.href = 'index.html'; }, 800);
         } else {
-            window.location.href = 'index.html';
+            const errorMessage = data.message || data.error || 'بيانات الدخول غير صحيحة';
+            showNotification(errorMessage, 'error');
         }
-    }, 800);
+    } catch (error) {
+        console.error(error);
+        showNotification('تعذر الاتصال بالسيرفر. تأكد من تشغيل run.py', 'error');
+    }
 }
 
-// معالجة إنشاء الحساب
-function handleSignup(event) {
+async function handleSignup(event) {
     event.preventDefault();
     
     const firstName = document.getElementById('firstName').value.trim();
@@ -144,143 +113,75 @@ function handleSignup(event) {
     const email = document.getElementById('signupEmail').value.trim();
     const password = document.getElementById('signupPassword').value;
     const confirmPassword = document.getElementById('signupConfirmPassword').value;
-    const termsAccepted = document.getElementById('termsCheckbox').checked;
     
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-        showNotification('الرجاء ملء جميع الحقول', 'error');
+    // --- التحقق من الشروط (Validations) ---
+
+    // 1. الاسم الأول
+    if (!firstName || firstName.length > 50) {
+        showNotification('الاسم الأول مطلوب ويجب أن لا يتجاوز 50 حرفاً', 'error');
         return;
     }
-    
-    if (!validateEmail(email)) {
-        showNotification('الرجاء إدخال بريد إلكتروني صحيح', 'error');
+
+    // 2. الاسم الأخير
+    if (!lastName || lastName.length > 50) {
+        showNotification('الاسم الأخير مطلوب ويجب أن لا يتجاوز 50 حرفاً', 'error');
         return;
     }
-    
-    if (!validateSignupPassword()) {
-        showNotification('كلمة المرور لا تستوفي المتطلبات', 'error');
+
+    // 3. البريد الإلكتروني (Regex)
+    const emailPattern = /^[\w\.-]+@[\w\.-]+\.\w+$/;
+    if (!email || !emailPattern.test(email)) {
+        showNotification('صيغة البريد الإلكتروني غير صحيحة', 'error');
         return;
     }
-    
+
+    // 4. كلمة المرور (الطول)
+    if (!password || password.length < 6) {
+        showNotification('كلمة المرور يجب أن تكون 6 خانات على الأقل', 'error');
+        return;
+    }
+
+    // 5. تطابق كلمة المرور
     if (password !== confirmPassword) {
         showNotification('كلمتا المرور غير متطابقتين', 'error');
         return;
     }
-    
-    if (!termsAccepted) {
-        showNotification('يجب الموافقة على شروط الاستخدام', 'error');
-        return;
-    }
-    
-    // هنا سيتم حفظ البيانات في قاعدة البيانات
-    
-    // حفظ بيانات المستخدم في localStorage
-    if (typeof saveUserSession === 'function') {
-        saveUserSession({
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            gender: 'female' // افتراضي
+
+    try {
+        // لاحظ: الرابط بدون شرطة في النهاية لتجنب مشاكل CORS
+        const response = await fetch('http://127.0.0.1:5000/api/v1/users', { 
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                first_name: firstName,
+                last_name: lastName,
+                email: email,
+                password: password
+            })
         });
-    }
-    
-    showNotification('تم إنشاء الحساب بنجاح', 'success');
-    
-    // إظهار شاشة التحميل والتوجيه للصفحة الرئيسية
-    setTimeout(() => {
-        if (typeof showLoadingScreen === 'function') {
-            showLoadingScreen('index.html');
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showNotification('تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول', 'success');
+            setTimeout(() => { switchTab('login'); }, 1500);
         } else {
-            window.location.href = 'index.html';
+            const errorMsg = data.message || data.error || 'فشل إنشاء الحساب';
+            showNotification(errorMsg, 'error');
         }
-    }, 800);
-}
-
-// التحقق من متطلبات كلمة المرور في صفحة إنشاء الحساب
-function validateSignupPassword() {
-    const password = document.getElementById('signupPassword').value;
-    const strengthIndicator = document.getElementById('signupPasswordStrength');
-    
-    if (!password) {
-        strengthIndicator.className = 'password-strength';
-        return false;
-    }
-    
-    let strength = 0;
-    
-    // التحقق من الطول
-    if (password.length >= 8) strength++;
-    
-    // التحقق من الأحرف الكبيرة
-    if (/[A-Z]/.test(password)) strength++;
-    
-    // التحقق من الأحرف الصغيرة
-    if (/[a-z]/.test(password)) strength++;
-    
-    // التحقق من الأرقام
-    if (/[0-9]/.test(password)) strength++;
-    
-    // التحقق من الرموز الخاصة
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength++;
-    
-    // تحديث مؤشر القوة
-    if (strength <= 2) {
-        strengthIndicator.className = 'password-strength weak';
-    } else if (strength <= 4) {
-        strengthIndicator.className = 'password-strength medium';
-    } else {
-        strengthIndicator.className = 'password-strength strong';
-    }
-    
-    // كلمة المرور قوية إذا استوفت جميع الشروط
-    return strength === 5;
-}
-
-// تحديث حالة المتطلب في صفحة إنشاء الحساب
-function updateSignupRequirement(id, isValid) {
-    const element = document.getElementById(id);
-    if (element) {
-        if (isValid) {
-            element.classList.add('valid');
-            element.querySelector('i').classList.remove('fa-circle');
-            element.querySelector('i').classList.add('fa-check-circle');
-        } else {
-            element.classList.remove('valid');
-            element.querySelector('i').classList.remove('fa-check-circle');
-            element.querySelector('i').classList.add('fa-circle');
-        }
+    } catch (error) {
+        console.error(error);
+        showNotification('حدث خطأ أثناء الاتصال بالخادم', 'error');
     }
 }
 
-// إضافة أنماط الرسوم المتحركة
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideInRight {
-        from {
-            transform: translateX(-100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    @keyframes slideOutRight {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(-100%);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
+// ==========================================
+// 3. تهيئة الصفحة والربط (Initialization)
+// ==========================================
 
-// تهيئة الصفحة
 document.addEventListener('DOMContentLoaded', () => {
-    // إضافة مستمعي الأحداث للتبويبات
+    
+    // ربط أزرار التبويبات
     const tabBtns = document.querySelectorAll('.tab-btn');
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -289,20 +190,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // إضافة مستمعي الأحداث للنماذج
+    // ربط فورم تسجيل الدخول
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
+        loginForm.removeEventListener('submit', handleLogin); 
         loginForm.addEventListener('submit', handleLogin);
     }
 
+    // ربط فورم إنشاء الحساب
     const signupForm = document.getElementById('signupForm');
     if (signupForm) {
+        signupForm.removeEventListener('submit', handleSignup);
         signupForm.addEventListener('submit', handleSignup);
-        
-        // إضافة مستمع للتحقق من كلمة المرور في صفحة إنشاء الحساب
-        const signupPasswordInput = document.getElementById('signupPassword');
-        if (signupPasswordInput) {
-            signupPasswordInput.addEventListener('input', validateSignupPassword);
-        }
     }
 });
