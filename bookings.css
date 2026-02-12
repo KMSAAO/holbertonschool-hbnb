@@ -1,0 +1,220 @@
+/**
+ * ملف: bookings.css
+ * الوصف: تنسيقات صفحة الحجوزات
+ */
+
+/* ==================== الحاوية الرئيسية ==================== */
+body {
+    font-family: 'Amiri', serif;
+}
+
+.bookings-container {
+    max-width: 1200px;
+    margin: 200px auto 50px;
+    padding: 0 20px;
+    min-height: 60vh;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    color: #815B2F;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.page-subtitle {
+    text-align: center;
+    color: #666;
+    font-size: 1.1rem;
+    margin-bottom: 40px;
+}
+
+/* ==================== قائمة الحجوزات ==================== */
+.bookings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.booking-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    display: grid;
+    grid-template-columns: 200px 1fr auto;
+    gap: 25px;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.booking-card:hover {
+    box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+    transform: translateY(-3px);
+}
+
+.booking-image {
+    width: 200px;
+    height: 150px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.booking-details {
+    flex: 1;
+}
+
+.booking-hotel-name {
+    font-size: 1.8rem;
+    color: #815B2F;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.booking-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #555;
+    font-size: 1rem;
+}
+
+.info-item i {
+    color: #815B2F;
+    font-size: 1.1rem;
+    width: 20px;
+}
+
+.booking-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.booking-total {
+    font-size: 1.5rem;
+    color: #815B2F;
+    font-weight: 700;
+}
+
+.booking-btn {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+    font-family: 'Amiri', serif;
+}
+
+.btn-details {
+    background: #815B2F;
+    color: white;
+}
+
+.btn-details:hover {
+    background: #6d4a26;
+}
+
+.btn-cancel {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background: #c82333;
+}
+
+/* ==================== حالة فارغة ==================== */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.empty-state i {
+    font-size: 5rem;
+    color: #815B2F;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state h2 {
+    font-size: 2rem;
+    color: #815B2F;
+    margin-bottom: 15px;
+}
+
+.empty-state p {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 35px;
+    background: linear-gradient(135deg, #815B2F 0%, #6d4a26 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    font-family: 'Amiri', serif;
+    border: 2px solid transparent;
+    box-shadow: 0 2px 8px rgba(129, 91, 47, 0.2);
+    line-height: 1.4;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #6d4a26 0%, #815B2F 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(129, 91, 47, 0.4);
+    border-color: #815B2F;
+}
+
+.btn-primary i {
+    font-size: 0.9rem;
+}
+
+/* ==================== الاستجابة للشاشات الصغيرة ==================== */
+@media (max-width: 768px) {
+    .bookings-container {
+        margin-top: 150px;
+    }
+
+    .booking-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .booking-image {
+        width: 100%;
+        height: 200px;
+        margin: 0 auto;
+    }
+
+    .booking-info {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-actions {
+        align-items: center;
+        width: 100%;
+    }
+
+    .booking-btn {
+        width: 100%;
+    }
+}

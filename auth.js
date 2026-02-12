@@ -233,7 +233,7 @@ function updateNavbar() {
 // التحقق من الصفحات المحمية
 function checkProtectedPage() {
     const currentPage = window.location.pathname.split('/').pop();
-    const protectedPages = ['profile.html'];
+    const protectedPages = ['profile.html', 'bookings.html'];
     
     if (protectedPages.includes(currentPage) && !isLoggedIn()) {
         // إذا كان في صفحة محمية وغير مسجل، يوجهه لتسجيل الدخول

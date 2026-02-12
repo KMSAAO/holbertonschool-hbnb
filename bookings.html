@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حجوزاتي - نُزل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="loading.css">
+    <link rel="stylesheet" href="bookings.css">
+</head>
+<body>
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="images/logo.png" alt="نُزل" class="logo-img">
+            </div>
+            
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link" onclick="showLoadingScreen('index.html'); return false;">الرئيسية</a>
+                <a href="places.html" class="nav-link" onclick="showLoadingScreen('places.html'); return false;">الوجهات</a>
+                <a href="admin.html" class="nav-link">إدارة النُزل</a>
+                <a href="bookings.html" class="nav-link active" id="bookingsLink">حجوزاتي</a>
+                <a href="#" class="nav-link" id="logoutLink" onclick="logout(); return false;">خروج</a>
+                <a href="login.html" class="nav-link" id="loginLink" style="display:none;">تسجيل دخول</a>
+            </div>
+            
+            <div class="profile">
+                <a href="profile.html" class="profile-circle">
+                    <i class="fas fa-user"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- محتوى الصفحة -->
+    <main class="bookings-container">
+        <h1 class="page-title">حجوزاتي</h1>
+        <p class="page-subtitle">هنا يمكنك الاطلاع على جميع حجوزاتك السابقة والحالية</p>
+
+        <!-- قائمة الحجوزات -->
+        <div id="bookingsList" class="bookings-list">
+            <!-- سيتم ملؤها ديناميكياً -->
+        </div>
+
+        <!-- رسالة لا يوجد حجوزات -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <i class="fas fa-calendar-times"></i>
+            <h2>لا توجد حجوزات</h2>
+            <p>لم تقم بأي حجوزات بعد</p>
+            <a href="places.html" class="btn-primary">
+                <i class="fas fa-search"></i>
+                استكشف الفنادق
+            </a>
+        </div>
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- اللوقو -->
+            <div class="footer-section">
+                <img src="images/logo.png" alt="نُزل" class="footer-logo">
+                <p class="footer-description">منصتك المثالية لحجز أفخم الفنادق في المملكة العربية السعودية</p>
+            </div>
+
+            <!-- روابط سريعة -->
+            <div class="footer-section">
+                <h4 class="footer-heading">روابط سريعة</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">الرئيسية</a></li>
+                    <li><a href="places.html">الوجهات</a></li>
+                    <li><a href="admin.html">إدارة النُزل</a></li>
+                    <li><a href="bookings.html">حجوزاتي</a></li>
+                </ul>
+            </div>
+
+            <!-- من نحن -->
+            <div class="footer-section">
+                <h4 class="footer-heading">من نحن</h4>
+                <ul class="footer-links">
+                    <li><a href="#">عن نُزل</a></li>
+                    <li><a href="#">الشروط والأحكام</a></li>
+                    <li><a href="#">سياسة الخصوصية</a></li>
+                    <li><a href="#">اتصل بنا</a></li>
+                </ul>
+            </div>
+
+            <!-- مواقع التواصل -->
+            <div class="footer-section">
+                <h4 class="footer-heading">تابعنا</h4>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- حقوق النشر -->
+        <div class="footer-bottom">
+            <p>جميع الحقوق محفوظة © نُزل 2026</p>
+        </div>
+    </footer>
+
+    <script src="auth.js"></script>
+    <script src="loading.js"></script>
+    <script src="bookings.js"></script>
+</body>
+</html>
