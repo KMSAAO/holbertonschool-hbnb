@@ -94,15 +94,15 @@
             <div class="hotel-description">
                 <h2 class="section-title">عن الفندق</h2>
                 <div class="description-item">
-                    <h3><i class="fas fa-bed"></i> إقامة</h3>
+                    <h3><i class="fas fa-bed"></i></h3>
                     <p></p>
                 </div>
                 <div class="description-item">
-                    <h3><i class="fas fa-spa"></i> مرافق</h3>
+                    <h3><i class="fas fa-spa"></i></h3>
                     <p></p>
                 </div>
                 <div class="description-item">
-                    <h3><i class="fas fa-utensils"></i> الطعام</h3>
+                    <h3><i class="fas fa-utensils"></i></h3>
                     <p></p>
                 </div>
             </div>
@@ -111,9 +111,18 @@
             <div class="hotel-amenities">
                 <h2 class="section-title">المرافق المميزة</h2>
                 <div class="amenities-grid">
-                    <div class="amenity-item"></div>
-                    <div class="amenity-item"></div>
-                    <div class="amenity-item"></div>
+                    <div class="amenity-item"><i class="fas fa-swimming-pool"></i></div>
+                    <div class="amenity-item"><i class="fas fa-spa"></i></div>
+                    <div class="amenity-item"><i class="fas fa-ban-smoking"></i></div>
+                    <div class="amenity-item"><i class="fas fa-dumbbell"></i></div>
+                    <div class="amenity-item"><i class="fas fa-concierge-bell"></i></div>
+                    <div class="amenity-item"><i class="fas fa-utensils"></i></div>
+                    <div class="amenity-item"><i class="fas fa-wifi"></i></div>
+                    <div class="amenity-item"><i class="fas fa-coffee"></i></div>
+                    <div class="amenity-item"><i class="fas fa-cocktail"></i></div>
+                    <div class="amenity-item"><i class="fas fa-egg"></i></div>
+                    <div class="amenity-item"><i class="fas fa-water"></i></div>
+                    <div class="amenity-item"><i class="fas fa-table-tennis"></i></div>
                 </div>
             </div>
 
@@ -134,19 +143,53 @@
             <!-- التقييمات والتعليقات -->
             <div class="reviews-section">
                 <h2 class="section-title">تقييمات النزلاء</h2>
-                <div class="reviews-summary"></div>
+                <div class="reviews-summary">
+                    <div class="rating-overview">
+                        <div class="rating-score">
+                            <span class="score-number" id="averageRating"></span>
+                            <div class="rating-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="rating-label"></span>
+                            <span class="reviews-count" id="reviewsCount"></span>
+                        </div>
+                    </div>
+                </div>
                 <div class="add-review-section">
                     <h3>شارك تجربتك</h3>
                     <form id="reviewForm">
-                        <div class="rating-input"></div>
-                        <div class="review-input"></div>
-                        <button type="submit" class="submit-review-btn"></button>
+                        <div class="rating-input">
+                            <label>التقييم:</label>
+                            <div class="star-rating">
+                                <i class="far fa-star" data-rating="1"></i>
+                                <i class="far fa-star" data-rating="2"></i>
+                                <i class="far fa-star" data-rating="3"></i>
+                                <i class="far fa-star" data-rating="4"></i>
+                                <i class="far fa-star" data-rating="5"></i>
+                            </div>
+                            <input type="hidden" id="selectedRating" value="0" required>
+                        </div>
+                        <div class="review-input">
+                            <label>تعليقك:</label>
+                            <textarea id="reviewText" placeholder="شاركنا رأيك في تجربتك..." rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-review-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            نشر التعليق
+                        </button>
                     </form>
                 </div>
                 <div class="reviews-list" id="reviewsList"></div>
             </div>
         </div>
     </section>
+
+    <!-- الغرف المتاحة -->
+
 
     <!-- زر الحجز الثابت -->
     <div class="booking-bar">
