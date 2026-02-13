@@ -220,10 +220,11 @@ class HBnBFacade:
             current_user=current_user
         )
     
-    def get_payment_by_booking_id(self, booking_id: str):
+    def get_payment_by_booking_id(self, booking_id: str, current_user):
         return self.payment_service.get_payment_by_booking_id(
             booking_id,
-            repo=self.payment_db
+            repo=self.payment_db,
+            current_user=current_user
         )
     
     def get_payments_by_booking_id(self, booking_id: str):

@@ -58,3 +58,18 @@ class PaymentResource(Resource):
             api.abort(404, str(e))
         except PermissionError as e:
             api.abort(403, str(e))
+@api.route('/booking/<string:booking_id>')
+class PaymentByBookingResource(Resource):
+    @api.marshal_with(payment_response_model)
+    @jwt_required()
+    def get(self, booking_id):
+        """Get a payment by its associated booking ID"""
+        current_user = get_current_user()
+
+        try:
+            payment = facade.get_payment_by_booking_id(booking_id, current_user)
+            return payment
+        except ValueError as e:
+            api.abort(404, str(e))
+        except PermissionError as e:
+            api.abort(403, str(e))

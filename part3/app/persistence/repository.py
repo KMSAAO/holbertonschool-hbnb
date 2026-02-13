@@ -178,10 +178,7 @@ class PaymentRepository:
         return self.model.query.get(payment_id)
     
     def get_payment_by_booking_id(self, booking_id):
-        return self.model.query.filter_by(booking_id=booking_id).first()
-
-    def get_payments_by_booking_id(self, booking_id):
-        return self.model.query.filter_by(booking_id=booking_id).all()
+        return self.model.query.filter_by(_booking_id=booking_id).all()
     
     def get_all_payments(self):
         return self.model.query.all()
