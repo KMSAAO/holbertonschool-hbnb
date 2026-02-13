@@ -23,7 +23,7 @@
                 <a href="index.html" class="nav-link">الرئيسية</a>
                 <a href="places.html" class="nav-link">الوجهات</a>
                 <a href="admin.html" class="nav-link active">إدارة النُزل</a>
-                <a href="bookings.html" class="nav-link" id="bookingsLink">حجوزاتي</a>
+                <a href="#bookings" class="nav-link" id="bookingsLink">حجوزاتي</a>
                 <a href="#" class="nav-link" id="logoutLink" onclick="logout(); return false;">خروج</a>
                 <a href="login.html" class="nav-link" id="loginLink" style="display:none;">تسجيل دخول</a>
             </div>
@@ -52,6 +52,10 @@
                     <h3 class="section-title"><i class="fas fa-info-circle"></i> المعلومات الأساسية</h3>
                     
                     <div class="form-group">
+                                            <div class="form-group">
+                                                <label for="hotelBasePrice">السعر الأساسي (ر.س) <span class="required">*</span></label>
+                                                <input type="number" id="hotelBasePrice" name="hotelBasePrice" required placeholder="مثال: 1500" min="0">
+                                            </div>
                         <label for="hotelName">اسم الفندق <span class="required">*</span></label>
                         <input type="text" id="hotelName" name="hotelName" required placeholder="مثال: فندق الصحراء الذهبية">
                     </div>
@@ -72,23 +76,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="hotelRegion">المنطقة <span class="required">*</span></label>
-                        <select id="hotelRegion" name="hotelRegion" required>
-                            <option value="">اختر المنطقة</option>
-                            <option value="riyadh">منطقة الرياض</option>
-                            <option value="makkah">منطقة مكة المكرمة</option>
-                            <option value="madinah">منطقة المدينة المنورة</option>
-                            <option value="eastern">المنطقة الشرقية</option>
-                            <option value="asir">منطقة عسير</option>
-                            <option value="tabuk">منطقة تبوك</option>
-                            <option value="qassim">منطقة القصيم</option>
-                            <option value="hail">منطقة حائل</option>
-                            <option value="northern">منطقة الحدود الشمالية</option>
-                            <option value="jazan">منطقة جازان</option>
-                            <option value="najran">منطقة نجران</option>
-                            <option value="bahah">منطقة الباحة</option>
-                            <option value="jawf">منطقة الجوف</option>
-                        </select>
+                        <!-- تم حذف حقل المنطقة -->
                     </div>
                 </div>
 
@@ -107,8 +95,7 @@
                                 <textarea class="about-content" rows="4" placeholder="اكتب وصف تفصيلي للفندق..." required></textarea>
                             </div>
                             <div class="form-group">
-                                <label>أيقونة (FontAwesome)</label>
-                                <input type="text" class="about-icon" placeholder="مثال: fas fa-hotel" value="fas fa-hotel">
+                                <!-- تم حذف حقل الأيقونة -->
                             </div>
                         </div>
                     </div>
@@ -136,38 +123,7 @@
                 </div>
 
                 <!-- الغرف -->
-                <div class="form-section">
-                    <h3 class="section-title"><i class="fas fa-bed"></i> الغرف المتوفرة</h3>
-                    
-                    <div class="rooms-list" id="roomsList">
-                        <div class="room-item">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>اسم الغرفة <span class="required">*</span></label>
-                                    <input type="text" class="room-name" placeholder="مثال: غرفة ديلوكس" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>السعر (ر.س) <span class="required">*</span></label>
-                                    <input type="number" class="room-price" placeholder="1500" required min="0">
-                                </div>
-                                <div class="form-group">
-                                    <label>المساحة (م²) <span class="required">*</span></label>
-                                    <input type="number" class="room-size" placeholder="45" required min="1">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>المميزات (افصل بفاصلة) <span class="required">*</span></label>
-                                <input type="text" class="room-features" placeholder="مثال: إطلالة على البحر, تكييف, واي فاي" required>
-                            </div>
-                            <button type="button" class="remove-btn" onclick="removeRoom(this)">
-                                <i class="fas fa-trash"></i> حذف الغرفة
-                            </button>
-                        </div>
-                    </div>
-                    <button type="button" class="add-btn" onclick="addRoom()">
-                        <i class="fas fa-plus"></i> إضافة غرفة
-                    </button>
-                </div>
+                <!-- تم حذف تفاصيل الغرف بالكامل -->
 
                 <!-- الصور -->
                 <div class="form-section">
@@ -205,17 +161,50 @@
     <!-- الفوتر -->
     <footer class="footer">
         <div class="footer-container">
+            <!-- اللوقو -->
             <div class="footer-section">
                 <img src="images/logo.png" alt="نُزل" class="footer-logo">
             </div>
+
+            <!-- الشركة -->
+            <div class="footer-section">
+                <h4 class="footer-heading">الشركة</h4>
+                <ul class="footer-links">
+                    <li><a href="#about">من نحن</a></li>
+                    <li><a href="#contact">تواصل معنا</a></li>
+                </ul>
+            </div>
+
+            <!-- استكشف -->
+            <div class="footer-section">
+                <h4 class="footer-heading">استكشف</h4>
+                <ul class="footer-links">
+                    <li><a href="places.html">الوجهات</a></li>
+                    <li><a href="#experiences">التجارب</a></li>
+                    <li><a href="#offers">العروض الخاصة</a></li>
+                </ul>
+            </div>
+
+            <!-- مواقع التواصل -->
+            <div class="footer-section">
+                <h4 class="footer-heading">تابعنا</h4>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
         </div>
+
+        <!-- حقوق النشر -->
         <div class="footer-bottom">
             <p>جميع الحقوق محفوظة © نُزل 2026</p>
         </div>
     </footer>
 
     <script src="auth.js"></script>
+    <script src="script.js"></script>
+    <script src="places.js"></script>
     <script src="loading.js"></script>
-    <script src="admin.js"></script>
 </body>
 </html>

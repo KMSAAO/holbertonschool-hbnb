@@ -391,37 +391,32 @@ function updateDateDisplay() {
 // حساب المجموع الكلي
 function calculateAll() {
     updateDateDisplay();
-    
+
     const nights = calculateNights();
+    // السعر الموحد للفندق
     let subtotal = 0;
     const selectedRoomsList = document.getElementById('selectedRoomsList');
-    selectedRoomsList.innerHTML = '';
-    
-    // حساب كل غرفة محددة
-    const roomOptions = document.querySelectorAll('.room-option');
-    roomOptions.forEach(room => {
-        const qty = parseInt(room.querySelector('.qty-input').value);
-        if (qty > 0) {
-            const price = parseInt(room.getAttribute('data-price'));
-            const roomName = room.getAttribute('data-name');
-            const roomTotal = price * nights * qty;
-            subtotal += roomTotal;
-            
-            // إضافة للقائمة
-            const roomItem = document.createElement('div');
-            roomItem.className = 'summary-item';
-            roomItem.innerHTML = `
-                <span class="summary-label">${roomName} × ${qty}</span>
-                <span class="summary-value" style="direction: ltr;">${roomTotal.toLocaleString('en-US')} ر.س</span>
-            `;
-            selectedRoomsList.appendChild(roomItem);
-        }
-    });
-    
+    if (selectedRoomsList) selectedRoomsList.innerHTML = '';
+
+    // استخدم startPrice للفندق الحالي
+    const pricePerNight = (currentHotel.startPrice || (currentHotel.rooms && currentHotel.rooms[0] && currentHotel.rooms[0].price) || 0);
+    subtotal = pricePerNight * nights;
+
+    // عرض السعر في الملخص
+    if (selectedRoomsList) {
+        const roomItem = document.createElement('div');
+        roomItem.className = 'summary-item';
+        roomItem.innerHTML = `
+            <span class="summary-label">سعر الإقامة (${nights} ليلة)</span>
+            <span class="summary-value" style="direction: ltr;">${subtotal.toLocaleString('en-US')} ر.س</span>
+        `;
+        selectedRoomsList.appendChild(roomItem);
+    }
+
     // حساب الضرائب (20.75%)
     const tax = Math.round(subtotal * 0.2075);
     const total = subtotal + tax;
-    
+
     // تحديث الملخص
     document.getElementById('summarySubtotal').textContent = subtotal.toLocaleString('en-US') + ' ر.س';
     document.getElementById('summaryTax').textContent = tax.toLocaleString('en-US') + ' ر.س';
@@ -460,60 +455,23 @@ function completeBooking() {
         return;
     }
     
-    // التحقق من اختيار غرفة
-    let hasRooms = false;
-    const roomOptions = document.querySelectorAll('.room-option');
-    roomOptions.forEach(room => {
-        const qty = parseInt(room.querySelector('.qty-input').value);
-        if (qty > 0) {
-            hasRooms = true;
-        }
-    });
+
     
-    if (!hasRooms) {
-        if (typeof showNotification === 'function') {
-            showNotification('الرجاء اختيار غرفة واحدة على الأقل', 'error');
-        }
-        return;
-    }
-    
-    // جمع بيانات الحجز
+    // جمع بيانات الحجز (سعر موحد للفندق)
+    const pricePerNight = (currentHotel.startPrice || (currentHotel.rooms && currentHotel.rooms[0] && currentHotel.rooms[0].price) || 0);
+    const subtotal = pricePerNight * nights;
+    const tax = Math.round(subtotal * 0.2075);
+    const total = subtotal + tax;
     const bookingData = {
         hotelName: currentHotel.name,
         hotelNameAr: currentHotel.nameAr,
         checkIn: checkIn,
         checkOut: checkOut,
         nights: nights,
-        adults: parseInt(document.getElementById('adultsCount').value),
-        children: parseInt(document.getElementById('childrenCount').value),
-        rooms: [],
-        subtotal: 0,
-        tax: 0,
-        total: 0
+        subtotal: subtotal,
+        tax: tax,
+        total: total
     };
-    
-    // جمع بيانات الغرف
-    roomOptions.forEach(room => {
-        const qty = parseInt(room.querySelector('.qty-input').value);
-        if (qty > 0) {
-            const price = parseInt(room.dataset.price);
-            const name = room.dataset.name;
-            const roomTotal = price * nights * qty;
-            
-            bookingData.rooms.push({
-                name: name,
-                quantity: qty,
-                pricePerNight: price,
-                total: roomTotal
-            });
-            
-            bookingData.subtotal += roomTotal;
-        }
-    });
-    
-    // حساب الضرائب والمجموع
-    bookingData.tax = Math.round(bookingData.subtotal * 0.2075);
-    bookingData.total = bookingData.subtotal + bookingData.tax;
     
     // حفظ البيانات في localStorage
     try {
@@ -659,17 +617,13 @@ function populatePaymentSummary(bookingData) {
         </div>
     `;
     
-    // الغرف
-    bookingData.rooms.forEach(room => {
-        const roomQty = room.quantity || room.count || 1;
-        const roomPrice = room.total || room.totalPrice || 0;
-        html += `
-            <div class="summary-row">
-                <span>${room.name} × ${roomQty}</span>
-                <span>${roomPrice.toLocaleString('en-US')} ريال</span>
-            </div>
-        `;
-    });
+    // السعر الموحد
+    html += `
+        <div class="summary-row">
+            <span>سعر الإقامة (${bookingData.nights} ليلة)</span>
+            <span>${bookingData.subtotal.toLocaleString('en-US')} ريال</span>
+        </div>
+    `;
     
     // المجموع الفرعي والضريبة والمجموع الكلي
     html += `
@@ -793,8 +747,8 @@ function processPayment(event) {
     // عرض رسالة النجاح
     alert(`✓ تم تأكيد حجزك بنجاح!\nرقم الحجز: ${bookingData.bookingId}\n\nسيتم إرسال تفاصيل الحجز على بريدك الإلكتروني`);
     
-    // الانتقال للصفحة الرئيسية
-    window.location.href = 'index.html';
+    // الانتقال لصفحة الحجوزات
+    window.location.href = 'bookings.html';
 }
 
 // تنسيق رقم البطاقة (إضافة مسافات كل 4 أرقام)

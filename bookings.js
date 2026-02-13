@@ -1,6 +1,6 @@
 /**
  * ملف: bookings.js
- * الوصف: إدارة صفحة الحجوزات - عرض وفلترة الحجوزات
+ * الوصف: إدارة صفحة الحجوزات - عرض وإلغاء الحجوزات
  */
 
 // ==================== تحميل الحجوزات ====================
@@ -18,8 +18,17 @@ function loadBookings() {
     const bookingsList = document.getElementById('bookingsList');
     const emptyState = document.getElementById('emptyState');
     
-    // جلب الحجوزات من localStorage
-    const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+    // جلب المستخدم الحالي
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    
+    if (!currentUser) {
+        bookingsList.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    // جلب الحجوزات الخاصة بالمستخدم من localStorage
+    const bookings = JSON.parse(localStorage.getItem(`bookings_${currentUser.email}`) || '[]');
     
     // التحقق من وجود حجوزات
     if (bookings.length === 0) {
@@ -131,7 +140,10 @@ function formatDate(dateString) {
 // ==================== عرض تفاصيل الحجز ====================
 
 function viewBookingDetails(index) {
-    const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) return;
+    
+    const bookings = JSON.parse(localStorage.getItem(`bookings_${currentUser.email}`) || '[]');
     const booking = bookings[index];
     
     if (!booking) return;
@@ -209,11 +221,14 @@ function cancelBooking(index) {
         return;
     }
     
-    const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) return;
+    
+    const bookings = JSON.parse(localStorage.getItem(`bookings_${currentUser.email}`) || '[]');
     
     if (bookings[index]) {
         bookings[index].status = 'cancelled';
-        localStorage.setItem('bookings', JSON.stringify(bookings));
+        localStorage.setItem(`bookings_${currentUser.email}`, JSON.stringify(bookings));
         
         // إعادة تحميل الصفحة
         loadBookings();

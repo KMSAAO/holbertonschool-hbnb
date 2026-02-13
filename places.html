@@ -25,8 +25,7 @@
             <div class="nav-menu">
                 <a href="index.html" class="nav-link">الرئيسية</a>
                 <a href="places.html" class="nav-link active">الوجهات</a>
-                <a href="admin.html" class="nav-link">إدارة النُزل</a>
-                <a href="bookings.html" class="nav-link" id="bookingsLink">حجوزاتي</a>
+                <a href="#bookings" class="nav-link" id="bookingsLink">حجوزاتي</a>
                 <a href="#" class="nav-link" id="logoutLink" onclick="logout(); return false;">خروج</a>
                 <a href="login.html" class="nav-link" id="loginLink" style="display:none;">تسجيل دخول</a>
             </div>
@@ -77,24 +76,6 @@
         </div>
     </header>
 
-    <!-- شريط الفلاتر -->
-    <section class="filters-section">
-        <div class="filters-container">
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="all">كل المناطق</button>
-                <button class="filter-btn" data-filter="alula">العلا</button>
-                <button class="filter-btn" data-filter="coast">البحر الأحمر</button>
-                <button class="filter-btn" data-filter="najd">الرياض</button>
-                <button class="filter-btn" data-filter="mountains">الجبال</button>
-            </div>
-            <div class="sort-dropdown">
-                <button class="sort-btn">
-                    <i class="fas fa-sort-amount-down"></i>
-                    <span>ترتيب حسب</span>
-                </button>
-            </div>
-        </div>
-    </section>
 
     <!-- شبكة البطاقات -->
     <section class="destinations-grid-section">
@@ -109,23 +90,6 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">منتجع شيبارا</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>البحر الأحمر، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">10,300</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
                     <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=shebara')">احجز الآن</button>
                 </div>
             </div>
@@ -140,23 +104,6 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">منتجع ديزرت روك</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>العلا، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">8,500</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
                     <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=desertrock')">احجز الآن</button>
                 </div>
             </div>
@@ -171,22 +118,6 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">منتجع شادن</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>العلا، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">4,120</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
                     <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=shaden')">احجز الآن</button>
                 </div>
             </div>
@@ -201,23 +132,6 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">شيدي الحِجر</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>العلا، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">5,336</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
                     <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=chedi')">احجز الآن</button>
                 </div>
             </div>
@@ -232,23 +146,6 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">فيرمونت الرياض</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>الرياض، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">1,520</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
                     <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=fairmont')">احجز الآن</button>
                 </div>
             </div>
@@ -263,22 +160,6 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">منتجع آشار الخيمي</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>العلا، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">2,800</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
                     <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=ashar')">احجز الآن</button>
                 </div>
             </div>
@@ -293,24 +174,7 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">قافلة العلا</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>العلا، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">2,831</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
-                    <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=caravan')">احجز الآن</button>
+                    <button class="card-btn">احجز الآن</button>
                 </div>
             </div>
 
@@ -324,24 +188,7 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">ماندارين أورينتال</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>الرياض، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">1,530</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
-                    <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=mandarin')">احجز الآن</button>
+                    <button class="card-btn">احجز الآن</button>
                 </div>
             </div>
 
@@ -355,23 +202,7 @@
                     </div>
                 </div>
                 <div class="card-content">
-                    <h3 class="card-title">فندق موفنبيك</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>الرياض، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">1,300</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
-                    <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=movenpick')">احجز الآن</button>
+                    <button class="card-btn">احجز الآن</button>
                 </div>
             </div>
         </div>
@@ -430,6 +261,5 @@
     <script src="script.js"></script>
     <script src="places.js"></script>
     <script src="loading.js"></script>
-    <script src="user-hotels.js"></script>
 </body>
 </html>
