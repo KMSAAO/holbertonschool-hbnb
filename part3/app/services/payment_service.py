@@ -55,13 +55,9 @@ class PaymentServices():
             raise ValueError("Payment not found for the given booking_id")
         return payment
     
-    def get_payments_by_booking_id(self, booking_id, repo):
-        payments = repo.get_payments_by_booking_id(booking_id)
-        if not payments:
-            raise ValueError("No payments found for the given booking_id")
-        return payments
-    
-    def get_all_payments(self, repo):
+    def get_all_payments(self, repo, current_user):
+        if not current_user:
+            raise PermissionError("Authentication required")
         return repo.get_all_payments()
     
     def update_payment_status(self, payment_id, new_status, repo):

@@ -227,15 +227,10 @@ class HBnBFacade:
             current_user=current_user
         )
     
-    def get_payments_by_booking_id(self, booking_id: str):
-        return self.payment_service.get_payments_by_booking_id(
-            booking_id,
-            repo=self.payment_db
-        )
-    
-    def get_all_payments(self):
+    def get_all_payments(self, current_user):
         return self.payment_service.get_all_payments(
-            repo=self.payment_db
+            repo=self.payment_db,
+            current_user=current_user
         )
     
     def update_payment_status(self, payment_id: str, new_status: str):
