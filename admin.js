@@ -272,6 +272,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 location: document.getElementById('hotelLocation').value,
                 tagline: document.getElementById('hotelTagline').value,
                 region: document.getElementById('hotelRegion').value,
+                latitude: parseFloat(document.getElementById('hotelLatitude').value) || 0,
+                longitude: parseFloat(document.getElementById('hotelLongitude').value) || 0,
                 startPrice: 0,
                 images: [],
                 about: [],
@@ -368,8 +370,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         price: parseFloat(hotelData.startPrice) || 0,
                         amenities: hotelData.amenities, // Send amenities array ({icon, text})
                         user_id: userId,
-                        latitude: 0,
-                        longitude: 0,
+                        latitude: hotelData.latitude,
+                        longitude: hotelData.longitude,
                         status: 'available' // تصحيح الحالة لتطابق الـ enum في backend
                     });
 
