@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from flask import request, current_app
 from werkzeug.utils import secure_filename
 from app.services import facade
@@ -21,6 +21,7 @@ place_create_model = api.model("PlaceCreate", {
     "status": fields.String(required=False),
     "latitude": fields.Float(required=True),
     "longitude": fields.Float(required=True),
+    "amenities": fields.List(fields.Raw, required=False), # Accepts list of {text, icon} or strings
 })
 
 place_update_model = api.model("PlaceUpdate", {
@@ -32,9 +33,33 @@ place_update_model = api.model("PlaceUpdate", {
     "longitude": fields.Float(required=False),
 })
 
+# Models for nested response
+amenity_response_model = api.model("AmenityResponse", {
+    "id": fields.String,
+    "amenity_name": fields.String,
+    "description": fields.String,
+    "status": fields.String
+})
+
+user_response_model = api.model("UserResponse", {
+    "id": fields.String,
+    "first_name": fields.String,
+    "last_name": fields.String,
+    "email": fields.String
+})
+
+review_response_model = api.model("ReviewResponse", {
+    "id": fields.String,
+    "rating": fields.Integer,
+    "comment": fields.String,
+    "created_at": fields.String,
+    "updated_at": fields.String
+})
+
 place_response_model = api.model("PlaceResponse", {
     "id": fields.String,
     "owner_id": fields.String,
+    "owner": fields.Nested(user_response_model),
     "title": fields.String,
     "description": fields.String,
     "price": fields.Float,
@@ -42,6 +67,8 @@ place_response_model = api.model("PlaceResponse", {
     "latitude": fields.Float,
     "longitude": fields.Float,
     "images": fields.List(fields.String),
+    "amenities": fields.List(fields.Nested(amenity_response_model)),
+    "reviews": fields.List(fields.Nested(review_response_model)),
     "created_at": fields.String,
     "updated_at": fields.String,
 })
@@ -69,6 +96,8 @@ class PlaceList(Resource):
 
         data = api.payload or {}
 
+        # data["owner_id"] = str(current_user_id) needs owner_id in payload for create_place service?
+        # Service expects 'owner_id' inside data.
         data["owner_id"] = str(current_user_id)
 
         try:
@@ -105,7 +134,9 @@ class PlaceResource(Resource):
             api.abort(403, "Unauthorized action")
 
         data = api.payload or {}
-        data.pop("owner_id", None)
+        # remove owner_id if prevent ownership transfer
+        if "owner_id" in data:
+            del data["owner_id"]
 
         try:
             updated = facade.update_place(place_id, data)
@@ -114,6 +145,63 @@ class PlaceResource(Resource):
 
             place = facade.get_place_info(place_id)
             return place, 200
+        except ValueError as e:
+            api.abort(400, str(e))
+
+
+@api.route("/<string:place_id>/amenities/<string:amenity_id>")
+class PlaceAmenityResource(Resource):
+    @jwt_required()
+    def post(self, place_id, amenity_id):
+        """Link an amenity to a place"""
+        current_user_id = get_jwt_identity()
+        if not current_user_id:
+            api.abort(401, "Invalid token")
+
+        try:
+            place = facade.get_place_info(place_id)
+        except ValueError as e:
+            api.abort(404, str(e))
+
+        owner_id = str(_get_attr(place, "owner_id"))
+        if owner_id != str(current_user_id):
+             # For simpler collaboration, maybe allow admins too? But strict ownership for now.
+             # Wait, get_place_info returns DICTIONARY now.
+             pass
+
+        if owner_id != str(current_user_id):
+            # Check for admin?
+            claims = get_jwt() or {}
+            if not claims.get("is_admin", False):
+                api.abort(403, "Unauthorized action")
+
+        try:
+            facade.add_amenity_to_place(place_id, amenity_id)
+            return {"message": "Amenity added successfully"}, 200
+        except ValueError as e:
+             api.abort(400, str(e))
+
+    @jwt_required()
+    def delete(self, place_id, amenity_id):
+        """Unlink an amenity from a place"""
+        current_user_id = get_jwt_identity()
+        
+        try:
+            place = facade.get_place_info(place_id)
+        except ValueError as e:
+            api.abort(404, str(e))
+
+        owner_id = str(_get_attr(place, "owner_id"))
+        
+        claims = get_jwt() or {}
+        is_admin = claims.get("is_admin", False)
+
+        if owner_id != str(current_user_id) and not is_admin:
+            api.abort(403, "Unauthorized action")
+
+        try:
+            facade.remove_amenity_from_place(place_id, amenity_id)
+            return {"message": "Amenity removed successfully"}, 200
         except ValueError as e:
             api.abort(400, str(e))
 
@@ -142,8 +230,8 @@ class PlaceImageUpload(Resource):
             api.abort(400, "No image files provided")
 
         files = request.files.getlist('images')
-        if len(files) > 5:
-            api.abort(400, "Maximum 5 images allowed")
+        # if len(files) > 5:
+        #    api.abort(400, "Maximum 5 images allowed")
 
         if len(files) == 0:
             api.abort(400, "No image files provided")

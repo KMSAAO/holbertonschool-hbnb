@@ -263,6 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         title: hotelData.name || hotelData.nameEn,
                         description: hotelData.about?.[0]?.text || hotelData.tagline || '',
                         price: parseFloat(hotelData.startPrice) || 0,
+                        amenities: hotelData.amenities, // Send amenities array ({icon, text})
                         user_id: userId,
                         latitude: 0,
                         longitude: 0,

@@ -37,6 +37,8 @@ class Place(BaseModel):
         self.status = status
         self.latitude = latitude
         self.longitude = longitude
+        self.amenities = []
+        self.reviews = []
 
 
     @property

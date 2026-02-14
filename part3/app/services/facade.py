@@ -81,8 +81,21 @@ class HBnBFacade:
         return self.place_service.create_place(
             place_data=place_data,
             repo=self.place_db,
-            user_db=self.user_db
+            user_db=self.user_db,
+            amenity_repo=self.amenity_db
         )
+
+    def get_place(self, place_id):
+        place = self.place_service.get_place(place_id, self.place_db)
+        if place:
+            # Manually populate reviews for in-memory repository
+            all_reviews = self.review_service.get_all_reviews(self.review_db)
+            if all_reviews:
+                place.reviews = [r for r in all_reviews if r.place_id == place_id]
+            
+            if all_reviews:
+                place.reviews = [r for r in all_reviews if r.place_id == place_id]
+        return place
 
     def get_place_info(self, place_id: str) -> dict:
         return self.place_service.get_place_info(
@@ -250,16 +263,19 @@ class HBnBFacade:
     #place-amenity methods
 
     def add_amenity_to_place(self, place_id: str, amenity_id: str):
-        return self.place_amenity_service.add_amenity_to_place(
+        return self.place_service.add_amenity(
             place_id,
             amenity_id,
-            repo=self.place_amenity_db
+            place_repo=self.place_db,
+            amenity_repo=self.amenity_db
         )
 
-    def remove_amenity_from_place(self, place_amenity_id: str):
-        return self.place_amenity_service.remove_amenity_from_place(
-            place_amenity_id,
-            repo=self.place_amenity_db
+    def remove_amenity_from_place(self, place_id: str, amenity_id: str):
+        return self.place_service.remove_amenity(
+            place_id,
+            amenity_id,
+            place_repo=self.place_db,
+            amenity_repo=self.amenity_db
         )
 
     def get_place_amenity_info(self, place_amenity_id: str) -> dict:
