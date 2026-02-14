@@ -140,11 +140,13 @@ class HBnBFacade:
         )
 
     def update_review(self, review_id: str, review_data: dict) -> bool:
-        return self.review_service.update_review(
+        updated_review = self.review_service.update_review(
             review_id,
             review_data,
             self.review_db
         )
+        self.review_db.commit()
+        return updated_review
 
     def delete_review(self, review_id: str) -> bool:
         return self.review_service.delete_Review(

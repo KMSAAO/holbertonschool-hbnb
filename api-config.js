@@ -35,7 +35,7 @@ const API_ENDPOINTS = {
     // المراجعات (reviews.py)
     getReviews: '/reviews',         // GET → [reviews]
     getReview: '/reviews/:id',      // GET → review object
-    createReview: '/reviews',       // POST {place_id, user_id, rating, comment}
+    createReview: '/reviews',       // POST {place_id, rating, comment}
     updateReview: '/reviews/:id',   // PUT
     deleteReview: '/reviews/:id',   // DELETE
 
@@ -204,6 +204,10 @@ async function apiDelete(endpoint) {
             }
             const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+
+        if (response.status === 204) {
+            return true;
         }
 
         return await response.json();

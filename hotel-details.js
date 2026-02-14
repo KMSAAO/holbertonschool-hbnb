@@ -196,11 +196,76 @@ function updatePageContent(hotel) {
     if (locationSection) {
         locationSection.style.display = 'none';
     }
+
+    // تحديث إحصائيات التقييم (Dynamic)
+    const avgElement = document.getElementById('averageRating');
+    const countElement = document.getElementById('reviewsCount');
+    const ratingStarsContainer = document.querySelector('.rating-score .rating-stars');
+    const ratingLabel = document.querySelector('.rating-score .rating-label');
+
+    if (hotel.reviews && hotel.reviews.length > 0) {
+        const totalRating = hotel.reviews.reduce((acc, r) => acc + (r.rating || 0), 0);
+        const avgRating = (totalRating / hotel.reviews.length).toFixed(1);
+
+        if (avgElement) avgElement.textContent = avgRating;
+        if (countElement) countElement.textContent = `${hotel.reviews.length} تقييمات`;
+
+        // Update Stars
+        if (ratingStarsContainer) {
+            let starsHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= Math.round(avgRating)) {
+                    starsHTML += '<i class="fas fa-star"></i>';
+                } else {
+                    starsHTML += '<i class="far fa-star"></i>';
+                }
+            }
+            ratingStarsContainer.innerHTML = starsHTML;
+        }
+
+        // Update Label
+        if (ratingLabel) {
+            let label = '';
+            if (avgRating >= 4.5) label = 'ممتاز';
+            else if (avgRating >= 3.5) label = 'جيد جداً';
+            else if (avgRating >= 2.5) label = 'جيد';
+            else if (avgRating >= 1.5) label = 'مقبول';
+            else label = 'ضعيف';
+            ratingLabel.textContent = label;
+        }
+
+    } else {
+        if (avgElement) avgElement.textContent = '-';
+        if (countElement) countElement.textContent = '0 تقييمات';
+
+        if (ratingStarsContainer) {
+            ratingStarsContainer.innerHTML = `
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+             `;
+        }
+        if (ratingLabel) ratingLabel.textContent = '';
+    }
+}
+
+// عرض المراجعات
+// دالة لتأمين النصوص من XSS
+function escapeHtml(text) {
+    if (!text) return '';
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 // عرض المراجعات
 async function displayReviews(hotel) {
-    const reviewsContainer = document.querySelector('.reviews-content');
+    const reviewsContainer = document.getElementById('reviewsList');
     if (!reviewsContainer) return;
 
     // استخدام المراجعات من الـ backend
@@ -228,12 +293,81 @@ async function displayReviews(hotel) {
                     <span class="review-date">${new Date(review.created_at || Date.now()).toLocaleDateString('ar-EG')}</span>
                 </div>
                 <div class="review-rating">${stars}</div>
-                <p class="review-text">${review.comment}</p>
+                <p class="review-text">${escapeHtml(review.comment)}</p>
             </div>
         `;
     });
 
     reviewsContainer.innerHTML = reviewsHTML;
+}
+
+// تحديد التقييم (النجوم)
+function setRating(rating) {
+    const ratingInput = document.getElementById('selectedRating');
+    if (ratingInput) ratingInput.value = rating;
+
+    const stars = document.querySelectorAll('.star-rating i');
+    stars.forEach(star => {
+        const starRating = parseInt(star.getAttribute('data-rating'));
+        if (starRating <= rating) {
+            star.classList.remove('far');
+            star.classList.add('fas');
+        } else {
+            star.classList.remove('fas');
+            star.classList.add('far');
+        }
+    });
+}
+
+// إرسال المراجعة
+async function submitReview(event) {
+    event.preventDefault();
+
+    // التحقق من تسجيل الدخول
+    if (typeof isLoggedIn === 'function' && !isLoggedIn()) {
+        alert('يجب تسجيل الدخول لإضافة تقييم');
+        window.location.href = 'login.html';
+        return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const placeId = urlParams.get('hotel');
+    const ratingElement = document.getElementById('selectedRating');
+    const commentElement = document.getElementById('reviewText');
+
+    const rating = ratingElement ? ratingElement.value : 0;
+    const comment = commentElement ? commentElement.value : '';
+
+    if (rating == 0) {
+        alert('الرجاء اختيار التقييم (عدد النجوم)');
+        return;
+    }
+
+    try {
+        const reviewData = {
+            place_id: placeId,
+            rating: parseInt(rating),
+            comment: comment
+        };
+
+        await ReviewsAPI.create(reviewData);
+        alert('تم إضافة تقييمك بنجاح');
+
+        // تحديث البيانات
+        const hotel = await fetchPlaceFromBackend(placeId);
+        if (hotel) {
+            displayReviews(hotel);
+            updatePageContent(hotel);
+        }
+
+        // إعادة تعيين النموذج
+        document.getElementById('reviewForm').reset();
+        setRating(0);
+
+    } catch (error) {
+        console.error('Error submitting review:', error);
+        alert('حدث خطأ أثناء إضافة التقييم: ' + error.message);
+    }
 }
 
 
