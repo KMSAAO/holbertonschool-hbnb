@@ -391,7 +391,7 @@ async function fetchPlaceFromBackend(placeId) {
                 location: `${data.latitude || ''}, ${data.longitude || ''}`,
                 rating: 5,
                 startPrice: data.price || 0,
-                images: ['images/default-hotel.jpg'],
+                images: (Array.isArray(data.images) && data.images.length > 0) ? data.images : ['images/default-hotel.jpg'],
                 tagline: data.description || '',
                 about: [{ title: 'عن المكان', icon: 'fas fa-info-circle', text: data.description || '' }],
                 amenities: [],

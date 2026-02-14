@@ -47,6 +47,7 @@ class PlaceService():
             "status": place.status,
             "latitude": place.latitude,
             "longitude": place.longitude,
+            "images": place.images,
             "owner_id": place.user.id,
             "created_at": place.created_at,
             "updated_at": place.updated_at
@@ -75,6 +76,9 @@ class PlaceService():
 
         if "status" in place_data:
             place.status = place_data["status"]
+
+        if "images" in place_data:
+            place.images = place_data["images"]
 
         return True
     

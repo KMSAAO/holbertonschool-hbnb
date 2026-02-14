@@ -1,8 +1,18 @@
 from flask_restx import Namespace, Resource, fields
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask import request, current_app
+from werkzeug.utils import secure_filename
 from app.services import facade
+import os
+import uuid
 
 api = Namespace("places", description="Place operations")
+
+# Allowed image file extensions
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 place_create_model = api.model("PlaceCreate", {
     "title": fields.String(required=True),
@@ -31,6 +41,7 @@ place_response_model = api.model("PlaceResponse", {
     "status": fields.String,
     "latitude": fields.Float,
     "longitude": fields.Float,
+    "images": fields.List(fields.String),
     "created_at": fields.String,
     "updated_at": fields.String,
 })
@@ -103,5 +114,75 @@ class PlaceResource(Resource):
 
             place = facade.get_place_info(place_id)
             return place, 200
+        except ValueError as e:
+            api.abort(400, str(e))
+
+
+@api.route("/<string:place_id>/images")
+class PlaceImageUpload(Resource):
+    @jwt_required()
+    def post(self, place_id):
+        """Upload images for a place (max 5 files, owner only)"""
+        current_user_id = get_jwt_identity()
+        if not current_user_id:
+            api.abort(401, "Invalid token")
+
+        # Verify the place exists and the user is the owner
+        try:
+            place = facade.get_place_info(place_id)
+        except ValueError as e:
+            api.abort(404, str(e))
+
+        owner_id = str(_get_attr(place, "owner_id"))
+        if owner_id != str(current_user_id):
+            api.abort(403, "Only the owner can upload images")
+
+        # Check if files were sent
+        if 'images' not in request.files:
+            api.abort(400, "No image files provided")
+
+        files = request.files.getlist('images')
+        if len(files) > 5:
+            api.abort(400, "Maximum 5 images allowed")
+
+        if len(files) == 0:
+            api.abort(400, "No image files provided")
+
+        # Create upload directory
+        upload_folder = current_app.config.get('UPLOAD_FOLDER', 'uploads')
+        place_upload_dir = os.path.join(upload_folder, 'places', place_id)
+        os.makedirs(place_upload_dir, exist_ok=True)
+
+        uploaded_urls = []
+        for file in files:
+            if file and file.filename and allowed_file(file.filename):
+                # Generate unique filename to prevent collisions
+                ext = file.filename.rsplit('.', 1)[1].lower()
+                safe_name = f"{uuid.uuid4().hex[:8]}.{ext}"
+                filename = secure_filename(safe_name)
+
+                file_path = os.path.join(place_upload_dir, filename)
+                file.save(file_path)
+
+                # Build the public URL path
+                url = f"/uploads/places/{place_id}/{filename}"
+                uploaded_urls.append(url)
+            elif file and file.filename:
+                api.abort(400, f"File type not allowed: {file.filename}. Allowed: {', '.join(ALLOWED_EXTENSIONS)}")
+
+        if not uploaded_urls:
+            api.abort(400, "No valid image files were uploaded")
+
+        # Get existing images and append new ones
+        existing_images = _get_attr(place, "images", []) or []
+        all_images = existing_images + uploaded_urls
+
+        # Update the place with the new image URLs
+        try:
+            facade.update_place(place_id, {"images": all_images})
+            return {
+                "message": f"{len(uploaded_urls)} image(s) uploaded successfully",
+                "images": all_images
+            }, 200
         except ValueError as e:
             api.abort(400, str(e))

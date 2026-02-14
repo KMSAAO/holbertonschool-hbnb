@@ -66,9 +66,10 @@ function createPlaceCard(place, index) {
     // استخدام data-place-id لتخزين معرف المكان
     card.setAttribute('data-place-id', place.id);
 
-    // تحديد الصورة — استخدام صورة افتراضية بناءً على الترتيب
-    const imageIndex = (index % 9) + 1;
-    const imageSrc = `images/hotel${imageIndex}.jpg`;
+    // تحديد الصورة — استخدام صور المكان من الـ API أو صورة افتراضية
+    const imageSrc = (Array.isArray(place.images) && place.images.length > 0)
+        ? place.images[0]
+        : `images/hotel${(index % 9) + 1}.jpg`;
 
     // تنسيق السعر
     const price = place.price ? Number(place.price).toLocaleString('en-US') : '0';

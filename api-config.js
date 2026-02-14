@@ -30,6 +30,7 @@ const API_ENDPOINTS = {
     createPlace: '/places',         // POST {title, description, price, status, latitude, longitude}
     updatePlace: '/places/:id',     // PUT
     deletePlace: '/places/:id',     // DELETE
+    uploadPlaceImages: '/places/:id/images', // POST multipart/form-data
 
     // المراجعات (reviews.py)
     getReviews: '/reviews',         // GET → [reviews]
@@ -57,6 +58,17 @@ const API_ENDPOINTS = {
 };
 
 // ==================== دوال مساعدة للـ API ====================
+
+/**
+ * معالجة أخطاء المصادقة (401)
+ */
+function handleAuthError() {
+    console.warn('جلسة انتهت صلاحيتها (401). جاري توجيه المستخدم لصفحة الدخول...');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('userId');
+    window.location.href = 'login.html';
+}
 
 /**
  * الحصول على التوكن من localStorage
@@ -94,6 +106,10 @@ async function apiGet(endpoint, params = {}) {
         const response = await fetch(url, { method: 'GET', headers });
 
         if (!response.ok) {
+            if (response.status === 401) {
+                handleAuthError();
+                throw new Error('جلسة غير صالحة');
+            }
             const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
         }
@@ -121,6 +137,10 @@ async function apiPost(endpoint, data) {
         });
 
         if (!response.ok) {
+            if (response.status === 401) {
+                handleAuthError();
+                throw new Error('جلسة غير صالحة');
+            }
             const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
         }
@@ -148,6 +168,10 @@ async function apiPut(endpoint, data) {
         });
 
         if (!response.ok) {
+            if (response.status === 401) {
+                handleAuthError();
+                throw new Error('جلسة غير صالحة');
+            }
             const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
         }
@@ -174,6 +198,10 @@ async function apiDelete(endpoint) {
         });
 
         if (!response.ok) {
+            if (response.status === 401) {
+                handleAuthError();
+                throw new Error('جلسة غير صالحة');
+            }
             const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
         }
@@ -181,6 +209,38 @@ async function apiDelete(endpoint) {
         return await response.json();
     } catch (error) {
         console.error('API DELETE Error:', error);
+        throw error;
+    }
+}
+
+/**
+ * دالة لرفع ملفات (multipart/form-data)
+ * لا نحدد Content-Type — المتصفح يضيفه تلقائياً مع boundary
+ */
+async function apiUploadFiles(endpoint, formData) {
+    try {
+        const headers = {};
+        const token = getAuthToken();
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            method: 'POST',
+            headers,
+            body: formData
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                handleAuthError();
+                throw new Error('جلسة غير صالحة');
+            }
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('API Upload Error:', error);
         throw error;
     }
 }
@@ -193,7 +253,14 @@ const PlacesAPI = {
     getById: (id) => apiGet(replaceUrlParams(API_ENDPOINTS.getPlace, { id })),
     create: (placeData) => apiPost(API_ENDPOINTS.createPlace, placeData),
     update: (id, placeData) => apiPut(replaceUrlParams(API_ENDPOINTS.updatePlace, { id }), placeData),
-    delete: (id) => apiDelete(replaceUrlParams(API_ENDPOINTS.deletePlace, { id }))
+    delete: (id) => apiDelete(replaceUrlParams(API_ENDPOINTS.deletePlace, { id })),
+    uploadImages: (id, files) => {
+        const formData = new FormData();
+        for (const file of files) {
+            formData.append('images', file);
+        }
+        return apiUploadFiles(replaceUrlParams(API_ENDPOINTS.uploadPlaceImages, { id }), formData);
+    }
 };
 
 // دوال المستخدمين

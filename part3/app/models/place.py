@@ -1,3 +1,4 @@
+import json
 from app.models.base_model import BaseModel
 from app.enums import place_status
 from app.enums.place_status import PlaceStatus
@@ -19,6 +20,7 @@ class Place(BaseModel):
     _status = db.Column("status", db.String(50), nullable=True)
     _latitude = db.Column("latitude", db.Float, nullable=True)
     _longitude = db.Column("longitude", db.Float, nullable=True)
+    _images = db.Column("images", db.Text, nullable=True, default='[]')
 
     user = relationship("User", backref="places")
 
@@ -110,6 +112,24 @@ class Place(BaseModel):
         if value is None or not isinstance(value, (int, float)) or not -180.0 <= value <= 180.0:
             raise ValueError("Longitude must be between -180 and 180")
         self._longitude = value
+
+    @property
+    def images(self):
+        if not self._images:
+            return []
+        try:
+            return json.loads(self._images)
+        except (json.JSONDecodeError, TypeError):
+            return []
+
+    @images.setter
+    def images(self, value):
+        if isinstance(value, list):
+            self._images = json.dumps(value)
+        elif isinstance(value, str):
+            self._images = value
+        else:
+            self._images = '[]'
     
     def to_dict(self):
         return {
@@ -121,6 +141,7 @@ class Place(BaseModel):
             "status": self.status,
             "latitude": self.latitude,
             "longitude": self.longitude,
+            "images": self.images,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
         }

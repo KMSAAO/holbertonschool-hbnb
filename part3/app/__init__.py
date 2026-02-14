@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, send_from_directory, abort
+from flask import Flask, jsonify, send_from_directory, abort, current_app
 from flask_restx import Api
 from flask_cors import CORS  # استيراد المكتبة
 
@@ -42,6 +42,31 @@ def create_app(config_class="config.DevelopmentConfig"):
     # إنشاء الجداول تلقائياً عند بدء التشغيل
     with app.app_context():
         db.create_all()
+
+        # Idempotent migration: add 'images' column if it doesn't exist
+        try:
+            db.session.execute(db.text(
+                "ALTER TABLE places ADD COLUMN images TEXT DEFAULT '[]'"
+            ))
+            db.session.commit()
+            print("✅ Migration: 'images' column added to places table")
+        except Exception:
+            db.session.rollback()
+            # Column already exists — safe to ignore
+
+        # Create uploads directory
+        upload_folder = app.config.get('UPLOAD_FOLDER', os.path.join(os.path.dirname(__file__), '..', 'uploads'))
+        os.makedirs(os.path.join(upload_folder, 'places'), exist_ok=True)
+
+    # ==================== خدمة الملفات المرفوعة ====================
+
+    @app.route('/uploads/<path:filename>')
+    def serve_uploads(filename):
+        upload_folder = current_app.config.get('UPLOAD_FOLDER', 'uploads')
+        file_path = os.path.join(upload_folder, filename)
+        if os.path.isfile(file_path):
+            return send_from_directory(upload_folder, filename)
+        abort(404)
 
     # ==================== مسارات الواجهة الأمامية ====================
 

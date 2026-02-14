@@ -246,10 +246,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // حفظ أسماء الصور (في التطبيق الحقيقي سيتم رفعها للسيرفر)
-            for (let i = 0; i < imageFiles.length; i++) {
-                hotelData.images.push(`images/${hotelData.id}_${i + 1}.jpg`);
-            }
+            // حفظ أسماء الصور مؤقتاً (سيتم تحديثها بعد الرفع الفعلي)
+            hotelData.images = [];
 
             // حفظ البيانات في localStorage
             let userHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
@@ -264,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const apiPlace = await PlacesAPI.create({
                         title: hotelData.name || hotelData.nameEn,
                         description: hotelData.about?.[0]?.text || hotelData.tagline || '',
-                        price: hotelData.startPrice || 0,
+                        price: parseFloat(hotelData.startPrice) || 0,
                         user_id: userId,
                         latitude: 0,
                         longitude: 0,
@@ -273,12 +271,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     console.log('تم حفظ المكان في الـ backend:', apiPlace);
 
-                    // تحديث الـ ID في localStorage ليطابق الـ backend
+                    // رفع الصور إلى السيرفر
+                    let uploadedImages = [];
+                    if (apiPlace && apiPlace.id && imageFiles.length > 0) {
+                        try {
+                            const uploadResult = await PlacesAPI.uploadImages(apiPlace.id, imageFiles);
+                            uploadedImages = uploadResult.images || [];
+                            console.log('تم رفع الصور بنجاح:', uploadedImages);
+                        } catch (uploadErr) {
+                            console.warn('تعذر رفع الصور:', uploadErr);
+                            // المكان تم حفظه بنجاح لكن الصور لم ترفع
+                        }
+                    }
+
+                    // تحديث الـ ID والصور في localStorage ليطابق الـ backend
                     if (apiPlace && apiPlace.id) {
                         let currentHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
                         // تحديث آخر فندق تمت إضافته
                         if (currentHotels.length > 0) {
                             currentHotels[currentHotels.length - 1].id = apiPlace.id;
+                            currentHotels[currentHotels.length - 1].images = uploadedImages;
                             localStorage.setItem('userHotels', JSON.stringify(currentHotels));
                         }
                     }
