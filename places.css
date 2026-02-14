@@ -359,3 +359,84 @@
         justify-content: center;
     }
 }
+
+/* ==================== حالات التحميل والخطأ ==================== */
+
+.places-loading {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}
+
+.loading-spinner-container {
+    text-align: center;
+    color: #815B2F;
+}
+
+.loading-spinner-container i {
+    color: #D4AF37;
+    margin-bottom: 1rem;
+}
+
+.loading-spinner-container p {
+    font-size: 1.3rem;
+    font-family: 'Amiri', serif;
+    margin-top: 1rem;
+}
+
+.no-places-message,
+.places-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 300px;
+    padding: 3rem;
+    color: #815B2F;
+    gap: 1rem;
+}
+
+.no-places-message i,
+.places-error i {
+    color: #D4AF37;
+    opacity: 0.6;
+}
+
+.no-places-message h3,
+.places-error h3 {
+    font-size: 1.5rem;
+    font-family: 'Amiri', serif;
+}
+
+.no-places-message p,
+.places-error p {
+    font-size: 1.1rem;
+    opacity: 0.7;
+}
+
+.no-places-message a {
+    color: #D4AF37;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.places-error .card-btn {
+    width: auto;
+    padding: 0.8rem 2rem;
+    margin-top: 1rem;
+}
+
+.status-active {
+    color: #2e7d32;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.status-inactive {
+    color: #c62828;
+    font-weight: bold;
+    font-size: 0.85rem;
+}

@@ -7,11 +7,11 @@ let originalValues = {
 // تفعيل وضع التعديل
 function enableEdit(field) {
     const formActions = document.getElementById('formActions');
-    
+
     if (field === 'email') {
         const emailInput = document.getElementById('emailInput');
         const emailGroup = emailInput.closest('.form-group');
-        
+
         if (emailInput.hasAttribute('readonly')) {
             originalValues.email = emailInput.value;
             emailInput.removeAttribute('readonly');
@@ -22,7 +22,7 @@ function enableEdit(field) {
     } else if (field === 'gender') {
         const genderInput = document.getElementById('genderInput');
         const genderGroup = genderInput.closest('.form-group');
-        
+
         if (genderInput.hasAttribute('disabled')) {
             originalValues.gender = genderInput.value;
             genderInput.removeAttribute('disabled');
@@ -34,34 +34,48 @@ function enableEdit(field) {
 }
 
 // حفظ التغييرات
-function saveChanges() {
+async function saveChanges() {
     const emailInput = document.getElementById('emailInput');
     const genderInput = document.getElementById('genderInput');
     const formActions = document.getElementById('formActions');
-    
+
     if (!emailInput.hasAttribute('readonly')) {
         const emailValue = emailInput.value.trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
+
         if (!emailRegex.test(emailValue)) {
             alert('الرجاء إدخال بريد إلكتروني صحيح');
             emailInput.focus();
             return;
         }
     }
-    
+
+    // حفظ في الـ backend
+    const userId = localStorage.getItem('userId');
+    if (userId && typeof UsersAPI !== 'undefined') {
+        try {
+            await UsersAPI.update(userId, {
+                email: emailInput.value.trim()
+            });
+            // تحديث localStorage
+            localStorage.setItem('userEmail', emailInput.value.trim());
+        } catch (err) {
+            console.warn('تعذر تحديث الملف في الـ backend:', err);
+        }
+    }
+
     if (!emailInput.hasAttribute('readonly')) {
         emailInput.setAttribute('readonly', 'readonly');
         emailInput.closest('.form-group').classList.remove('active');
         originalValues.email = emailInput.value;
     }
-    
+
     if (!genderInput.hasAttribute('disabled')) {
         genderInput.setAttribute('disabled', 'disabled');
         genderInput.closest('.form-group').classList.remove('active');
         originalValues.gender = genderInput.value;
     }
-    
+
     formActions.style.display = 'none';
     showNotification('تم حفظ التغييرات بنجاح', 'success');
 }
@@ -71,19 +85,19 @@ function cancelEdit() {
     const emailInput = document.getElementById('emailInput');
     const genderInput = document.getElementById('genderInput');
     const formActions = document.getElementById('formActions');
-    
+
     if (!emailInput.hasAttribute('readonly')) {
         emailInput.value = originalValues.email;
         emailInput.setAttribute('readonly', 'readonly');
         emailInput.closest('.form-group').classList.remove('active');
     }
-    
+
     if (!genderInput.hasAttribute('disabled')) {
         genderInput.value = originalValues.gender;
         genderInput.setAttribute('disabled', 'disabled');
         genderInput.closest('.form-group').classList.remove('active');
     }
-    
+
     formActions.style.display = 'none';
 }
 
@@ -95,7 +109,7 @@ function showNotification(message, type) {
         <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
         <span>${message}</span>
     `;
-    
+
     notification.style.cssText = `
         position: fixed;
         top: 100px;
@@ -113,9 +127,9 @@ function showNotification(message, type) {
         z-index: 10000;
         animation: slideInRight 0.3s ease;
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.style.animation = 'slideOutRight 0.3s ease';
         setTimeout(() => {
@@ -171,7 +185,7 @@ function togglePasswordSection() {
 function togglePasswordVisibility(inputId) {
     const input = document.getElementById(inputId);
     const button = input.parentElement.querySelector('.toggle-password-btn i');
-    
+
     if (input.type === 'password') {
         input.type = 'text';
         button.classList.remove('fa-eye');
@@ -186,22 +200,22 @@ function togglePasswordVisibility(inputId) {
 // التحقق من متطلبات كلمة المرور
 function validatePassword() {
     const password = document.getElementById('newPassword').value;
-    
+
     const lengthValid = password.length >= 8;
     updateRequirement('req-length', lengthValid);
-    
+
     const uppercaseValid = /[A-Z]/.test(password);
     updateRequirement('req-uppercase', uppercaseValid);
-    
+
     const lowercaseValid = /[a-z]/.test(password);
     updateRequirement('req-lowercase', lowercaseValid);
-    
+
     const numberValid = /[0-9]/.test(password);
     updateRequirement('req-number', numberValid);
-    
+
     const specialValid = /[!@#$%^&*(),.?":{}|<>]/.test(password);
     updateRequirement('req-special', specialValid);
-    
+
     return lengthValid && uppercaseValid && lowercaseValid && numberValid && specialValid;
 }
 
@@ -238,26 +252,38 @@ function resetPasswordRequirements() {
 }
 
 // حفظ كلمة المرور الجديدة
-function savePassword() {
+async function savePassword() {
     const currentPassword = document.getElementById('currentPassword').value;
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
-    
+
     if (!currentPassword || !newPassword || !confirmPassword) {
         showNotification('الرجاء ملء جميع الحقول', 'error');
         return;
     }
-    
+
     if (!validatePassword()) {
         showNotification('كلمة المرور الجديدة لا تستوفي المتطلبات', 'error');
         return;
     }
-    
+
     if (newPassword !== confirmPassword) {
         showNotification('كلمتا المرور غير متطابقتين', 'error');
         return;
     }
-    
+
+    // محاولة تحديث كلمة المرور في الـ backend
+    const userId = localStorage.getItem('userId');
+    if (userId && typeof UsersAPI !== 'undefined') {
+        try {
+            await UsersAPI.update(userId, {
+                password: newPassword
+            });
+        } catch (err) {
+            console.warn('تعذر تحديث كلمة المرور في الـ backend:', err);
+        }
+    }
+
     showNotification('تم تغيير كلمة المرور بنجاح', 'success');
     togglePasswordSection();
 }
@@ -271,7 +297,7 @@ function cancelPasswordChange() {
 document.addEventListener('DOMContentLoaded', () => {
     originalValues.email = document.getElementById('emailInput').value;
     originalValues.gender = document.getElementById('genderInput').value;
-    
+
     const newPasswordInput = document.getElementById('newPassword');
     if (newPasswordInput) {
         newPasswordInput.addEventListener('input', validatePassword);

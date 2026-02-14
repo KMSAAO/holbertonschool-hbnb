@@ -48,7 +48,7 @@ function showLogoutConfirmation() {
         z-index: 10000;
         animation: fadeIn 0.3s ease;
     `;
-    
+
     // إنشاء مربع التأكيد
     const confirmBox = document.createElement('div');
     confirmBox.className = 'logout-confirm-box';
@@ -63,7 +63,7 @@ function showLogoutConfirmation() {
         animation: slideUp 0.3s ease;
         font-family: 'Amiri', serif;
     `;
-    
+
     confirmBox.innerHTML = `
         <div style="font-size: 4rem; margin-bottom: 1rem;">😢</div>
         <h2 style="color: #815B2F; font-size: 1.8rem; margin-bottom: 1rem; font-weight: 700;">
@@ -105,14 +105,14 @@ function showLogoutConfirmation() {
             </button>
         </div>
     `;
-    
+
     overlay.appendChild(confirmBox);
     document.body.appendChild(overlay);
-    
+
     // إضافة تأثيرات hover للأزرار
     const confirmBtn = document.getElementById('confirmLogoutBtn');
     const cancelBtn = document.getElementById('cancelLogoutBtn');
-    
+
     confirmBtn.onmouseover = () => {
         confirmBtn.style.background = '#6B4A26';
         confirmBtn.style.transform = 'translateY(-2px)';
@@ -123,7 +123,7 @@ function showLogoutConfirmation() {
         confirmBtn.style.transform = 'translateY(0)';
         confirmBtn.style.boxShadow = 'none';
     };
-    
+
     cancelBtn.onmouseover = () => {
         cancelBtn.style.background = '#815B2F';
         cancelBtn.style.color = '#EFE2CF';
@@ -136,13 +136,13 @@ function showLogoutConfirmation() {
         cancelBtn.style.transform = 'translateY(0)';
         cancelBtn.style.boxShadow = 'none';
     };
-    
+
     // معالجة النقر على نعم
     confirmBtn.onclick = () => {
         overlay.remove();
         performLogout();
     };
-    
+
     // معالجة النقر على إلغاء
     cancelBtn.onclick = () => {
         overlay.style.animation = 'fadeOut 0.3s ease';
@@ -150,7 +150,7 @@ function showLogoutConfirmation() {
             overlay.remove();
         }, 300);
     };
-    
+
     // إغلاق عند النقر على الخلفية
     overlay.onclick = (e) => {
         if (e.target === overlay) {
@@ -170,10 +170,12 @@ function performLogout() {
     localStorage.removeItem('userLastName');
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userGender');
-    
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('userId');
+
     // حفظ علامة للإشعار
     localStorage.setItem('showLogoutMessage', 'true');
-    
+
     // إظهار شاشة التحميل
     if (typeof showLoadingScreen === 'function') {
         showLoadingScreen('index.html');
@@ -187,16 +189,16 @@ function updateNavbar() {
     const loggedIn = isLoggedIn();
     console.log('تحديث Navbar - هل مسجل دخول؟', loggedIn);
     console.log('بيانات المستخدم:', getUserInfo());
-    
+
     // العناصر التي تظهر فقط للمسجلين
     const bookingsLink = document.getElementById('bookingsLink');
     const logoutLink = document.getElementById('logoutLink');
     const profileCircle = document.querySelector('.profile-circle');
     const adminLink = document.querySelector('a[href="admin.html"]');
-    
+
     // العناصر التي تظهر فقط لغير المسجلين
     const loginLink = document.getElementById('loginLink');
-    
+
     console.log('العناصر:', {
         bookingsLink: bookingsLink,
         logoutLink: logoutLink,
@@ -204,7 +206,7 @@ function updateNavbar() {
         adminLink: adminLink,
         loginLink: loginLink
     });
-    
+
     if (loggedIn) {
         // المستخدم مسجل دخول
         console.log('المستخدم مسجل - تحديث العناصر');
@@ -233,8 +235,8 @@ function updateNavbar() {
 // التحقق من الصفحات المحمية
 function checkProtectedPage() {
     const currentPage = window.location.pathname.split('/').pop();
-    const protectedPages = ['profile.html', 'bookings.html'];
-    
+    const protectedPages = ['profile.html', 'bookings.html', 'admin.html'];
+
     if (protectedPages.includes(currentPage) && !isLoggedIn()) {
         // إذا كان في صفحة محمية وغير مسجل، يوجهه لتسجيل الدخول
         showNotification('يجب تسجيل الدخول أولاً', 'error');
@@ -264,14 +266,14 @@ function showNotification(message, type) {
     if (existingNotification) {
         existingNotification.remove();
     }
-    
+
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
         <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
         <span>${message}</span>
     `;
-    
+
     notification.style.cssText = `
         position: fixed;
         top: 20px;
@@ -289,9 +291,9 @@ function showNotification(message, type) {
         z-index: 10000;
         animation: slideInRight 0.3s ease;
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.style.animation = 'slideOutRight 0.3s ease';
         setTimeout(() => {
@@ -368,16 +370,16 @@ if (document.readyState === 'loading') {
 function initAuth() {
     // تحديث navbar
     updateNavbar();
-    
+
     // التحقق من الصفحات المحمية
     checkProtectedPage();
-    
+
     // إضافة مستمع لرابط الحجوزات
     const bookingsLink = document.getElementById('bookingsLink');
     if (bookingsLink) {
         bookingsLink.addEventListener('click', handleBookingsClick);
     }
-    
+
     // عرض رسالة الخروج إذا كانت موجودة
     if (localStorage.getItem('showLogoutMessage') === 'true') {
         localStorage.removeItem('showLogoutMessage');

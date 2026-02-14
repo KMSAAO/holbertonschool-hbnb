@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="admin.css">
 </head>
+
 <body>
     <!-- شريط التنقل -->
     <nav class="navbar">
@@ -17,7 +19,7 @@
             <div class="logo">
                 <img src="images/logo.png" alt="نُزل" class="logo-img">
             </div>
-            
+
             <!-- القائمة في المنتصف -->
             <div class="nav-menu">
                 <a href="index.html" class="nav-link">الرئيسية</a>
@@ -27,7 +29,7 @@
                 <a href="#" class="nav-link" id="logoutLink" onclick="logout(); return false;">خروج</a>
                 <a href="login.html" class="nav-link" id="loginLink" style="display:none;">تسجيل دخول</a>
             </div>
-            
+
             <!-- صورة الملف الشخصي على اليمين -->
             <div class="profile">
                 <a href="profile.html" class="profile-circle">
@@ -45,30 +47,34 @@
         <!-- نموذج إضافة فندق -->
         <div class="admin-form-container">
             <h2 class="form-title">إضافة فندق جديد</h2>
-            
+
             <form id="addHotelForm" class="admin-form">
                 <!-- معلومات أساسية -->
                 <div class="form-section">
                     <h3 class="section-title"><i class="fas fa-info-circle"></i> المعلومات الأساسية</h3>
-                    
+
                     <div class="form-group">
                         <label for="hotelName">اسم الفندق <span class="required">*</span></label>
-                        <input type="text" id="hotelName" name="hotelName" required placeholder="مثال: فندق الصحراء الذهبية">
+                        <input type="text" id="hotelName" name="hotelName" required
+                            placeholder="مثال: فندق الصحراء الذهبية">
                     </div>
 
                     <div class="form-group">
                         <label for="hotelNameEn">اسم الفندق بالإنجليزية <span class="required">*</span></label>
-                        <input type="text" id="hotelNameEn" name="hotelNameEn" required placeholder="Example: Golden Desert Hotel">
+                        <input type="text" id="hotelNameEn" name="hotelNameEn" required
+                            placeholder="Example: Golden Desert Hotel">
                     </div>
 
                     <div class="form-group">
                         <label for="hotelLocation">الموقع <span class="required">*</span></label>
-                        <input type="text" id="hotelLocation" name="hotelLocation" required placeholder="مثال: الرياض، المملكة العربية السعودية">
+                        <input type="text" id="hotelLocation" name="hotelLocation" required
+                            placeholder="مثال: الرياض، المملكة العربية السعودية">
                     </div>
 
                     <div class="form-group">
                         <label for="hotelTagline">الشعار/العبارة الترويجية <span class="required">*</span></label>
-                        <input type="text" id="hotelTagline" name="hotelTagline" required placeholder="مثال: اشعر وكأنك نجم واستمتع بالمعاملة الراقية">
+                        <input type="text" id="hotelTagline" name="hotelTagline" required
+                            placeholder="مثال: اشعر وكأنك نجم واستمتع بالمعاملة الراقية">
                     </div>
 
                     <div class="form-group">
@@ -95,7 +101,7 @@
                 <!-- الوصف -->
                 <div class="form-section">
                     <h3 class="section-title"><i class="fas fa-align-left"></i> الوصف والتفاصيل</h3>
-                    
+
                     <div class="about-sections" id="aboutSections">
                         <div class="about-item">
                             <div class="form-group">
@@ -104,11 +110,13 @@
                             </div>
                             <div class="form-group">
                                 <label>الوصف <span class="required">*</span></label>
-                                <textarea class="about-content" rows="4" placeholder="اكتب وصف تفصيلي للفندق..." required></textarea>
+                                <textarea class="about-content" rows="4" placeholder="اكتب وصف تفصيلي للفندق..."
+                                    required></textarea>
                             </div>
                             <div class="form-group">
                                 <label>أيقونة (FontAwesome)</label>
-                                <input type="text" class="about-icon" placeholder="مثال: fas fa-hotel" value="fas fa-hotel">
+                                <input type="text" class="about-icon" placeholder="مثال: fas fa-hotel"
+                                    value="fas fa-hotel">
                             </div>
                         </div>
                     </div>
@@ -120,7 +128,7 @@
                 <!-- المرافق -->
                 <div class="form-section">
                     <h3 class="section-title"><i class="fas fa-star"></i> المرافق والخدمات</h3>
-                    
+
                     <div class="amenities-list" id="amenitiesList">
                         <div class="amenity-item">
                             <input type="text" class="amenity-icon" placeholder="مثال: fas fa-wifi" value="fas fa-wifi">
@@ -138,7 +146,7 @@
                 <!-- الغرف -->
                 <div class="form-section">
                     <h3 class="section-title"><i class="fas fa-bed"></i> الغرف المتوفرة</h3>
-                    
+
                     <div class="rooms-list" id="roomsList">
                         <div class="room-item">
                             <div class="form-row">
@@ -157,7 +165,8 @@
                             </div>
                             <div class="form-group">
                                 <label>المميزات (افصل بفاصلة) <span class="required">*</span></label>
-                                <input type="text" class="room-features" placeholder="مثال: إطلالة على البحر, تكييف, واي فاي" required>
+                                <input type="text" class="room-features"
+                                    placeholder="مثال: إطلالة على البحر, تكييف, واي فاي" required>
                             </div>
                             <button type="button" class="remove-btn" onclick="removeRoom(this)">
                                 <i class="fas fa-trash"></i> حذف الغرفة
@@ -173,7 +182,7 @@
                 <div class="form-section">
                     <h3 class="section-title"><i class="fas fa-images"></i> صور الفندق</h3>
                     <p class="help-text">قم برفع 5 صور للفندق (يُفضل صور بجودة عالية)</p>
-                    
+
                     <div class="form-group">
                         <label>رفع الصور (5 صور) <span class="required">*</span></label>
                         <input type="file" id="hotelImages" name="hotelImages" accept="image/*" multiple required>
@@ -214,8 +223,10 @@
         </div>
     </footer>
 
+    <script src="api-config.js"></script>
     <script src="auth.js"></script>
     <script src="loading.js"></script>
     <script src="admin.js"></script>
 </body>
+
 </html>

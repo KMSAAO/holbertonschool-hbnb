@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <!-- شريط التنقل العلوي -->
     <nav class="navbar">
@@ -20,7 +22,7 @@
             <div class="logo">
                 <img src="images/logo.png" alt="نُزل" class="logo-img">
             </div>
-            
+
             <!-- القائمة في المنتصف -->
             <div class="nav-menu">
                 <a href="index.html" class="nav-link">الرئيسية</a>
@@ -30,7 +32,7 @@
                 <a href="#" class="nav-link" id="logoutLink" onclick="logout(); return false;">خروج</a>
                 <a href="login.html" class="nav-link" id="loginLink" style="display:none;">تسجيل دخول</a>
             </div>
-            
+
             <!-- صورة الملف الشخصي على اليمين -->
             <div class="profile">
                 <a href="profile.html" class="profile-circle">
@@ -47,7 +49,8 @@
                 <img src="images/slider1.jpg" alt="صحراء 1" class="slide-img">
                 <div class="slide-content">
                     <h1 class="hero-title">استكشف وجهات الصحراء الفاخرة</h1>
-                    <p class="hero-subtitle">رحلة استثنائية في قلب الصحراء العربية مع أرقى المنتجعات والتجارب الفريدة</p>
+                    <p class="hero-subtitle">رحلة استثنائية في قلب الصحراء العربية مع أرقى المنتجعات والتجارب الفريدة
+                    </p>
                     <button class="hero-btn">ابدأ رحلتك</button>
                 </div>
             </div>
@@ -55,7 +58,8 @@
                 <img src="images/slider2.jpg" alt="صحراء 2" class="slide-img">
                 <div class="slide-content">
                     <h1 class="hero-title">استكشف وجهات الصحراء الفاخرة</h1>
-                    <p class="hero-subtitle">رحلة استثنائية في قلب الصحراء العربية مع أرقى المنتجعات والتجارب الفريدة</p>
+                    <p class="hero-subtitle">رحلة استثنائية في قلب الصحراء العربية مع أرقى المنتجعات والتجارب الفريدة
+                    </p>
                     <button class="hero-btn">ابدأ رحلتك</button>
                 </div>
             </div>
@@ -63,12 +67,13 @@
                 <img src="images/slider3.jpg" alt="صحراء 3" class="slide-img">
                 <div class="slide-content">
                     <h1 class="hero-title">استكشف وجهات الصحراء الفاخرة</h1>
-                    <p class="hero-subtitle">رحلة استثنائية في قلب الصحراء العربية مع أرقى المنتجعات والتجارب الفريدة</p>
+                    <p class="hero-subtitle">رحلة استثنائية في قلب الصحراء العربية مع أرقى المنتجعات والتجارب الفريدة
+                    </p>
                     <button class="hero-btn">ابدأ رحلتك</button>
                 </div>
             </div>
         </div>
-        
+
         <!-- مؤشرات السلايدر -->
         <div class="slider-dots">
             <span class="dot active" onclick="currentSlide(1)"></span>
@@ -96,289 +101,31 @@
         </div>
     </section>
 
-    <!-- شبكة البطاقات -->
+    <!-- شبكة البطاقات - يتم تحميلها ديناميكياً من الـ API -->
     <section class="destinations-grid-section">
-        <div class="destinations-grid">
-            <!-- بطاقة 1 -->
-            <div class="destination-card" data-region="coast">
-                <div class="card-image-wrapper">
-                    <img src="images/hotel1.jpg" alt="منتجع شيبارا" class="card-image">
-                    <div class="card-badge">
-                        <i class="fas fa-star"></i>
-                        <span>4.9</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title">منتجع شيبارا</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>البحر الأحمر، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">10,300</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
-                    <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=shebara')">احجز الآن</button>
-                </div>
-            </div>
-
-            <!-- بطاقة 2 -->
-            <div class="destination-card" data-region="alula">
-                <div class="card-image-wrapper">
-                    <img src="images/hotel2.jpg" alt="منتجع ديزرت روك" class="card-image">
-                    <div class="card-badge">
-                        <i class="fas fa-star"></i>
-                        <span>5.0</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title">منتجع ديزرت روك</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>العلا، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">8,500</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
-                    <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=desertrock')">احجز الآن</button>
-                </div>
-            </div>
-
-            <!-- بطاقة 3 -->
-            <div class="destination-card" data-region="alula">
-                <div class="card-image-wrapper">
-                    <img src="images/hotel3.jpg" alt="منتجع شادن" class="card-image">
-                    <div class="card-badge">
-                        <i class="fas fa-star"></i>
-                        <span>4.8</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title">منتجع شادن</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>العلا، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">4,120</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
-                    <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=shaden')">احجز الآن</button>
-                </div>
-            </div>
-
-            <!-- بطاقة 4 -->
-            <div class="destination-card" data-region="alula">
-                <div class="card-image-wrapper">
-                    <img src="images/hotel4.jpg" alt="شيدي الحِجر" class="card-image">
-                    <div class="card-badge">
-                        <i class="fas fa-star"></i>
-                        <span>4.7</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title">شيدي الحِجر</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>العلا، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">5,336</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
-                    <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=chedi')">احجز الآن</button>
-                </div>
-            </div>
-
-            <!-- بطاقة 5 -->
-            <div class="destination-card" data-region="najd">
-                <div class="card-image-wrapper">
-                    <img src="images/hotel5.jpg" alt="فيرمونت الرياض" class="card-image">
-                    <div class="card-badge">
-                        <i class="fas fa-star"></i>
-                        <span>4.9</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title">فيرمونت الرياض</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>الرياض، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">1,520</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
-                    <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=fairmont')">احجز الآن</button>
-                </div>
-            </div>
-
-            <!-- بطاقة 6 -->
-            <div class="destination-card" data-region="alula">
-                <div class="card-image-wrapper">
-                    <img src="images/hotel6.jpg" alt="منتجع آشار الخيمي" class="card-image">
-                    <div class="card-badge">
-                        <i class="fas fa-star"></i>
-                        <span>4.6</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title">منتجع آشار الخيمي</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>العلا، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">2,800</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
-                    <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=ashar')">احجز الآن</button>
-                </div>
-            </div>
-
-            <!-- بطاقة 7 -->
-            <div class="destination-card" data-region="alula">
-                <div class="card-image-wrapper">
-                    <img src="images/hotel7.jpg" alt="قافلة العلا" class="card-image">
-                    <div class="card-badge">
-                        <i class="fas fa-star"></i>
-                        <span>4.8</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title">قافلة العلا</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>العلا، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">2,831</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
-                    <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=caravan')">احجز الآن</button>
-                </div>
-            </div>
-
-            <!-- بطاقة 8 -->
-            <div class="destination-card" data-region="najd">
-                <div class="card-image-wrapper">
-                    <img src="images/hotel8.jpg" alt="ماندارين أورينتال" class="card-image">
-                    <div class="card-badge">
-                        <i class="fas fa-star"></i>
-                        <span>5.0</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title">ماندارين أورينتال</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>الرياض، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">1,530</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
-                    <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=mandarin')">احجز الآن</button>
-                </div>
-            </div>
-
-            <!-- بطاقة 9 -->
-            <div class="destination-card" data-region="najd">
-                <div class="card-image-wrapper">
-                    <img src="images/hotel9.jpg" alt="فندق موفنبيك" class="card-image">
-                    <div class="card-badge">
-                        <i class="fas fa-star"></i>
-                        <span>4.9</span>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title">فندق موفنبيك</h3>
-                    <div class="card-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>الرياض، المملكة العربية السعودية</span>
-                    </div>
-                    <div class="card-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="card-price">
-                        <span class="price-amount">1,300</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/ لليلة الواحدة</span>
-                    </div>
-                    <button class="card-btn" onclick="showLoadingScreen('hotel-details.html?hotel=movenpick')">احجز الآن</button>
+        <div class="destinations-grid" id="placesGrid">
+            <!-- حالة التحميل -->
+            <div class="places-loading" id="placesLoading">
+                <div class="loading-spinner-container">
+                    <i class="fas fa-spinner fa-spin fa-3x"></i>
+                    <p>جاري تحميل الوجهات...</p>
                 </div>
             </div>
         </div>
 
-        <!-- زر عرض المزيد -->
-        <div class="load-more-section">
-            <button class="load-more-btn">عرض المزيد من الوجهات</button>
+        <!-- رسالة عدم وجود وجهات -->
+        <div class="no-places-message" id="noPlacesMessage" style="display: none;">
+            <i class="fas fa-map-marked-alt fa-3x"></i>
+            <h3>لا توجد وجهات متاحة حالياً</h3>
+            <p>يمكنك إضافة وجهات جديدة من <a href="admin.html">صفحة إدارة النُزل</a></p>
+        </div>
+
+        <!-- رسالة خطأ -->
+        <div class="places-error" id="placesError" style="display: none;">
+            <i class="fas fa-exclamation-triangle fa-3x"></i>
+            <h3>تعذر تحميل الوجهات</h3>
+            <p>تأكد من أن الخادم يعمل على المنفذ 5000</p>
+            <button class="card-btn" onclick="fetchAndRenderPlaces()">إعادة المحاولة</button>
         </div>
     </section>
 
@@ -426,10 +173,12 @@
         </div>
     </footer>
 
+    <script src="api-config.js"></script>
     <script src="auth.js"></script>
     <script src="script.js"></script>
     <script src="places.js"></script>
     <script src="loading.js"></script>
-    <script src="user-hotels.js"></script>
+
 </body>
+
 </html>

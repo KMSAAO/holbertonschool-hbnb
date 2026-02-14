@@ -25,16 +25,16 @@ function switchTab(tabName) {
 function togglePasswordVisibility(inputId) {
     const input = document.getElementById(inputId);
     const icon = input.nextElementSibling.querySelector('i');
-    
+
     if (input.type === 'password') {
         input.type = 'text';
-        if(icon) {
+        if (icon) {
             icon.classList.remove('fa-eye');
             icon.classList.add('fa-eye-slash');
         }
     } else {
         input.type = 'password';
-        if(icon) {
+        if (icon) {
             icon.classList.remove('fa-eye-slash');
             icon.classList.add('fa-eye');
         }
@@ -73,17 +73,18 @@ function showNotification(message, type = 'error') {
 
 async function handleLogin(event) {
     event.preventDefault();
-    
+
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
-    
+
     if (!email || !password) {
         showNotification('الرجاء ملء جميع الحقول', 'error');
         return;
     }
 
     try {
-        const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login', { 
+        // 1. تسجيل الدخول والحصول على التوكن
+        const response = await fetch('http://127.0.0.1:5000/api/v1/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
@@ -92,7 +93,57 @@ async function handleLogin(event) {
         const data = await response.json();
 
         if (response.ok) {
+            // 2. حفظ التوكن
             localStorage.setItem('access_token', data.access_token);
+
+            // 3. فك تشفير JWT للحصول على user_id
+            let userId = '';
+            try {
+                const tokenParts = data.access_token.split('.');
+                const payload = JSON.parse(atob(tokenParts[1]));
+                userId = payload.sub || payload.identity || '';
+            } catch (e) {
+                console.warn('تعذر فك تشفير JWT:', e);
+            }
+
+            // 4. جلب بيانات المستخدم من الـ backend
+            if (userId) {
+                localStorage.setItem('userId', userId);
+                try {
+                    const userResponse = await fetch(`http://127.0.0.1:5000/api/v1/users/${userId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${data.access_token}`
+                        }
+                    });
+                    if (userResponse.ok) {
+                        const userData = await userResponse.json();
+                        // 5. حفظ جلسة المستخدم (يربط مع auth.js)
+                        saveUserSession({
+                            firstName: userData.first_name || '',
+                            lastName: userData.last_name || '',
+                            email: userData.email || email,
+                            gender: userData.gender || 'female'
+                        });
+                    } else {
+                        // حفظ بيانات أساسية إذا فشل جلب المستخدم
+                        saveUserSession({
+                            firstName: '',
+                            lastName: '',
+                            email: email,
+                            gender: 'female'
+                        });
+                    }
+                } catch (fetchErr) {
+                    console.warn('تعذر جلب بيانات المستخدم:', fetchErr);
+                    saveUserSession({ firstName: '', lastName: '', email: email, gender: 'female' });
+                }
+            } else {
+                // حفظ جلسة بدون userId
+                saveUserSession({ firstName: '', lastName: '', email: email, gender: 'female' });
+            }
+
             showNotification('تم تسجيل الدخول بنجاح', 'success');
             setTimeout(() => { window.location.href = 'index.html'; }, 800);
         } else {
@@ -107,13 +158,13 @@ async function handleLogin(event) {
 
 async function handleSignup(event) {
     event.preventDefault();
-    
+
     const firstName = document.getElementById('firstName').value.trim();
     const lastName = document.getElementById('lastName').value.trim();
     const email = document.getElementById('signupEmail').value.trim();
     const password = document.getElementById('signupPassword').value;
     const confirmPassword = document.getElementById('signupConfirmPassword').value;
-    
+
     // --- التحقق من الشروط (Validations) ---
 
     // 1. الاسم الأول
@@ -149,7 +200,7 @@ async function handleSignup(event) {
 
     try {
         // لاحظ: الرابط بدون شرطة في النهاية لتجنب مشاكل CORS
-        const response = await fetch('http://127.0.0.1:5000/api/v1/users', { 
+        const response = await fetch('http://127.0.0.1:5000/api/v1/users', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -180,7 +231,7 @@ async function handleSignup(event) {
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     // ربط أزرار التبويبات
     const tabBtns = document.querySelectorAll('.tab-btn');
     tabBtns.forEach(btn => {
@@ -193,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ربط فورم تسجيل الدخول
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
-        loginForm.removeEventListener('submit', handleLogin); 
+        loginForm.removeEventListener('submit', handleLogin);
         loginForm.addEventListener('submit', handleLogin);
     }
 

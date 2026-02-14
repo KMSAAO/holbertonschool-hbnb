@@ -373,43 +373,60 @@ const hotelsDetailsData = {
 function getCurrentHotelDetails() {
     const urlParams = new URLSearchParams(window.location.search);
     const hotelParam = urlParams.get('hotel');
-    
-    // التحقق من الفنادق المضافة من المستخدمين أولاً
-    if (hotelParam && hotelParam.startsWith('hotel_')) {
-        const userHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
-        const userHotel = userHotels.find(h => h.id === hotelParam);
-        if (userHotel) {
-            return userHotel;
+
+    // التحقق من الفنادق الأساسية (fallback)
+    // تم إزالة fallback الافتراضي (shebara) لدعم الأماكن الديناميكية
+    return hotelsDetailsData[hotelParam];
+}
+
+// جلب بيانات الفندق من الـ backend (إذا كان place_id)
+async function fetchPlaceFromBackend(placeId) {
+    try {
+        const data = await PlacesAPI.getById(placeId);
+        if (data && data.id) {
+            return {
+                id: data.id,
+                name: data.title || 'مكان',
+                nameAr: data.title || '',
+                location: `${data.latitude || ''}, ${data.longitude || ''}`,
+                rating: 5,
+                startPrice: data.price || 0,
+                images: ['images/default-hotel.jpg'],
+                tagline: data.description || '',
+                about: [{ title: 'عن المكان', icon: 'fas fa-info-circle', text: data.description || '' }],
+                amenities: [],
+                status: data.status
+            };
         }
+    } catch (err) {
+        console.warn('تعذر جلب المكان من الـ backend:', err);
     }
-    
-    // إذا لم يكن فندق مضاف من المستخدم، استخدم الفنادق الأساسية
-    return hotelsDetailsData[hotelParam] || hotelsDetailsData.shebara;
+    return null;
 }
 
 // تحديث معلومات الصفحة
 function updatePageContent() {
     const hotel = getCurrentHotelDetails();
-    
+
     // تحديث العنوان
     document.title = `${hotel.name} - نُزل`;
-    
+
     // تحديث اسم الفندق
     const hotelNameElement = document.querySelector('.hotel-name');
     if (hotelNameElement) hotelNameElement.textContent = hotel.name;
-    
+
     // تحديث الموقع
     const hotelLocationElement = document.querySelector('.hotel-location span');
     if (hotelLocationElement) hotelLocationElement.textContent = hotel.location;
-    
+
     // تحديث السعر
     const priceAmountElement = document.querySelector('.price-amount');
     if (priceAmountElement) priceAmountElement.textContent = `${hotel.startPrice.toLocaleString('en-US')} ر.س`;
-    
+
     // تحديث tagline
     const taglineElement = document.querySelector('.hotel-tagline p');
     if (taglineElement) taglineElement.textContent = hotel.tagline;
-    
+
     // تحديث قسم "عن الفندق"
     const descriptionElement = document.querySelector('.hotel-description');
     if (descriptionElement && hotel.about) {
@@ -424,7 +441,7 @@ function updatePageContent() {
         });
         descriptionElement.innerHTML = aboutHTML;
     }
-    
+
     // تحديث المرافق
     const amenitiesGrid = document.querySelector('.amenities-grid');
     if (amenitiesGrid && hotel.amenities) {
@@ -439,18 +456,18 @@ function updatePageContent() {
         });
         amenitiesGrid.innerHTML = amenitiesHTML;
     }
-    
+
     // تحديث الصور في السلايدر
     const sliderWrapper = document.querySelector('.slider-wrapper');
     if (sliderWrapper) {
         let slidesHTML = '';
         let dotsHTML = '';
-        
+
         hotel.images.forEach((img, index) => {
             slidesHTML += `<div class="hotel-slide ${index === 0 ? 'active' : ''}"><img src="${img}" alt="${hotel.name} ${index + 1}"></div>`;
             dotsHTML += `<span class="dot ${index === 0 ? 'active' : ''}" onclick="goToSlide(${index})"></span>`;
         });
-        
+
         sliderWrapper.innerHTML = `
             ${slidesHTML}
             <button class="slider-arrow prev" onclick="changeSlide(-1)">
@@ -462,27 +479,27 @@ function updatePageContent() {
             <div class="slider-dots">${dotsHTML}</div>
         `;
     }
-    
+
     // تحديث الشريط الثابت للحجز
     const bookingBarName = document.querySelector('.booking-hotel-name');
     const bookingBarPrice = document.querySelector('.booking-price');
     const bookingBtn = document.querySelector('.booking-btn');
-    
+
     if (bookingBarName) bookingBarName.textContent = hotel.name;
     if (bookingBarPrice) bookingBarPrice.textContent = `يبدأ من ${hotel.startPrice.toLocaleString('ar-EG')} ر.س / ليلة`;
-    
+
     if (bookingBtn) {
         const hotelParam = new URLSearchParams(window.location.search).get('hotel') || 'shebara';
         bookingBtn.setAttribute('onclick', `handleBooking()`);
     }
-    
+
     // تحديث رابط الحجز القديم (إن وجد)
     const bookButton = document.querySelector('.book-button');
     if (bookButton) {
         const hotelParam = new URLSearchParams(window.location.search).get('hotel') || 'shebara';
         bookButton.setAttribute('onclick', `window.location.href='reservation.html?hotel=${hotelParam}'`);
     }
-    
+
     // إخفاء قسم الموقع لديزرت روك وشادن وتشيدي وفيرمونت وآشار وكارافان وماندارين
     const locationSection = document.getElementById('locationSection');
     if (locationSection) {
@@ -493,7 +510,7 @@ function updatePageContent() {
             locationSection.style.display = 'block';
         }
     }
-    
+
     // تحديث الغرف المتاحة
     updateRoomsDisplay();
 }
@@ -502,31 +519,31 @@ function updatePageContent() {
 function updateRoomsDisplay() {
     const urlParams = new URLSearchParams(window.location.search);
     const hotelParam = urlParams.get('hotel') || 'shebara';
-    
+
     // الحصول على بيانات الغرف من reservation.js
     if (typeof hotelsData === 'undefined') {
         console.error('hotelsData غير موجود');
         return;
     }
-    
+
     const hotelData = hotelsData[hotelParam];
     if (!hotelData || !hotelData.rooms) {
         console.error('بيانات الغرف غير موجودة');
         return;
     }
-    
+
     const roomsContainer = document.getElementById('roomsContainer');
     if (!roomsContainer) return;
-    
+
     let roomsHTML = '';
     const taxRate = 0.2075;
-    
+
     hotelData.rooms.forEach(room => {
         const tax = Math.round(room.price * taxRate);
-        const featuresHTML = room.features.map(f => 
+        const featuresHTML = room.features.map(f =>
             `<span class="feature-tag"><i class="fas fa-check"></i> ${f}</span>`
         ).join('');
-        
+
         roomsHTML += `
             <div class="room-card">
                 <div class="room-header">
@@ -557,7 +574,7 @@ function updateRoomsDisplay() {
             </div>
         `;
     });
-    
+
     roomsContainer.innerHTML = roomsHTML;
 }
 
@@ -581,21 +598,21 @@ function stopSlider() {
 function changeSlide(direction) {
     const slides = document.querySelectorAll('.hotel-slide');
     const dots = document.querySelectorAll('.dot');
-    
+
     // إخفاء الصورة الحالية
     slides[currentSlide].classList.remove('active');
     dots[currentSlide].classList.remove('active');
-    
+
     // حساب الصورة الجديدة
     currentSlide = currentSlide + direction;
-    
+
     // التأكد من البقاء ضمن النطاق
     if (currentSlide >= slides.length) {
         currentSlide = 0;
     } else if (currentSlide < 0) {
         currentSlide = slides.length - 1;
     }
-    
+
     // إظهار الصورة الجديدة
     slides[currentSlide].classList.add('active');
     dots[currentSlide].classList.add('active');
@@ -605,18 +622,18 @@ function changeSlide(direction) {
 function goToSlide(slideIndex) {
     const slides = document.querySelectorAll('.hotel-slide');
     const dots = document.querySelectorAll('.dot');
-    
+
     // إخفاء الصورة الحالية
     slides[currentSlide].classList.remove('active');
     dots[currentSlide].classList.remove('active');
-    
+
     // تحديث الفهرس
     currentSlide = slideIndex;
-    
+
     // إظهار الصورة الجديدة
     slides[currentSlide].classList.add('active');
     dots[currentSlide].classList.add('active');
-    
+
     // إعادة تشغيل السلايدر
     stopSlider();
     startSlider();
@@ -634,11 +651,11 @@ function handleBooking() {
         }, 1500);
         return;
     }
-    
+
     // الحصول على معامل الفندق من URL
     const urlParams = new URLSearchParams(window.location.search);
     const hotelParam = urlParams.get('hotel') || 'shebara';
-    
+
     // الانتقال لصفحة الحجز مع معامل الفندق
     if (typeof showLoadingScreen === 'function') {
         showLoadingScreen(`reservation.html?hotel=${hotelParam}`);
@@ -648,22 +665,70 @@ function handleBooking() {
 }
 
 // إيقاف السلايدر عند التمرير فوق الصور
-document.addEventListener('DOMContentLoaded', () => {
-    // تحديث محتوى الصفحة حسب الفندق
-    updatePageContent();
-    
-    // عرض التعليقات
-    displayReviews();
-    
-    const sliderWrapper = document.querySelector('.slider-wrapper');
-    
-    if (sliderWrapper) {
-        sliderWrapper.addEventListener('mouseenter', stopSlider);
-        sliderWrapper.addEventListener('mouseleave', startSlider);
+// إيقاف السلايدر عند التمرير فوق الصور
+document.addEventListener('DOMContentLoaded', async () => {
+    // إظهار حالة التحميل (اختياري - يمكن إضافته في HTML)
+    // const loadingMsg = document.createElement('div');
+    // loadingMsg.id = 'loadingMsg';
+    // loadingMsg.innerHTML = '<div style="text-align:center; padding: 50px;"><i class="fas fa-spinner fa-spin fa-2x"></i><p>جاري تحميل التفاصيل...</p></div>';
+    // document.querySelector('main').prepend(loadingMsg);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const hotelParam = urlParams.get('hotel');
+
+    let placeFound = false;
+
+    // 1. التحقق من البيانات المحلية (للفنادق الـ 9 الأصلية)
+    if (hotelsDetailsData[hotelParam]) {
+        console.log('تم العثور على المكان في البيانات المحلية:', hotelParam);
+        placeFound = true;
     }
-    
-    // بدء السلايدر
-    startSlider();
+    // 2. التحقق من الـ backend (للأماكن الجديدة)
+    else if (hotelParam) {
+        console.log('محاولة جلب المكان من الـ backend:', hotelParam);
+        const backendPlace = await fetchPlaceFromBackend(hotelParam);
+
+        if (backendPlace) {
+            // حفظ البيانات في الكائن المحلي ليعمل باقي الكود
+            hotelsDetailsData[hotelParam] = backendPlace;
+            placeFound = true;
+            console.log('تم جلب البيانات بنجاح:', backendPlace);
+        }
+    }
+
+    // إخفاء التحميل
+    // const loadingMsgEl = document.getElementById('loadingMsg');
+    // if (loadingMsgEl) loadingMsgEl.remove();
+
+    if (placeFound) {
+        // تحديث محتوى الصفحة
+        updatePageContent();
+
+        // عرض التعليقات
+        await displayReviews();
+
+        // إعداد السلايدر
+        const sliderWrapper = document.querySelector('.slider-wrapper');
+        if (sliderWrapper) {
+            sliderWrapper.addEventListener('mouseenter', stopSlider);
+            sliderWrapper.addEventListener('mouseleave', startSlider);
+            // بدء السلايدر
+            startSlider();
+        }
+    } else {
+        // عرض رسالة خطأ إذا لم يتم العثور على المكان
+        const mainContent = document.querySelector('main');
+        if (mainContent) {
+            mainContent.innerHTML = `
+                <div class="places-error" style="height: 50vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                    <i class="fas fa-exclamation-circle fa-4x" style="color: #c62828; margin-bottom: 20px;"></i>
+                    <h2 style="font-family: 'Amiri', serif; margin-bottom: 10px;">عذراً، الوجهة غير موجودة</h2>
+                    <p style="margin-bottom: 20px;">لم نتمكن من العثور على تفاصيل هذه الوجهة.</p>
+                    <a href="places.html" class="card-btn" style="text-decoration: none; display: inline-block; width: auto;">العودة للوجهات</a>
+                </div>
+            `;
+        }
+    }
 });
 
 // إيقاف السلايدر عند مغادرة الصفحة
@@ -772,29 +837,52 @@ const hotelReviews = {
     ]
 };
 
-// عرض التعليقات
-function displayReviews() {
+// عرض التعليقات (يجلب من backend + المحلية)
+async function displayReviews() {
     const urlParams = new URLSearchParams(window.location.search);
     const hotelParam = urlParams.get('hotel') || 'shebara';
-    const reviews = hotelReviews[hotelParam] || hotelReviews.shebara;
-    
+    let reviews = hotelReviews[hotelParam] || hotelReviews.shebara || [];
+
+    // محاولة جلب مراجعات من الـ backend
+    try {
+        const backendReviews = await ReviewsAPI.getAll();
+        if (Array.isArray(backendReviews) && backendReviews.length > 0) {
+            // تحويل مراجعات backend لصيغة العرض
+            const apiReviews = backendReviews
+                .filter(r => r.place_id === hotelParam) // حسب المكان
+                .map(r => ({
+                    name: r.user_id ? r.user_id.substring(0, 8) : 'مستخدم',
+                    rating: r.rating,
+                    date: r.created_at ? r.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
+                    comment: r.comment || '',
+                    fromBackend: true
+                }));
+            // دمج مراجعات backend مع المحلية (backend أولاً)
+            reviews = [...apiReviews, ...reviews];
+        }
+    } catch (err) {
+        console.warn('تعذر جلب المراجعات من الـ backend:', err);
+    }
+
     const reviewsList = document.getElementById('reviewsList');
     if (!reviewsList) return;
-    
+
     // حساب متوسط التقييم
-    const avgRating = (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1);
+    const avgRating = reviews.length > 0
+        ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+        : '0';
     const avgRatingElement = document.getElementById('averageRating');
     const reviewsCountElement = document.getElementById('reviewsCount');
-    
+
     if (avgRatingElement) avgRatingElement.textContent = avgRating;
     if (reviewsCountElement) reviewsCountElement.textContent = `${reviews.length} تقييمات`;
-    
+
     // عرض التعليقات
     let reviewsHTML = '';
     reviews.forEach(review => {
         const initials = review.name.split(' ').map(n => n[0]).join('');
         const starsHTML = Array(review.rating).fill('<i class="fas fa-star"></i>').join('');
-        
+
         reviewsHTML += `
             <div class="review-card">
                 <div class="review-header">
@@ -813,7 +901,7 @@ function displayReviews() {
             </div>
         `;
     });
-    
+
     reviewsList.innerHTML = reviewsHTML;
 }
 
@@ -823,7 +911,7 @@ let selectedRatingValue = 0;
 function setRating(rating) {
     selectedRatingValue = rating;
     document.getElementById('selectedRating').value = rating;
-    
+
     const stars = document.querySelectorAll('.star-rating i');
     stars.forEach((star, index) => {
         if (index < rating) {
@@ -837,67 +925,85 @@ function setRating(rating) {
 }
 
 // إرسال تعليق جديد
-function submitReview(event) {
+async function submitReview(event) {
     event.preventDefault();
-    
+
     // التحقق من تسجيل الدخول
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    if (!isLoggedIn) {
+    const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (!loggedIn) {
         alert('⚠️ أنت لست مسجلاً!\n\nيجب عليك تسجيل الدخول أولاً لإضافة تعليق.\n\nسيتم تحويلك إلى صفحة تسجيل الدخول...');
         setTimeout(() => {
             window.location.href = 'login.html';
         }, 500);
         return;
     }
-    
+
     // الحصول على معلومات المستخدم
     const userFirstName = localStorage.getItem('userFirstName') || '';
     const userLastName = localStorage.getItem('userLastName') || '';
     const userName = `${userFirstName} ${userLastName}`.trim() || 'مستخدم';
-    
+    const userId = localStorage.getItem('userId') || '';
+
     const rating = parseInt(document.getElementById('selectedRating').value);
     const comment = document.getElementById('reviewText').value.trim();
-    
+
     if (rating === 0) {
         alert('الرجاء اختيار التقييم');
         return;
     }
-    
+
     if (!comment) {
         alert('الرجاء كتابة تعليقك');
         return;
     }
-    
-    // إضافة التعليق الجديد
+
     const urlParams = new URLSearchParams(window.location.search);
     const hotelParam = urlParams.get('hotel') || 'shebara';
-    
+
+    // محاولة إرسال المراجعة للـ backend
+    let savedToBackend = false;
+    if (userId && hotelParam.includes('-')) {
+        // إذا كان place_id حقيقي (UUID) أرسله للـ backend
+        try {
+            await ReviewsAPI.create({
+                place_id: hotelParam,
+                user_id: userId,
+                rating: rating,
+                comment: comment
+            });
+            savedToBackend = true;
+        } catch (err) {
+            console.warn('تعذر حفظ المراجعة في الـ backend:', err);
+        }
+    }
+
+    // حفظ محلياً أيضاً (للعرض الفوري)
     const newReview = {
         name: userName,
         rating: rating,
         date: new Date().toISOString().split('T')[0],
         comment: comment
     };
-    
-    // إضافة التعليق في بداية القائمة
+
     if (!hotelReviews[hotelParam]) {
         hotelReviews[hotelParam] = [];
     }
     hotelReviews[hotelParam].unshift(newReview);
-    
-    // حفظ التعليقات في localStorage
     localStorage.setItem('hotelReviews', JSON.stringify(hotelReviews));
-    
+
     // إعادة عرض التعليقات
-    displayReviews();
-    
+    await displayReviews();
+
     // إعادة تعيين النموذج
     document.getElementById('reviewForm').reset();
     setRating(0);
-    
+
     // رسالة نجاح
-    alert('تم إضافة تعليقك بنجاح! شكراً لمشاركتك');
-    
+    const msg = savedToBackend
+        ? 'تم إضافة تعليقك بنجاح وحفظه في قاعدة البيانات! شكراً لمشاركتك'
+        : 'تم إضافة تعليقك بنجاح! شكراً لمشاركتك';
+    alert(msg);
+
     // التمرير إلى التعليقات
     document.getElementById('reviewsList').scrollIntoView({ behavior: 'smooth' });
 }

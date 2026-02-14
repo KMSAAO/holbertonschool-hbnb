@@ -275,31 +275,86 @@ const hotelsData = {
 };
 
 // الحصول على الفندق الحالي من URL
-function getCurrentHotel() {
+let currentHotel = {};
+
+// الحصول على الفندق الحالي من URL (يدعم API)
+async function fetchCurrentHotel() {
     const urlParams = new URLSearchParams(window.location.search);
     const hotelParam = urlParams.get('hotel');
-    
-    // التحقق من الفنادق المضافة من المستخدمين أولاً
+
+    // 1. التحقق من الفنادق المضافة من المستخدمين أولاً (localStorage)
     if (hotelParam && hotelParam.startsWith('hotel_')) {
         const userHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
         const userHotel = userHotels.find(h => h.id === hotelParam);
         if (userHotel) {
-            // تحويل بيانات الفندق المضافة من المستخدم إلى تنسيق reservation.js
             return {
                 name: userHotel.nameEn || userHotel.name,
                 nameAr: userHotel.name,
                 location: userHotel.location,
                 rating: 5,
-                rooms: userHotel.rooms
+                rooms: userHotel.rooms || []
             };
         }
     }
-    
-    return hotelsData[hotelParam] || hotelsData.shebara; // default to Shebara
+
+    // 2. التحقق من الفنادق الأساسية (hardcoded)
+    if (hotelsData[hotelParam]) {
+        return hotelsData[hotelParam];
+    }
+
+    // 3. التحقق من الـ backend API (للأماكن الجديدة)
+    if (hotelParam && hotelParam.length > 20 && typeof PlacesAPI !== 'undefined') {
+        try {
+            console.log('جلب بيانات الفندق من API:', hotelParam);
+            const place = await PlacesAPI.getById(hotelParam);
+            if (place) {
+                // إنشاء غرفة افتراضية بناءً على السعر
+                const defaultRoom = {
+                    id: 'standard-room-' + place.id,
+                    name: 'غرفة قياسية',
+                    price: place.price || 500,
+                    features: ['سرير مزدوج', 'إطلالة', 'تكييف', 'واي فاي مجاني', 'يستوعب 2'],
+                    size: 35,
+                    image: 'images/default-hotel.jpg'
+                };
+
+                return {
+                    name: place.title || 'فندق غير معروف',
+                    nameAr: place.title || 'فندق غير معروف',
+                    location: `${place.latitude || '0'}, ${place.longitude || '0'}`,
+                    rating: 5,
+                    rooms: [defaultRoom]
+                };
+            }
+        } catch (err) {
+            console.error('فشل جلب الفندق من API:', err);
+        }
+    }
+
+    return null; // لا يوجد fallback لـ Shebara
 }
 
 // تحميل بيانات الفندق عند تحميل الصفحة
-let currentHotel = getCurrentHotel();
+document.addEventListener('DOMContentLoaded', async () => {
+    const hotel = await fetchCurrentHotel();
+
+    if (hotel) {
+        currentHotel = hotel;
+        updateHotelInfo();
+        calculateAll(); // تحديث الحسابات الأولية
+    } else {
+        // عرض رسالة خطأ
+        const container = document.querySelector('.booking-container') || document.body;
+        container.innerHTML = `
+            <div style="text-align: center; padding: 100px 20px;">
+                <i class="fas fa-exclamation-circle fa-4x" style="color: #c62828; margin-bottom: 20px;"></i>
+                <h1 style="font-family: 'Amiri', serif;">عذراً، الوجهة غير موجودة</h1>
+                <p>لم نتمكن من العثور على تفاصيل الحجز لهذه الوجهة.</p>
+                <a href="places.html" class="status-active" style="display: inline-block; margin-top: 20px; text-decoration: none; font-size: 1.2rem;">العودة للوجهات</a>
+            </div>
+        `;
+    }
+});
 
 // حساب تفاصيل الحجز
 
@@ -313,7 +368,7 @@ function updateRoomQuantity(btn, change) {
     const currentValue = parseInt(input.value);
     const newValue = Math.max(0, Math.min(10, currentValue + change));
     input.value = newValue;
-    
+
     // تحديث حالة الغرفة
     const roomOption = btn.closest('.room-option');
     if (newValue > 0) {
@@ -321,7 +376,7 @@ function updateRoomQuantity(btn, change) {
     } else {
         roomOption.classList.remove('selected');
     }
-    
+
     calculateAll();
 }
 
@@ -333,7 +388,7 @@ function updateGuests(type, change) {
     const max = type === 'adults' ? 20 : 10;
     const newValue = Math.max(min, Math.min(max, currentValue + change));
     input.value = newValue;
-    
+
     // تحديث الملخص
     document.getElementById(type === 'adults' ? 'summaryAdults' : 'summaryChildren').textContent = newValue;
 }
@@ -342,13 +397,13 @@ function updateGuests(type, change) {
 function calculateNights() {
     const checkIn = document.getElementById('checkInDate').value;
     const checkOut = document.getElementById('checkOutDate').value;
-    
+
     if (checkIn && checkOut) {
         const date1 = new Date(checkIn);
         const date2 = new Date(checkOut);
         const diffTime = date2 - date1;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
+
         if (diffDays > 0) {
             return diffDays;
         }
@@ -361,11 +416,11 @@ function updateDateDisplay() {
     const checkIn = document.getElementById('checkInDate').value;
     const checkOut = document.getElementById('checkOutDate').value;
     const nights = calculateNights();
-    
+
     // تحديث عدد الليالي
     document.getElementById('nightsCount').textContent = nights;
     document.getElementById('summaryNights').textContent = nights;
-    
+
     // تحديث التواريخ في الملخص
     if (checkIn) {
         const date = new Date(checkIn);
@@ -376,7 +431,7 @@ function updateDateDisplay() {
     } else {
         document.getElementById('summaryCheckIn').textContent = '-';
     }
-    
+
     if (checkOut) {
         const date = new Date(checkOut);
         const day = date.getDate();
@@ -391,12 +446,12 @@ function updateDateDisplay() {
 // حساب المجموع الكلي
 function calculateAll() {
     updateDateDisplay();
-    
+
     const nights = calculateNights();
     let subtotal = 0;
     const selectedRoomsList = document.getElementById('selectedRoomsList');
     selectedRoomsList.innerHTML = '';
-    
+
     // حساب كل غرفة محددة
     const roomOptions = document.querySelectorAll('.room-option');
     roomOptions.forEach(room => {
@@ -406,7 +461,7 @@ function calculateAll() {
             const roomName = room.getAttribute('data-name');
             const roomTotal = price * nights * qty;
             subtotal += roomTotal;
-            
+
             // إضافة للقائمة
             const roomItem = document.createElement('div');
             roomItem.className = 'summary-item';
@@ -417,11 +472,11 @@ function calculateAll() {
             selectedRoomsList.appendChild(roomItem);
         }
     });
-    
+
     // حساب الضرائب (20.75%)
     const tax = Math.round(subtotal * 0.2075);
     const total = subtotal + tax;
-    
+
     // تحديث الملخص
     document.getElementById('summarySubtotal').textContent = subtotal.toLocaleString('en-US') + ' ر.س';
     document.getElementById('summaryTax').textContent = tax.toLocaleString('en-US') + ' ر.س';
@@ -440,18 +495,18 @@ function completeBooking() {
         }, 1500);
         return;
     }
-    
+
     // التحقق من التواريخ
     const checkIn = document.getElementById('checkInDate').value;
     const checkOut = document.getElementById('checkOutDate').value;
-    
+
     if (!checkIn || !checkOut) {
         if (typeof showNotification === 'function') {
             showNotification('الرجاء اختيار تواريخ الإقامة', 'error');
         }
         return;
     }
-    
+
     const nights = calculateNights();
     if (nights <= 0) {
         if (typeof showNotification === 'function') {
@@ -459,7 +514,7 @@ function completeBooking() {
         }
         return;
     }
-    
+
     // التحقق من اختيار غرفة
     let hasRooms = false;
     const roomOptions = document.querySelectorAll('.room-option');
@@ -469,14 +524,14 @@ function completeBooking() {
             hasRooms = true;
         }
     });
-    
+
     if (!hasRooms) {
         if (typeof showNotification === 'function') {
             showNotification('الرجاء اختيار غرفة واحدة على الأقل', 'error');
         }
         return;
     }
-    
+
     // جمع بيانات الحجز
     const bookingData = {
         hotelName: currentHotel.name,
@@ -491,7 +546,7 @@ function completeBooking() {
         tax: 0,
         total: 0
     };
-    
+
     // جمع بيانات الغرف
     roomOptions.forEach(room => {
         const qty = parseInt(room.querySelector('.qty-input').value);
@@ -499,22 +554,22 @@ function completeBooking() {
             const price = parseInt(room.dataset.price);
             const name = room.dataset.name;
             const roomTotal = price * nights * qty;
-            
+
             bookingData.rooms.push({
                 name: name,
                 quantity: qty,
                 pricePerNight: price,
                 total: roomTotal
             });
-            
+
             bookingData.subtotal += roomTotal;
         }
     });
-    
+
     // حساب الضرائب والمجموع
     bookingData.tax = Math.round(bookingData.subtotal * 0.2075);
     bookingData.total = bookingData.subtotal + bookingData.tax;
-    
+
     // حفظ البيانات في localStorage
     try {
         localStorage.setItem('currentBooking', JSON.stringify(bookingData));
@@ -524,12 +579,12 @@ function completeBooking() {
         alert('حدث خطأ في حفظ بيانات الحجز');
         return;
     }
-    
+
     // إخفاء قسم الحجز وإظهار قسم الدفع
     document.getElementById('bookingSection').style.display = 'none';
     document.getElementById('paymentSection').style.display = 'block';
     window.scrollTo(0, 0);
-    
+
     // ملء ملخص الطلب في قسم الدفع
     populatePaymentSummary(bookingData);
 }
@@ -541,7 +596,7 @@ function updateHotelInfo() {
     if (hotelNameElement) {
         hotelNameElement.textContent = currentHotel.name;
     }
-    
+
     // تحديث الموقع
     const hotelLocationElement = document.querySelector('.hotel-location');
     if (hotelLocationElement) {
@@ -550,17 +605,17 @@ function updateHotelInfo() {
             ${currentHotel.location}
         `;
     }
-    
+
     // تحديث النجوم
     const hotelRatingElement = document.querySelector('.hotel-rating span');
     if (hotelRatingElement) {
         hotelRatingElement.textContent = `منتجع ${currentHotel.rating} نجوم`;
     }
-    
+
     // تحديث خيارات الغرف
     const roomOptionsContainer = document.querySelector('.booking-form-section');
     const roomsSection = roomOptionsContainer.querySelector('.booking-section-card:nth-child(3)');
-    
+
     if (roomsSection) {
         let roomsHTML = `
             <h2 class="section-title">
@@ -568,7 +623,7 @@ function updateHotelInfo() {
                 اختر نوع الغرفة
             </h2>
         `;
-        
+
         currentHotel.rooms.forEach(room => {
             roomsHTML += `
                 <div class="room-option" data-price="${room.price}" data-name="${room.name}">
@@ -595,7 +650,7 @@ function updateHotelInfo() {
                 </div>
             `;
         });
-        
+
         roomsSection.innerHTML = roomsHTML;
     }
 }
@@ -604,26 +659,26 @@ function updateHotelInfo() {
 document.addEventListener('DOMContentLoaded', () => {
     // تحديث معلومات الفندق في الصفحة
     updateHotelInfo();
-    
+
     // تحديث اسم الفندق في الملخص
     const summaryHotelName = document.querySelector('.summary-card .summary-value');
     if (summaryHotelName) {
         summaryHotelName.textContent = currentHotel.name;
     }
-    
+
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('checkInDate').setAttribute('min', today);
     document.getElementById('checkOutDate').setAttribute('min', today);
-    
+
     // تعيين تاريخ افتراضي (غداً لمدة 3 أيام)
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     document.getElementById('checkInDate').value = tomorrow.toISOString().split('T')[0];
-    
+
     const checkout = new Date();
     checkout.setDate(checkout.getDate() + 4);
     document.getElementById('checkOutDate').value = checkout.toISOString().split('T')[0];
-    
+
     calculateAll();
 });
 
@@ -634,11 +689,11 @@ function populatePaymentSummary(bookingData) {
         console.error('لم يتم العثور على عنصر paymentSummary');
         return;
     }
-    
+
     console.log('ملء ملخص الطلب:', bookingData);
-    
+
     let html = '';
-    
+
     // الفندق والتواريخ
     html += `
         <div class="summary-row">
@@ -658,7 +713,7 @@ function populatePaymentSummary(bookingData) {
             <span>${bookingData.nights}</span>
         </div>
     `;
-    
+
     // الغرف
     bookingData.rooms.forEach(room => {
         const roomQty = room.quantity || room.count || 1;
@@ -670,7 +725,7 @@ function populatePaymentSummary(bookingData) {
             </div>
         `;
     });
-    
+
     // المجموع الفرعي والضريبة والمجموع الكلي
     html += `
         <div class="summary-row">
@@ -686,15 +741,15 @@ function populatePaymentSummary(bookingData) {
             <span>${bookingData.total.toLocaleString('en-US')} ريال</span>
         </div>
     `;
-    
+
     summaryDiv.innerHTML = html;
-    
+
     // تحديث زر الدفع بالمبلغ
     const payBtn = document.getElementById('payBtnAmount');
     if (payBtn) {
         payBtn.textContent = `${bookingData.total.toLocaleString('en-US')} ريال`;
     }
-    
+
     console.log('تم ملء ملخص الطلب بنجاح');
 }
 
@@ -706,93 +761,100 @@ function backToBooking() {
 }
 
 // معالجة الدفع
-function processPayment(event) {
+async function processPayment(event) {
     event.preventDefault();
-    
+
     // التحقق من تسجيل الدخول
     if (!isLoggedIn()) {
         alert('يجب تسجيل الدخول أولاً');
         window.location.href = 'login.html';
         return;
     }
-    
+
     // التحقق من طريقة الدفع المختارة
     const selectedMethod = document.querySelector('.payment-method.active');
     const isApplePay = selectedMethod && selectedMethod.querySelector('span').textContent === 'Apple Pay';
-    
+
     let paymentMethod = 'بطاقة ائتمان';
     let cardLastFour = '';
-    
+
     if (isApplePay) {
-        // محاكاة Apple Pay
         paymentMethod = 'Apple Pay';
-        cardLastFour = '****'; // Apple Pay لا يعرض أرقام البطاقة
-        
-        // عرض رسالة تحميل
+        cardLastFour = '****';
         alert('جاري معالجة الدفع عبر Apple Pay...');
     } else {
-        // التحقق من بيانات البطاقة
         const cardName = document.getElementById('cardName').value.trim();
         const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
         const expiryDate = document.getElementById('expiryDate').value;
         const cvv = document.getElementById('cvv').value;
-        
-        // التحقق من البيانات
-        if (!cardName) {
-            alert('الرجاء إدخال اسم حامل البطاقة');
-            return;
-        }
-        
-        if (cardNumber.length !== 16 || !/^\d+$/.test(cardNumber)) {
-            alert('الرجاء إدخال رقم بطاقة صحيح (16 رقم)');
-            return;
-        }
-        
-        if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
-            alert('الرجاء إدخال تاريخ انتهاء صحيح (MM/YY)');
-            return;
-        }
-        
-        if (cvv.length !== 3 || !/^\d+$/.test(cvv)) {
-            alert('الرجاء إدخال رمز CVV صحيح (3 أرقام)');
-            return;
-        }
-        
+
+        if (!cardName) { alert('الرجاء إدخال اسم حامل البطاقة'); return; }
+        if (cardNumber.length !== 16 || !/^\d+$/.test(cardNumber)) { alert('الرجاء إدخال رقم بطاقة صحيح (16 رقم)'); return; }
+        if (!/^\d{2}\/\d{2}$/.test(expiryDate)) { alert('الرجاء إدخال تاريخ انتهاء صحيح (MM/YY)'); return; }
+        if (cvv.length !== 3 || !/^\d+$/.test(cvv)) { alert('الرجاء إدخال رمز CVV صحيح (3 أرقام)'); return; }
+
         cardLastFour = cardNumber.slice(-4);
-        
         if (selectedMethod && selectedMethod.querySelector('span').textContent === 'مدى') {
             paymentMethod = 'مدى';
         }
     }
-    
+
     // الحصول على بيانات الحجز
     const bookingData = JSON.parse(localStorage.getItem('currentBooking'));
     if (!bookingData) {
         alert('حدث خطأ في استرجاع بيانات الحجز');
         return;
     }
-    
+
     // إضافة معلومات الدفع
     bookingData.paymentMethod = paymentMethod;
     bookingData.cardLastFour = cardLastFour;
     bookingData.paymentDate = new Date().toISOString();
     bookingData.bookingId = 'BK' + Date.now();
-    bookingData.status = 'مؤكد';
-    
-    // حفظ الحجز في قائمة الحجوزات
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (currentUser) {
-        let userBookings = JSON.parse(localStorage.getItem(`bookings_${currentUser.email}`)) || [];
-        userBookings.push(bookingData);
-        localStorage.setItem(`bookings_${currentUser.email}`, JSON.stringify(userBookings));
+    bookingData.status = 'confirmed';
+
+    // حفظ في localStorage
+    let allBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+    allBookings.push({
+        bookingId: bookingData.bookingId,
+        hotelName: bookingData.hotelName,
+        roomName: bookingData.rooms?.[0]?.name || 'غرفة',
+        checkIn: bookingData.checkIn,
+        checkOut: bookingData.checkOut,
+        guests: (bookingData.adults || 1) + (bookingData.children || 0),
+        totalPrice: bookingData.total,
+        status: 'confirmed',
+        bookingDate: bookingData.paymentDate,
+        hotelImage: 'images/hotel1.jpg'
+    });
+    localStorage.setItem('bookings', JSON.stringify(allBookings));
+
+    // أيضاً حفظ في الـ backend
+    const userId = localStorage.getItem('userId');
+    const urlParams = new URLSearchParams(window.location.search);
+    const hotelParam = urlParams.get('hotel') || '';
+
+    if (userId && typeof BookingsAPI !== 'undefined') {
+        try {
+            await BookingsAPI.create({
+                guest_id: userId,
+                place_id: hotelParam,
+                check_in: bookingData.checkIn,
+                check_out: bookingData.checkOut,
+                status: 'confirmed'
+            });
+            console.log('تم حفظ الحجز في الـ backend');
+        } catch (err) {
+            console.warn('تعذر حفظ الحجز في الـ backend:', err);
+        }
     }
-    
+
     // حذف الحجز المؤقت
     localStorage.removeItem('currentBooking');
-    
+
     // عرض رسالة النجاح
     alert(`✓ تم تأكيد حجزك بنجاح!\nرقم الحجز: ${bookingData.bookingId}\n\nسيتم إرسال تفاصيل الحجز على بريدك الإلكتروني`);
-    
+
     // الانتقال للصفحة الرئيسية
     window.location.href = 'index.html';
 }
@@ -824,29 +886,29 @@ function selectPaymentMethod(method) {
         el.classList.remove('active');
     });
     event.target.closest('.payment-method').classList.add('active');
-    
+
     const cardFields = document.getElementById('cardFields');
     const applePayMessage = document.getElementById('applePayMessage');
     const payBtnText = document.getElementById('payBtnText');
     const payBtnIcon = document.getElementById('payBtnIcon');
     const cardInputs = cardFields.querySelectorAll('input');
-    
+
     if (method === 'applepay') {
         // إخفاء حقول البطاقة وإظهار رسالة Apple Pay
         cardFields.style.display = 'none';
         applePayMessage.style.display = 'block';
-        
+
         // تغيير نص الزر
         payBtnText.textContent = 'ادفع بـ Apple Pay';
         payBtnIcon.className = 'fab fa-apple-pay';
-        
+
         // إزالة required من حقول البطاقة
         cardInputs.forEach(input => input.removeAttribute('required'));
     } else {
         // إظهار حقول البطاقة وإخفاء رسالة Apple Pay
         cardFields.style.display = 'block';
         applePayMessage.style.display = 'none';
-        
+
         // إرجاع نص الزر
         if (method === 'mada') {
             payBtnText.textContent = 'تأكيد الدفع بمدى';
@@ -855,7 +917,7 @@ function selectPaymentMethod(method) {
             payBtnText.textContent = 'تأكيد الدفع';
             payBtnIcon.className = 'fas fa-lock';
         }
-        
+
         // إضافة required لحقول البطاقة
         cardInputs.forEach(input => input.setAttribute('required', 'required'));
     }

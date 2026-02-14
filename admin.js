@@ -117,18 +117,18 @@ function removeRoom(btn) {
 document.addEventListener('DOMContentLoaded', () => {
     const imageInput = document.getElementById('hotelImages');
     const previewContainer = document.getElementById('imagesPreview');
-    
+
     if (imageInput) {
         imageInput.addEventListener('change', (e) => {
             previewContainer.innerHTML = '';
             const files = Array.from(e.target.files);
-            
+
             if (files.length > 5) {
                 alert('يمكنك رفع 5 صور كحد أقصى');
                 imageInput.value = '';
                 return;
             }
-            
+
             files.forEach((file, index) => {
                 const reader = new FileReader();
                 reader.onload = (event) => {
@@ -158,11 +158,11 @@ function removeImage(btn, index) {
 // حفظ بيانات الفندق في localStorage
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('addHotelForm');
-    
+
     if (form) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             // جمع البيانات
             const hotelData = {
                 id: 'hotel_' + Date.now(),
@@ -177,13 +177,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 amenities: [],
                 rooms: []
             };
-            
+
             // جمع أقسام الوصف
             document.querySelectorAll('.about-item').forEach(item => {
                 const title = item.querySelector('.about-title').value;
                 const content = item.querySelector('.about-content').value;
                 const icon = item.querySelector('.about-icon').value || 'fas fa-info-circle';
-                
+
                 if (title && content) {
                     hotelData.about.push({
                         title: title,
@@ -192,12 +192,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             });
-            
+
             // جمع المرافق
             document.querySelectorAll('.amenity-item').forEach(item => {
                 const icon = item.querySelector('.amenity-icon').value;
                 const text = item.querySelector('.amenity-text').value;
-                
+
                 if (icon && text) {
                     hotelData.amenities.push({
                         icon: icon,
@@ -205,14 +205,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 }
             });
-            
+
             // جمع الغرف
             document.querySelectorAll('.room-item').forEach((item, index) => {
                 const name = item.querySelector('.room-name').value;
                 const price = parseInt(item.querySelector('.room-price').value);
                 const size = parseInt(item.querySelector('.room-size').value);
                 const features = item.querySelector('.room-features').value.split(',').map(f => f.trim());
-                
+
                 if (name && price && size) {
                     hotelData.rooms.push({
                         id: 'room_' + index,
@@ -221,44 +221,90 @@ document.addEventListener('DOMContentLoaded', () => {
                         size: size,
                         features: features
                     });
-                    
+
                     // تحديث أقل سعر
                     if (index === 0 || price < hotelData.startPrice) {
                         hotelData.startPrice = price;
                     }
                 }
             });
-            
+
             // معالجة الصور
             const imageFiles = document.getElementById('hotelImages').files;
             if (imageFiles.length === 0) {
                 alert('يرجى رفع صور الفندق');
                 return;
             }
-            
-            if (imageFiles.length < 5) {
-                alert('يرجى رفع 5 صور للفندق');
+
+            if (imageFiles.length === 0) {
+                alert('يرجى رفع صورة واحدة على الأقل');
                 return;
             }
-            
+
+            if (imageFiles.length > 5) {
+                alert('يمكنك رفع 5 صور كحد أقصى');
+                return;
+            }
+
             // حفظ أسماء الصور (في التطبيق الحقيقي سيتم رفعها للسيرفر)
             for (let i = 0; i < imageFiles.length; i++) {
                 hotelData.images.push(`images/${hotelData.id}_${i + 1}.jpg`);
             }
-            
+
             // حفظ البيانات في localStorage
             let userHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
             userHotels.push(hotelData);
             localStorage.setItem('userHotels', JSON.stringify(userHotels));
-            
-            // عرض رسالة نجاح
-            alert('تم إضافة الفندق بنجاح! سيظهر في صفحة الوجهات.');
-            
-            // إعادة تحميل الصفحة
-            window.location.reload();
+
+            // أيضاً حفظ في الـ backend
+            const userId = localStorage.getItem('userId');
+
+            if (userId && typeof PlacesAPI !== 'undefined') {
+                try {
+                    const apiPlace = await PlacesAPI.create({
+                        title: hotelData.name || hotelData.nameEn,
+                        description: hotelData.about?.[0]?.text || hotelData.tagline || '',
+                        price: hotelData.startPrice || 0,
+                        user_id: userId,
+                        latitude: 0,
+                        longitude: 0,
+                        status: 'available' // تصحيح الحالة لتطابق الـ enum في backend
+                    });
+
+                    console.log('تم حفظ المكان في الـ backend:', apiPlace);
+
+                    // تحديث الـ ID في localStorage ليطابق الـ backend
+                    if (apiPlace && apiPlace.id) {
+                        let currentHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
+                        // تحديث آخر فندق تمت إضافته
+                        if (currentHotels.length > 0) {
+                            currentHotels[currentHotels.length - 1].id = apiPlace.id;
+                            localStorage.setItem('userHotels', JSON.stringify(currentHotels));
+                        }
+                    }
+
+                    // عرض رسالة نجاح فقط إذا نجح الحفظ في الـ API
+                    alert('تم إضافة الفندق بنجاح! سيظهر في صفحة الوجهات.');
+                    window.location.reload();
+
+                } catch (err) {
+                    console.error('تعذر حفظ المكان في الـ backend:', err);
+
+                    // حذف الفندق من localStorage لأنه فشل في الـ API
+                    let currentHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
+                    currentHotels.pop();
+                    localStorage.setItem('userHotels', JSON.stringify(currentHotels));
+
+                    alert('عذراً، حدث خطأ أثناء حفظ الفندق في الخادم. يرجى التأكد من البيانات والمحاولة مرة أخرى.\n\n' + err.message);
+                }
+            } else {
+                // في حال عدم وجود اتصال بالـ API (نادر الحدوث)
+                alert('تم إضافة الفندق محلياً فقط.');
+                window.location.reload();
+            }
         });
     }
-    
+
     // عرض الفنادق المضافة
     displayUserHotels();
 });
@@ -269,14 +315,14 @@ document.addEventListener('DOMContentLoaded', () => {
 function displayUserHotels() {
     const container = document.getElementById('userHotelsList');
     if (!container) return;
-    
+
     const userHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
-    
+
     if (userHotels.length === 0) {
         container.innerHTML = '<p class="empty-message">لم تقم بإضافة أي فنادق بعد</p>';
         return;
     }
-    
+
     container.innerHTML = '';
     userHotels.forEach((hotel, index) => {
         const card = document.createElement('div');

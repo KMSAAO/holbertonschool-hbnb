@@ -5,49 +5,84 @@
 
 // ==================== تحميل الحجوزات ====================
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // التحقق من تسجيل الدخول
     checkProtectedPage();
-    
+
     // تحميل الحجوزات
-    loadBookings();
+    await loadBookings();
 });
 
-// تحميل وعرض الحجوزات
-function loadBookings() {
+// تحميل وعرض الحجوزات (من backend + localStorage)
+async function loadBookings() {
     const bookingsList = document.getElementById('bookingsList');
     const emptyState = document.getElementById('emptyState');
-    
-    // جلب الحجوزات من localStorage
-    const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-    
+
+    // 1. جلب الحجوزات من localStorage
+    let bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+
+    // 2. جلب الحجوزات من الـ backend
+    const userId = localStorage.getItem('userId');
+    if (userId && typeof BookingsAPI !== 'undefined') {
+        try {
+            const backendBookings = await BookingsAPI.getByGuest(userId);
+            if (Array.isArray(backendBookings) && backendBookings.length > 0) {
+                const apiBookings = backendBookings.map(b => ({
+                    bookingId: b.id || '',
+                    hotelName: b.place_id || 'مكان',
+                    roomName: 'غرفة',
+                    checkIn: b.check_in || '',
+                    checkOut: b.check_out || '',
+                    guests: 2,
+                    totalPrice: 0,
+                    status: b.status || 'confirmed',
+                    bookingDate: b.created_at || new Date().toISOString(),
+                    fromBackend: true
+                }));
+                bookings = [...apiBookings, ...bookings];
+            }
+        } catch (err) {
+            console.warn('تعذر جلب الحجوزات من الـ backend:', err);
+        }
+    }
+
     // التحقق من وجود حجوزات
     if (bookings.length === 0) {
         bookingsList.style.display = 'none';
         emptyState.style.display = 'block';
         return;
     }
-    
+
     bookingsList.style.display = 'flex';
     emptyState.style.display = 'none';
-    
+
     // عرض الحجوزات
     displayBookings(bookings);
+}
+
+// عرض قائمة الحجوزات
+function displayBookings(bookings) {
+    const bookingsList = document.getElementById('bookingsList');
+    bookingsList.innerHTML = '';
+    bookings.forEach((booking, index) => {
+        const card = createBookingCard(booking, index);
+        bookingsList.appendChild(card);
+    });
 }
 
 // إنشاء بطاقة حجز
 function createBookingCard(booking, index) {
     const card = document.createElement('div');
     card.className = 'booking-card';
-    
+
     // تحديد الأيقونة والنص حسب الحالة
     const statusInfo = getStatusInfo(booking.status || 'confirmed');
-    
+
     // حساب عدد الليالي
     const checkIn = new Date(booking.checkIn);
     const checkOut = new Date(booking.checkOut);
     const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-    
+
     card.innerHTML = `
         <img src="${booking.hotelImage || 'images/hotel1.jpg'}" alt="${booking.hotelName}" class="booking-image">
         
@@ -97,7 +132,7 @@ function createBookingCard(booking, index) {
             ` : ''}
         </div>
     `;
-    
+
     return card;
 }
 
@@ -117,7 +152,7 @@ function getStatusInfo(status) {
             text: 'ملغي'
         }
     };
-    
+
     return statusMap[status] || statusMap['confirmed'];
 }
 
@@ -133,9 +168,9 @@ function formatDate(dateString) {
 function viewBookingDetails(index) {
     const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
     const booking = bookings[index];
-    
+
     if (!booking) return;
-    
+
     // عرض نافذة منبثقة بالتفاصيل
     const modal = document.createElement('div');
     modal.className = 'booking-modal';
@@ -152,7 +187,7 @@ function viewBookingDetails(index) {
         z-index: 10000;
         padding: 20px;
     `;
-    
+
     const modalContent = document.createElement('div');
     modalContent.style.cssText = `
         background: white;
@@ -164,7 +199,7 @@ function viewBookingDetails(index) {
         overflow-y: auto;
         font-family: 'Amiri', serif;
     `;
-    
+
     modalContent.innerHTML = `
         <h2 style="color: #815B2F; margin-bottom: 20px; font-size: 2rem;">تفاصيل الحجز</h2>
         <div style="line-height: 2;">
@@ -190,10 +225,10 @@ function viewBookingDetails(index) {
             font-family: 'Amiri', serif;
         ">إغلاق</button>
     `;
-    
+
     modal.appendChild(modalContent);
     document.body.appendChild(modal);
-    
+
     // إغلاق عند النقر خارج المحتوى
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
@@ -208,16 +243,16 @@ function cancelBooking(index) {
     if (!confirm('هل أنت متأكد من إلغاء هذا الحجز؟')) {
         return;
     }
-    
+
     const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-    
+
     if (bookings[index]) {
         bookings[index].status = 'cancelled';
         localStorage.setItem('bookings', JSON.stringify(bookings));
-        
+
         // إعادة تحميل الصفحة
         loadBookings();
-        
+
         alert('تم إلغاء الحجز بنجاح');
     }
 }

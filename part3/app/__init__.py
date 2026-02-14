@@ -35,6 +35,10 @@ def create_app(config_class="config.DevelopmentConfig"):
     jwt.init_app(app)
     db.init_app(app)
 
+    # إنشاء الجداول تلقائياً عند بدء التشغيل
+    with app.app_context():
+        db.create_all()
+
     # إعدادات الـ API والتوثيق (Swagger)
     api = Api(
         app,

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <!-- شريط التنقل -->
     <nav class="navbar">
@@ -186,7 +188,8 @@
                             </div>
                             <div class="quantity-controls">
                                 <button class="qty-btn" onclick="updateGuests('adults', -1)">-</button>
-                                <input type="number" id="adultsCount" class="qty-input" value="1" min="1" max="20" readonly>
+                                <input type="number" id="adultsCount" class="qty-input" value="1" min="1" max="20"
+                                    readonly>
                                 <button class="qty-btn" onclick="updateGuests('adults', 1)">+</button>
                             </div>
                         </div>
@@ -197,7 +200,8 @@
                             </div>
                             <div class="quantity-controls">
                                 <button class="qty-btn" onclick="updateGuests('children', -1)">-</button>
-                                <input type="number" id="childrenCount" class="qty-input" value="0" min="0" max="10" readonly>
+                                <input type="number" id="childrenCount" class="qty-input" value="0" min="0" max="10"
+                                    readonly>
                                 <button class="qty-btn" onclick="updateGuests('children', 1)">+</button>
                             </div>
                         </div>
@@ -209,7 +213,7 @@
             <div class="booking-summary-section">
                 <div class="summary-card">
                     <h2 class="summary-title">ملخص الحجز</h2>
-                    
+
                     <div class="summary-item">
                         <span class="summary-label">الفندق</span>
                         <span class="summary-value">Shebara Resort</span>
@@ -300,7 +304,7 @@
                 <!-- نموذج الدفع -->
                 <div class="payment-form-card">
                     <h3>طريقة الدفع</h3>
-                    
+
                     <div class="payment-methods">
                         <button type="button" class="payment-method active" onclick="selectPaymentMethod('card')">
                             <i class="fas fa-credit-card"></i>
@@ -326,17 +330,20 @@
 
                             <div class="form-group">
                                 <label>رقم البطاقة</label>
-                                <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCardNumber(this)">
+                                <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19"
+                                    oninput="formatCardNumber(this)">
                             </div>
 
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>تاريخ الانتهاء</label>
-                                    <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5" oninput="formatExpiryDate(this)">
+                                    <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5"
+                                        oninput="formatExpiryDate(this)">
                                 </div>
                                 <div class="form-group">
                                     <label>CVV</label>
-                                    <input type="text" id="cvv" placeholder="123" maxlength="3" oninput="validateCVV(this)">
+                                    <input type="text" id="cvv" placeholder="123" maxlength="3"
+                                        oninput="validateCVV(this)">
                                 </div>
                             </div>
                         </div>
@@ -345,7 +352,8 @@
                         <div id="applePayMessage" style="display: none;">
                             <div class="apple-pay-container">
                                 <i class="fab fa-apple-pay" style="font-size: 4rem; color: #000;"></i>
-                                <p style="font-size: 1.2rem; color: #815B2F; margin: 1rem 0;">جاهز للدفع عبر Apple Pay</p>
+                                <p style="font-size: 1.2rem; color: #815B2F; margin: 1rem 0;">جاهز للدفع عبر Apple Pay
+                                </p>
                                 <p style="color: #666;">سيتم فتح نافذة Apple Pay عند الضغط على زر الدفع</p>
                             </div>
                         </div>
@@ -415,7 +423,9 @@
         </div>
     </footer>
 
+    <script src="api-config.js"></script>
     <script src="auth.js"></script>
     <script src="reservation.js"></script>
 </body>
+
 </html>
