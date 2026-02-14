@@ -4,6 +4,50 @@
  * الوظائف: إضافة/حذف أقسام النموذج، حفظ البيانات في localStorage، عرض الفنادق المضافة
  */
 
+let currentEditId = null; // متغير لتتبع حالة التعديل
+const DEFAULT_FORM_TITLE = 'إضافة فندق جديد';
+const EDIT_FORM_TITLE = 'تعديل الفندق';
+const DEFAULT_SUBMIT_HTML = '<i class="fas fa-save"></i> حفظ الفندق';
+const EDIT_SUBMIT_HTML = '<i class="fas fa-save"></i> تحديث الفندق';
+
+function clearEditMode() {
+    currentEditId = null;
+
+    const submitBtn = document.querySelector('#addHotelForm button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.innerHTML = DEFAULT_SUBMIT_HTML;
+    }
+
+    const formTitle = document.querySelector('.admin-form-container .form-title');
+    if (formTitle) {
+        formTitle.textContent = DEFAULT_FORM_TITLE;
+    }
+
+    const imageInput = document.getElementById('hotelImages');
+    if (imageInput) {
+        imageInput.required = true;
+    }
+}
+
+function setEditMode(placeId) {
+    currentEditId = placeId;
+
+    const submitBtn = document.querySelector('#addHotelForm button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.innerHTML = EDIT_SUBMIT_HTML;
+    }
+
+    const formTitle = document.querySelector('.admin-form-container .form-title');
+    if (formTitle) {
+        formTitle.textContent = EDIT_FORM_TITLE;
+    }
+
+    const imageInput = document.getElementById('hotelImages');
+    if (imageInput) {
+        imageInput.required = false;
+    }
+}
+
 // ==================== إدارة أقسام الوصف ====================
 
 // إضافة قسم وصف جديد
@@ -260,9 +304,14 @@ function removeImage(btn, index) {
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('addHotelForm');
 
+    clearEditMode();
+
     if (form) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            // التحقق من وضع التعديل مقابل الإضافة
+            const isEditMode = !!currentEditId;
 
             // جمع البيانات
             const hotelData = {
@@ -336,12 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // معالجة الصور
             const imageFiles = document.getElementById('hotelImages').files;
-            if (imageFiles.length === 0) {
-                alert('يرجى رفع صور الفندق');
-                return;
-            }
-
-            if (imageFiles.length === 0) {
+            if (!isEditMode && imageFiles.length === 0) {
                 alert('يرجى رفع صورة واحدة على الأقل');
                 return;
             }
@@ -351,33 +395,62 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // حفظ أسماء الصور مؤقتاً (سيتم تحديثها بعد الرفع الفعلي)
-            hotelData.images = [];
+            const previousHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
+            const nextHotels = JSON.parse(JSON.stringify(previousHotels));
 
-            // حفظ البيانات في localStorage
-            let userHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
-            userHotels.push(hotelData);
-            localStorage.setItem('userHotels', JSON.stringify(userHotels));
+            let targetIndex = -1;
+            if (isEditMode) {
+                targetIndex = nextHotels.findIndex(h => h.id === currentEditId);
+                if (targetIndex === -1) {
+                    alert('تعذر العثور على الفندق المراد تعديله. يرجى تحديث الصفحة والمحاولة مرة أخرى.');
+                    clearEditMode();
+                    return;
+                }
 
-            // أيضاً حفظ في الـ backend
+                // الاحتفاظ بالـ ID والصور الحالية حتى يتم رفع صور جديدة بنجاح.
+                hotelData.id = currentEditId;
+                hotelData.images = previousHotels[targetIndex]?.images || [];
+                nextHotels[targetIndex] = hotelData;
+            } else {
+                hotelData.images = [];
+                nextHotels.push(hotelData);
+                targetIndex = nextHotels.length - 1;
+            }
+
+            // أيضاً حفظ/تحديث في الـ backend
             const userId = localStorage.getItem('userId');
 
             if (userId && typeof PlacesAPI !== 'undefined') {
                 try {
-                    const apiPlace = await PlacesAPI.create({
-                        title: hotelData.name || hotelData.nameEn,
-                        description: hotelData.about?.[0]?.text || hotelData.tagline || '',
-                        price: parseFloat(hotelData.startPrice) || 0,
-                        amenities: hotelData.amenities, // Send amenities array ({icon, text})
-                        user_id: userId,
-                        latitude: hotelData.latitude,
-                        longitude: hotelData.longitude,
-                        status: 'available' // تصحيح الحالة لتطابق الـ enum في backend
-                    });
+                    let apiPlace;
 
-                    console.log('تم حفظ المكان في الـ backend:', apiPlace);
+                    if (isEditMode) {
+                        // تحديث
+                        apiPlace = await PlacesAPI.update(currentEditId, {
+                            title: hotelData.name || hotelData.nameEn,
+                            description: hotelData.about?.[0]?.text || hotelData.tagline || '',
+                            price: parseFloat(hotelData.startPrice) || 0,
+                            latitude: hotelData.latitude,
+                            longitude: hotelData.longitude,
+                            status: 'available'
+                        });
+                        console.log('تم تحديث المكان في الـ backend:', apiPlace);
+                    } else {
+                        // إنشاء
+                        apiPlace = await PlacesAPI.create({
+                            title: hotelData.name || hotelData.nameEn,
+                            description: hotelData.about?.[0]?.text || hotelData.tagline || '',
+                            price: parseFloat(hotelData.startPrice) || 0,
+                            amenities: hotelData.amenities,
+                            user_id: userId,
+                            latitude: hotelData.latitude,
+                            longitude: hotelData.longitude,
+                            status: 'available'
+                        });
+                        console.log('تم حفظ المكان في الـ backend:', apiPlace);
+                    }
 
-                    // رفع الصور إلى السيرفر
+                    // رفع الصور إلى السيرفر (إذا وجدت صور جديدة)
                     let uploadedImages = [];
                     if (apiPlace && apiPlace.id && imageFiles.length > 0) {
                         try {
@@ -386,40 +459,45 @@ document.addEventListener('DOMContentLoaded', () => {
                             console.log('تم رفع الصور بنجاح:', uploadedImages);
                         } catch (uploadErr) {
                             console.warn('تعذر رفع الصور:', uploadErr);
-                            // المكان تم حفظه بنجاح لكن الصور لم ترفع
                         }
                     }
 
-                    // تحديث الـ ID والصور في localStorage ليطابق الـ backend
-                    if (apiPlace && apiPlace.id) {
-                        let currentHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
-                        // تحديث آخر فندق تمت إضافته
-                        if (currentHotels.length > 0) {
-                            currentHotels[currentHotels.length - 1].id = apiPlace.id;
-                            currentHotels[currentHotels.length - 1].images = uploadedImages;
-                            localStorage.setItem('userHotels', JSON.stringify(currentHotels));
-                        }
+                    // مزامنة localStorage بعد نجاح العملية في الـ backend
+                    if (!isEditMode && apiPlace && apiPlace.id) {
+                        nextHotels[targetIndex].id = apiPlace.id;
                     }
 
-                    // عرض رسالة نجاح فقط إذا نجح الحفظ في الـ API
-                    alert('تم إضافة الفندق بنجاح! سيظهر في صفحة الوجهات.');
+                    if (uploadedImages.length > 0) {
+                        nextHotels[targetIndex].images = uploadedImages;
+                    }
+
+                    localStorage.setItem('userHotels', JSON.stringify(nextHotels));
+                    clearEditMode();
+
+                    alert(isEditMode ? 'تم تحديث الفندق بنجاح!' : 'تم إضافة الفندق بنجاح! سيظهر في صفحة الوجهات.');
                     window.location.reload();
 
                 } catch (err) {
-                    console.error('تعذر حفظ المكان في الـ backend:', err);
-
-                    // حذف الفندق من localStorage لأنه فشل في الـ API
-                    let currentHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
-                    currentHotels.pop();
-                    localStorage.setItem('userHotels', JSON.stringify(currentHotels));
-
-                    alert('عذراً، حدث خطأ أثناء حفظ الفندق في الخادم. يرجى التأكد من البيانات والمحاولة مرة أخرى.\n\n' + err.message);
+                    console.error('تعذر حفظ/تحديث المكان في الـ backend:', err);
+                    alert('عذراً، حدث خطأ أثناء الاتصال بالخادم.\n\n' + err.message);
                 }
             } else {
-                // في حال عدم وجود اتصال بالـ API (نادر الحدوث)
-                alert('تم إضافة الفندق محلياً فقط.');
+                // أوفلاين
+                localStorage.setItem('userHotels', JSON.stringify(nextHotels));
+                clearEditMode();
+                alert('تم الحفظ محلياً فقط.');
                 window.location.reload();
             }
+        });
+
+        form.addEventListener('reset', () => {
+            setTimeout(() => {
+                clearEditMode();
+                const previewContainer = document.getElementById('imagesPreview');
+                if (previewContainer) {
+                    previewContainer.innerHTML = '';
+                }
+            }, 0);
         });
     }
 
@@ -478,7 +556,97 @@ function deleteHotel(index) {
     }
 }
 
-// تعديل فندق (للمستقبل)
+// تعديل فندق
 function editHotel(index) {
-    alert('ميزة التعديل ستكون متاحة قريباً');
+    const userHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
+    const hotel = userHotels[index];
+
+    if (!hotel) return;
+
+    // تعيين وضع التعديل
+    setEditMode(hotel.id);
+
+    // 1. ملء الحقول الأساسية
+    document.getElementById('hotelName').value = hotel.name || '';
+    document.getElementById('hotelNameEn').value = hotel.nameEn || '';
+    document.getElementById('hotelLocation').value = hotel.location || '';
+    document.getElementById('hotelTagline').value = hotel.tagline || '';
+    document.getElementById('hotelRegion').value = hotel.region || '';
+    document.getElementById('hotelLatitude').value = hotel.latitude ?? '';
+    document.getElementById('hotelLongitude').value = hotel.longitude ?? '';
+
+    // 2. ملء أقسام الوصف
+    const aboutContainer = document.getElementById('aboutSections');
+    aboutContainer.innerHTML = ''; // مسح القديم
+
+    // إضافة الأقسام الموجودة
+    if (hotel.about && hotel.about.length > 0) {
+        hotel.about.forEach(item => {
+            addAboutSection(); // إضافة عنصر DOM جديد
+            const sections = document.querySelectorAll('.about-item');
+            const lastSection = sections[sections.length - 1]; // الحصول على آخر واحد أضيف
+
+            lastSection.querySelector('.about-title').value = item.title;
+            lastSection.querySelector('.about-content').value = item.text;
+            lastSection.querySelector('.about-icon').value = item.icon;
+        });
+    } else {
+        // إذا لم يوجد، أضف واحداً فارغاً
+        addAboutSection();
+    }
+
+    // 3. ملء المرافق
+    const amenitiesContainer = document.getElementById('amenitiesList');
+    amenitiesContainer.innerHTML = '';
+
+    if (hotel.amenities && hotel.amenities.length > 0) {
+        hotel.amenities.forEach(item => {
+            addAmenity();
+            const amenities = document.querySelectorAll('.amenity-item');
+            const lastAmenity = amenities[amenities.length - 1];
+
+            const iconInput = lastAmenity.querySelector('.amenity-icon-value');
+            const textInput = lastAmenity.querySelector('.amenity-text');
+            const triggerSpan = lastAmenity.querySelector('.dropdown-trigger span');
+
+            iconInput.value = item.icon;
+            textInput.value = item.text;
+
+            // تحديث العرض البصري للأيقونة
+            // البحث عن LabelEn إذا أمكن
+            const opt = amenityOptions.find(o => o.icon === item.icon);
+            const labelEn = opt ? opt.labelEn : 'Selected';
+
+            triggerSpan.innerHTML = `<i class="${item.icon}"></i> ${labelEn}`;
+        });
+    } else {
+        addAmenity();
+    }
+
+    // 4. ملء الغرف
+    const roomsContainer = document.getElementById('roomsList');
+    roomsContainer.innerHTML = '';
+
+    if (hotel.rooms && hotel.rooms.length > 0) {
+        hotel.rooms.forEach(item => {
+            addRoom();
+            const rooms = document.querySelectorAll('.room-item');
+            const lastRoom = rooms[rooms.length - 1];
+
+            lastRoom.querySelector('.room-name').value = item.name;
+            lastRoom.querySelector('.room-price').value = item.price;
+            lastRoom.querySelector('.room-size').value = item.size;
+            // المميزات قد تكون مصفوفة
+            const features = Array.isArray(item.features) ? item.features.join(', ') : item.features;
+            lastRoom.querySelector('.room-features').value = features;
+        });
+    } else {
+        addRoom();
+    }
+
+    // مسح الصور من العرض لأننا لا نستطيع تعيين value لـ input file
+    document.getElementById('imagesPreview').innerHTML = '';
+
+    // التمرير للأعلى
+    document.getElementById('addHotelForm').scrollIntoView({ behavior: 'smooth' });
 }
