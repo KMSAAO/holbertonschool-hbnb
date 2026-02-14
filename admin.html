@@ -131,8 +131,21 @@
 
                     <div class="amenities-list" id="amenitiesList">
                         <div class="amenity-item">
-                            <input type="text" class="amenity-icon" placeholder="مثال: fas fa-wifi" value="fas fa-wifi">
-                            <input type="text" class="amenity-text" placeholder="مثال: واي فاي مجاني" required>
+                            <div class="custom-dropdown" tabindex="0">
+                                <div class="dropdown-trigger">
+                                    <span><i class="fas fa-wifi"></i> Wifi</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <input type="hidden" class="amenity-icon-value" value="fas fa-wifi">
+                                <div class="dropdown-menu">
+                                    <!-- Options will be populated by JS if needed, or we can rely on addAmenity for new ones. 
+                                         But for the initial one, we might need a way to initialize it or just let JS re-render it.
+                                         Actually, let's keep it simple: simpler to just have the container empty or call addAmenity() on load?
+                                         Existing code has one item hardcoded. I will hardcode the structure here to match. -->
+                                </div>
+                            </div>
+                            <input type="text" class="amenity-text" placeholder="مثال: واي فاي مجاني"
+                                value="واي فاي مجاني" required>
                             <button type="button" class="remove-btn" onclick="removeAmenity(this)">
                                 <i class="fas fa-trash"></i>
                             </button>

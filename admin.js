@@ -43,13 +43,52 @@ function removeAboutSection(btn) {
 
 // ==================== إدارة المرافق ====================
 
+// قائمة المرافق القياسية
+const amenityOptions = [
+    { icon: 'fas fa-wifi', label: 'واي فاي', labelEn: 'WiFi' },
+    { icon: 'fas fa-parking', label: 'موقف سيارات', labelEn: 'Parking' },
+    { icon: 'fas fa-swimming-pool', label: 'مسبح', labelEn: 'Swimming Pool' },
+    { icon: 'fas fa-dumbbell', label: 'صالة رياضة', labelEn: 'Gym' },
+    { icon: 'fas fa-utensils', label: 'مطعم', labelEn: 'Restaurant' },
+    { icon: 'fas fa-spa', label: 'سبا', labelEn: 'Spa' },
+    { icon: 'fas fa-wind', label: 'تكييف', labelEn: 'Air Conditioning' },
+    { icon: 'fas fa-tv', label: 'تلفاز', labelEn: 'TV' },
+    { icon: 'fas fa-tshirt', label: 'غسيل ملابس', labelEn: 'Laundry' },
+    { icon: 'fas fa-cocktail', label: 'بار', labelEn: 'Bar' },
+    { icon: 'fas fa-coffee', label: 'إفطار', labelEn: 'Breakfast' },
+    { icon: 'fas fa-shuttle-van', label: 'نقل للمطار', labelEn: 'Airport Shuttle' },
+    { icon: 'fas fa-paw', label: 'حيوانات أليفة', labelEn: 'Pets Allowed' },
+    { icon: 'fas fa-concierge-bell', label: 'خدمة غرف', labelEn: 'Room Service' },
+    { icon: 'fas fa-briefcase', label: 'مركز أعمال', labelEn: 'Business Center' },
+    { icon: 'fas fa-wheelchair', label: 'دخول للكراسي المتحركة', labelEn: 'Wheelchair Accessible' }
+];
+
+// إنشاء خيارات القائمة المنسدلة
+function getDropdownOptionsHTML() {
+    return amenityOptions.map(opt => `
+        <div class="dropdown-item" data-value="${opt.icon}" data-label="${opt.label}">
+            <i class="${opt.icon}"></i> ${opt.labelEn}
+        </div>
+    `).join('');
+}
+
 // إضافة مرفق جديد
 function addAmenity() {
     const container = document.getElementById('amenitiesList');
     const newAmenity = document.createElement('div');
     newAmenity.className = 'amenity-item';
+
     newAmenity.innerHTML = `
-        <input type="text" class="amenity-icon" placeholder="مثال: fas fa-wifi" value="fas fa-star">
+        <div class="custom-dropdown" tabindex="0">
+            <div class="dropdown-trigger">
+                <span>اختر أيقونة</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <input type="hidden" class="amenity-icon-value">
+            <div class="dropdown-menu">
+                ${getDropdownOptionsHTML()}
+            </div>
+        </div>
         <input type="text" class="amenity-text" placeholder="مثال: واي فاي مجاني" required>
         <button type="button" class="remove-btn" onclick="removeAmenity(this)">
             <i class="fas fa-trash"></i>
@@ -57,6 +96,68 @@ function addAmenity() {
     `;
     container.appendChild(newAmenity);
 }
+
+// Event Delegation for Dropdowns
+document.addEventListener('click', function (e) {
+    // Toggle Dropdown
+    const trigger = e.target.closest('.dropdown-trigger');
+    if (trigger) {
+        const dropdown = trigger.parentElement;
+        const allDropdowns = document.querySelectorAll('.custom-dropdown.active');
+
+        // Close other dropdowns
+        allDropdowns.forEach(d => {
+            if (d !== dropdown) d.classList.remove('active');
+        });
+
+        dropdown.classList.toggle('active');
+        e.stopPropagation();
+        return;
+    }
+
+    // Select Option
+    const item = e.target.closest('.dropdown-item');
+    if (item) {
+        const dropdown = item.closest('.custom-dropdown');
+        const triggerSpan = dropdown.querySelector('.dropdown-trigger span');
+        const hiddenInput = dropdown.querySelector('.amenity-icon-value');
+        const amenityItem = dropdown.closest('.amenity-item');
+        const textInput = amenityItem.querySelector('.amenity-text');
+
+        const iconClass = item.dataset.value;
+        const label = item.dataset.label;
+
+        // Update UI
+        triggerSpan.innerHTML = `<i class="${iconClass}"></i> ${item.textContent.trim()}`;
+        hiddenInput.value = iconClass;
+
+        // Auto-fill text if empty
+        if (!textInput.value) {
+            textInput.value = label;
+        }
+
+        dropdown.classList.remove('active');
+        e.stopPropagation();
+        return;
+    }
+
+    // Close when clicking outside
+    if (!e.target.closest('.custom-dropdown')) {
+        document.querySelectorAll('.custom-dropdown.active').forEach(d => {
+            d.classList.remove('active');
+        });
+    }
+});
+
+// تهيئة القوائم الموجودة عند التحميل (إن وجدت)
+document.addEventListener('DOMContentLoaded', () => {
+    const initialDropdowns = document.querySelectorAll('.dropdown-menu');
+    initialDropdowns.forEach(menu => {
+        if (!menu.children.length) {
+            menu.innerHTML = getDropdownOptionsHTML();
+        }
+    });
+});
 
 // حذف مرفق
 function removeAmenity(btn) {
@@ -195,7 +296,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // جمع المرافق
             document.querySelectorAll('.amenity-item').forEach(item => {
-                const icon = item.querySelector('.amenity-icon').value;
+                const iconInput = item.querySelector('.amenity-icon-value');
+                // Fallback for older items or if just text input was used previously, but now we use hidden input
+                const icon = iconInput ? iconInput.value : '';
                 const text = item.querySelector('.amenity-text').value;
 
                 if (icon && text) {

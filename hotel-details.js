@@ -6,21 +6,42 @@
 
 // ==================== مصفوفة أيقونات المرافق ====================
 const amenityIcons = {
+    // English Keys
     "Wifi": "fas fa-wifi",
+    "WiFi": "fas fa-wifi",
     "Pool": "fas fa-swimming-pool",
-    "Air conditioning": "fas fa-snowflake",
+    "Air conditioning": "fas fa-wind",
     "Kitchen": "fas fa-utensils",
     "Parking": "fas fa-parking",
     "Gym": "fas fa-dumbbell",
-    "Breakfast": "fas fa-bread-slice",
+    "Breakfast": "fas fa-coffee",
     "Spa": "fas fa-spa",
-    "Pet friendly": "fas fa-dog",
+    "Pet friendly": "fas fa-paw",
     "Heating": "fas fa-fire",
     "TV": "fas fa-tv",
     "Iron": "fas fa-tshirt",
     "Hair dryer": "fas fa-wind",
     "Linen": "fas fa-bed",
     "Towels": "fas fa-bath",
+
+    // Arabic Keys (matching admin.js labels)
+    "واي فاي": "fas fa-wifi",
+    "موقف سيارات": "fas fa-parking",
+    "مسبح": "fas fa-swimming-pool",
+    "صالة رياضة": "fas fa-dumbbell",
+    "مطعم": "fas fa-utensils",
+    "سبا": "fas fa-spa",
+    "تكييف": "fas fa-wind",
+    "تلفاز": "fas fa-tv",
+    "غسيل ملابس": "fas fa-tshirt",
+    "بار": "fas fa-cocktail",
+    "إفطار": "fas fa-coffee",
+    "نقل للمطار": "fas fa-shuttle-van",
+    "حيوانات أليفة": "fas fa-paw",
+    "خدمة غرف": "fas fa-concierge-bell",
+    "مركز أعمال": "fas fa-briefcase",
+    "دخول للكراسي المتحركة": "fas fa-wheelchair",
+
     "default": "fas fa-check-circle"
 };
 
@@ -33,7 +54,8 @@ async function fetchPlaceFromBackend(placeId) {
             // تحويل المرافق لإضافة الأيقونات
             const amenitiesWithIcons = (data.amenities || []).map(amenity => ({
                 text: amenity.amenity_name || amenity.name, // Handle different field names
-                icon: amenityIcons[amenity.amenity_name] || amenityIcons[amenity.name] || amenityIcons['default']
+                // Use icon from backend if available, otherwise fallback to map
+                icon: amenity.icon || amenityIcons[amenity.amenity_name] || amenityIcons[amenity.name] || amenityIcons['default']
             }));
 
             // معالجة الصور
