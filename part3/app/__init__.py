@@ -1,4 +1,5 @@
-from flask import Flask, jsonify
+import os
+from flask import Flask, jsonify, send_from_directory, abort
 from flask_restx import Api
 from flask_cors import CORS  # استيراد المكتبة
 
@@ -16,6 +17,9 @@ from app.bcrypt import bcrypt
 from app.JWTManger import jwt   
 from app.db import db
 import app.services.facade as facade
+
+# مسار ملفات الواجهة الأمامية (Frontend) — المجلد الأب الذي يحتوي على HTML/CSS/JS
+FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
@@ -38,6 +42,18 @@ def create_app(config_class="config.DevelopmentConfig"):
     # إنشاء الجداول تلقائياً عند بدء التشغيل
     with app.app_context():
         db.create_all()
+
+    # ==================== مسارات الواجهة الأمامية ====================
+
+    # الصفحة الرئيسية — تقدم index.html من مجلد الـ Frontend
+    @app.route("/")
+    def index():
+        return send_from_directory(FRONTEND_DIR, 'index.html')
+
+    # مسار للتحقق من حالة الـ API
+    @app.route("/api/health")
+    def health_check():
+        return jsonify({"message": "HBnB API is running", "status": "success"})
 
     # إعدادات الـ API والتوثيق (Swagger)
     api = Api(
@@ -66,10 +82,15 @@ def create_app(config_class="config.DevelopmentConfig"):
     api.add_namespace(guests_ns, path='/api/v1/guests')
     api.add_namespace(bookings_ns, path='/api/v1/bookings')
 
-    # مسار للتأكد أن السيرفر يعمل
-    @app.route("/")
-    def index():
-        return jsonify({"message": "HBnB API is running", "status": "success"})
+    # ==================== خدمة ملفات الواجهة الأمامية ====================
+    # هذا المسار يقدم جميع ملفات HTML, CSS, JS, والصور من مجلد الـ Frontend
+    # مسارات API أعلاه لها أولوية أعلى لأنها أكثر تحديداً
+    @app.route('/<path:filename>')
+    def serve_frontend(filename):
+        file_path = os.path.join(FRONTEND_DIR, filename)
+        if os.path.isfile(file_path):
+            return send_from_directory(FRONTEND_DIR, filename)
+        abort(404)
 
     return app
 

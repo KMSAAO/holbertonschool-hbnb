@@ -3,15 +3,15 @@
  * الوصف: إعدادات الاتصال بالـ API الخلفي (Flask-RESTx)
  *
  * ⚠️ ملاحظة مهمة:
- * - Backend يعمل على http://127.0.0.1:5000/api/v1
+ * - Frontend و Backend يعملان على نفس السيرفر (Flask) على المنفذ 5000
  * - جميع نقاط النهاية تطابق بنية Flask-RESTx في part3/
  * - المصادقة عبر JWT (Flask-JWT-Extended)
  */
 
 // ==================== إعدادات الـ API ====================
 
-// عنوان API الأساسي — يتطابق مع Flask backend في part3/run.py
-const API_BASE_URL = 'http://127.0.0.1:5000/api/v1';
+// عنوان API الأساسي — نسبي لأن Frontend و Backend على نفس السيرفر
+const API_BASE_URL = '/api/v1';
 
 // نقاط النهاية للـ API (تطابق backend routes)
 const API_ENDPOINTS = {
@@ -83,8 +83,9 @@ function replaceUrlParams(endpoint, params) {
  */
 async function apiGet(endpoint, params = {}) {
     try {
-        const url = new URL(`${API_BASE_URL}${endpoint}`);
-        Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+        let url = `${API_BASE_URL}${endpoint}`;
+        const searchParams = new URLSearchParams(params).toString();
+        if (searchParams) url += `?${searchParams}`;
 
         const headers = { 'Content-Type': 'application/json' };
         const token = getAuthToken();
