@@ -1,0 +1,16 @@
+import os
+
+class Config:
+    SECRET_KEY = os.getenv('SECRET_KEY', 'default_secret_key')
+    DEBUG = False
+
+class DevelopmentConfig(Config):
+    DEBUG = True
+    PROPAGATE_EXCEPTIONS = True
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:kk@localhost/hbnb_db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+config = {
+    'development': DevelopmentConfig,
+    'default': DevelopmentConfig
+}

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نُزل - تسجيل الدخول</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/loading.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- الخلفية -->
+    <div class="background-image"></div>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="auth-container">
+        <!-- اللوقو -->
+        <div class="logo-container">
+            <img src="{{ url_for('static', filename='images/logo-white.png') }}" alt="نُزل" class="logo-white">
+        </div>
+
+        <!-- صندوق تسجيل الدخول/إنشاء الحساب -->
+        <div class="auth-box">
+            <!-- التبويبات -->
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="login">تسجيل الدخول</button>
+                <button class="tab-btn" data-tab="signup">إنشاء حساب</button>
+            </div>
+
+            <!-- محتوى تسجيل الدخول -->
+            <div class="tab-content active" id="login">
+                <form class="auth-form auth-form-login" id="loginForm">
+                    <!-- البريد الإلكتروني -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-envelope"></i>
+                            البريد الإلكتروني
+                        </label>
+                        <input type="email" class="form-input" id="loginEmail" required>
+                    </div>
+
+                    <!-- كلمة المرور -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-lock"></i>
+                            كلمة المرور
+                        </label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-input" id="loginPassword" required>
+                            <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('loginPassword')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- نسيت كلمة المرور -->
+                    <div class="forgot-password">
+                        <a href="{{ url_for('forgot_password') }}">نسيت كلمة المرور؟</a>
+                    </div>
+
+                    <!-- زر تسجيل الدخول -->
+                    <button type="submit" class="submit-btn">تسجيل الدخول</button>
+                </form>
+            </div>
+
+            <!-- محتوى إنشاء الحساب -->
+            <div class="tab-content" id="signup">
+                <form class="auth-form" id="signupForm">
+                    <!-- الأسماء في سطر واحد -->
+                    <div class="name-row">
+                        <div class="form-group half-width">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i>
+                                الاسم الأول
+                            </label>
+                            <input type="text" class="form-input" id="firstName" required>
+                        </div>
+
+                        <div class="form-group half-width">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i>
+                                الاسم الأخير
+                            </label>
+                            <input type="text" class="form-input" id="lastName" required>
+                        </div>
+                    </div>
+
+                    <!-- البريد الإلكتروني -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-envelope"></i>
+                            البريد الإلكتروني
+                        </label>
+                        <input type="email" class="form-input" id="signupEmail" required>
+                    </div>
+
+                    <!-- كلمة المرور -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-lock"></i>
+                            كلمة المرور
+                        </label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-input" id="signupPassword" required>
+                            <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('signupPassword')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="password-strength" id="signupPasswordStrength"></div>
+                    </div>
+
+                    <!-- تأكيد كلمة المرور -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-lock"></i>
+                            تأكيد كلمة المرور
+                        </label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-input" id="signupConfirmPassword" required>
+                            <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('signupConfirmPassword')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- الموافقة على الشروط -->
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="termsCheckbox" required>
+                            <span class="checkmark"></span>
+                            <span class="checkbox-text">
+                                أوافق على <a href="#terms" class="link">شروط الاستخدام</a> و<a href="#privacy" class="link">سياسة الخصوصية</a>
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- زر إنشاء الحساب -->
+                    <button type="submit" class="submit-btn">إنشاء حساب</button>
+
+                    <!-- رابط تسجيل الدخول -->
+                    <div class="switch-text">
+                        هل لديك حساب؟ <a href="#" class="link" onclick="switchTab('login'); return false;">تسجيل دخول</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- الجملة التسويقية -->
+        <div class="tagline">
+            عِش الفخامة في قلب الصحراء
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/loading.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+</html>

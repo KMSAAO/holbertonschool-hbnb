@@ -1,0 +1,806 @@
+/* صفحة تفاصيل الفندق */
+
+/* سلايدر الصور */
+.hotel-slider {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    margin-top: 160px;
+    overflow: hidden;
+}
+
+.slider-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.hotel-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.hotel-slide.active {
+    opacity: 1;
+}
+
+.hotel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    filter: contrast(1.05) saturate(1.1) brightness(1.02);
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* أسهم التنقل */
+.slider-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(129, 91, 47, 0.8);
+    color: #EFE2CF;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.slider-arrow:hover {
+    background: #815B2F;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.slider-arrow.prev {
+    right: 2rem;
+}
+
+.slider-arrow.next {
+    left: 2rem;
+}
+
+/* النقاط */
+.slider-dots {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 1rem;
+    z-index: 10;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dot.active,
+.dot:hover {
+    background: #D4AF37;
+    transform: scale(1.2);
+}
+
+/* معلومات الفندق */
+.hotel-info {
+    padding: 4rem 2rem;
+    background: linear-gradient(135deg, #EFE2CF 0%, #ffffff 100%);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.hotel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.hotel-title-section {
+    flex: 1;
+}
+
+.hotel-name {
+    font-size: 3rem;
+    color: #815B2F;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.hotel-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.hotel-rating i {
+    color: #D4AF37;
+    font-size: 1.3rem;
+}
+
+.rating-text {
+    color: #815B2F;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+.hotel-location {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #815B2F;
+    font-size: 1.2rem;
+}
+
+.hotel-location i {
+    color: #D4AF37;
+}
+
+.hotel-price-section {
+    background: white;
+    padding: 2rem 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(129, 91, 47, 0.1);
+    border: 2px solid #D4AF37;
+}
+
+.price-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+}
+
+.price-label {
+    font-size: 0.95rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.price-amount {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #815B2F;
+    direction: ltr;
+    font-variant-numeric: lining-nums;
+}
+
+.price-period {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+.hotel-tagline {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.hotel-tagline p {
+    font-size: 1.5rem;
+    color: #815B2F;
+    font-weight: 600;
+    font-style: italic;
+}
+
+/* الأقسام */
+.section-title {
+    font-size: 2rem;
+    color: #815B2F;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid #D4AF37;
+    font-weight: 700;
+}
+
+/* الوصف */
+.hotel-description {
+    margin-bottom: 4rem;
+}
+
+.description-item {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 5px 20px rgba(129, 91, 47, 0.1);
+}
+
+.description-item h3 {
+    color: #815B2F;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.description-item h3 i {
+    color: #D4AF37;
+    font-size: 1.8rem;
+}
+
+.description-item p {
+    color: #666;
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+/* المرافق */
+.hotel-amenities {
+    margin-bottom: 4rem;
+}
+
+.amenities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.amenity-item {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 5px 15px rgba(129, 91, 47, 0.1);
+    transition: all 0.3s ease;
+}
+
+.amenity-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(129, 91, 47, 0.15);
+}
+
+.amenity-item i {
+    font-size: 1.8rem;
+    color: #D4AF37;
+}
+
+.amenity-item span {
+    color: #815B2F;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* الغرف */
+.hotel-rooms {
+    margin-bottom: 4rem;
+}
+
+.room-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(129, 91, 47, 0.1);
+    transition: all 0.3s ease;
+}
+
+.room-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(129, 91, 47, 0.2);
+}
+
+.room-header {
+    background: linear-gradient(135deg, #815B2F 0%, #654825 100%);
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.room-title {
+    color: #EFE2CF;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.room-size {
+    color: #D4AF37;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.room-content {
+    padding: 2rem;
+}
+
+.room-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.feature-tag {
+    background: #EFE2CF;
+    color: #815B2F;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.feature-tag i {
+    color: #D4AF37;
+}
+
+.room-description p {
+    color: #666;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+.room-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 2px solid #EFE2CF;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.room-capacity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #815B2F;
+    font-size: 1.1rem;
+}
+
+.room-capacity i {
+    color: #D4AF37;
+    font-size: 1.3rem;
+}
+
+.room-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.room-price .price {
+    font-size: 2rem;
+    color: #815B2F;
+    font-weight: 700;
+}
+
+.room-price .price-note {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+/* الموقع */
+.hotel-location-section {
+    margin-bottom: 4rem;
+}
+
+.location-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(129, 91, 47, 0.1);
+}
+
+.location-text {
+    margin-bottom: 2rem;
+}
+
+.location-text p {
+    color: #666;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+}
+
+.location-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.location-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #EFE2CF;
+    border-radius: 10px;
+}
+
+.location-item i {
+    font-size: 1.8rem;
+    color: #D4AF37;
+}
+
+.location-item span {
+    color: #815B2F;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* زر الحجز الثابت */
+.booking-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 1.5rem 2rem;
+}
+
+.booking-bar-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.booking-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.booking-hotel-name {
+    font-size: 1.3rem;
+    color: #815B2F;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.booking-price {
+    font-size: 1.1rem;
+    color: #666;
+}
+
+.booking-btn {
+    background: #815B2F;
+    color: #EFE2CF;
+    border: none;
+    padding: 1rem 3rem;
+    border-radius: 50px;
+    font-family: 'Amiri', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    box-shadow: 0 5px 20px rgba(129, 91, 47, 0.3);
+    transition: all 0.3s ease;
+}
+
+.booking-btn:hover {
+    background: #654825;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(129, 91, 47, 0.4);
+}
+
+.booking-btn i {
+    font-size: 1.5rem;
+}
+
+/* الاستجابة للأجهزة المحمولة */
+@media (max-width: 768px) {
+    .hotel-slider {
+        height: 400px;
+        margin-top: 140px;
+    }
+
+    .slider-arrow {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+
+    .slider-arrow.prev {
+        right: 1rem;
+    }
+
+    .slider-arrow.next {
+        left: 1rem;
+    }
+
+    .hotel-name {
+        font-size: 2rem;
+    }
+
+    .price-amount {
+        font-size: 2rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .amenities-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    .room-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .booking-bar-content {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .booking-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* قسم التقييمات */
+.reviews-section {
+    margin-top: 4rem;
+}
+
+.reviews-summary {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    box-shadow: 0 5px 20px rgba(129, 91, 47, 0.1);
+}
+
+.rating-overview {
+    text-align: center;
+}
+
+.rating-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.score-number {
+    font-size: 4rem;
+    font-weight: 700;
+    color: #815B2F;
+    font-variant-numeric: lining-nums;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 0.3rem;
+}
+
+.rating-stars i {
+    color: #D4AF37;
+    font-size: 1.5rem;
+}
+
+.rating-label {
+    font-size: 1.3rem;
+    color: #815B2F;
+    font-weight: 600;
+}
+
+.reviews-count {
+    color: #666;
+    font-size: 1rem;
+}
+
+/* إضافة تعليق */
+.add-review-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    box-shadow: 0 5px 20px rgba(129, 91, 47, 0.1);
+}
+
+.add-review-section h3 {
+    color: #815B2F;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.rating-input {
+    margin-bottom: 1.5rem;
+}
+
+.rating-input label {
+    display: block;
+    color: #815B2F;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.star-rating {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 2rem;
+}
+
+.star-rating i {
+    color: #ddd;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.star-rating i:hover,
+.star-rating i.active {
+    color: #D4AF37;
+}
+
+.review-input {
+    margin-bottom: 1.5rem;
+}
+
+.review-input label {
+    display: block;
+    color: #815B2F;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.review-input textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #EFE2CF;
+    border-radius: 10px;
+    font-family: 'Amiri', serif;
+    font-size: 1rem;
+    color: #815B2F;
+    resize: vertical;
+}
+
+.review-input textarea:focus {
+    outline: none;
+    border-color: #815B2F;
+}
+
+.submit-review-btn {
+    background: #815B2F;
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-family: 'Amiri', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.submit-review-btn:hover {
+    background: #654825;
+    transform: translateY(-2px);
+}
+
+/* قائمة التعليقات */
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.review-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 3px 15px rgba(129, 91, 47, 0.08);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.reviewer-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.reviewer-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #815B2F, #D4AF37);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.reviewer-details h4 {
+    color: #815B2F;
+    margin-bottom: 0.2rem;
+    font-size: 1.1rem;
+}
+
+.review-date {
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.review-rating {
+    display: flex;
+    gap: 0.2rem;
+}
+
+.review-rating i {
+    color: #D4AF37;
+    font-size: 1rem;
+}
+
+.review-content {
+    color: #666;
+    line-height: 1.8;
+}
+
+@media (max-width: 768px) {
+    .score-number {
+        font-size: 3rem;
+    }
+    
+    .rating-stars i {
+        font-size: 1.2rem;
+    }
+    
+    .star-rating {
+        font-size: 1.5rem;
+    }
+}
+
+.description-text-only {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #4a4a4a;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-top: 15px;
+    text-align: justify;
+}

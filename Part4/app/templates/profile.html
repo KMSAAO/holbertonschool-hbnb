@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نُزل - الملف الشخصي</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="نُزل" class="logo-img">
+            </div>
+            
+            <div class="nav-menu">
+                <a href="{{ url_for('index') }}" class="nav-link">الرئيسية</a>
+                <a href="{{ url_for('places') }}" class="nav-link">الوجهات</a>
+                <a href="{{ url_for('bookings') }}" class="nav-link" id="bookingsLink">حجوزاتي</a>
+                <a href="#" class="nav-link" id="logoutLink" onclick="logout(); return false;">خروج</a>
+                <a href="{{ url_for('login') }}" class="nav-link" id="loginLink" style="display:none;">تسجيل دخول</a>
+            </div>
+            
+            <div class="profile">
+                <a href="{{ url_for('profile') }}" class="profile-circle">
+                    <i class="fas fa-user"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="profile-section">
+        <div class="profile-container">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h1 class="profile-title">الملف الشخصي</h1>
+            </div>
+
+            <div class="profile-content">
+                <form class="profile-form">
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-user"></i> الاسم الأول</label>
+                        <input type="text" class="form-input" id="firstNameInput" value="" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-user"></i> اسم العائلة</label>
+                        <input type="text" class="form-input" id="lastNameInput" value="" readonly>
+                    </div>
+
+                    <div class="form-group editable">
+                        <label class="form-label"><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                        <div class="input-wrapper">
+                            <input type="email" class="form-input" id="emailInput" value="" readonly>
+                            <button type="button" class="edit-btn" onclick="enableEdit('email')">
+                                <i class="fas fa-edit"></i> تعديل
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group password-section">
+                        <label class="form-label"><i class="fas fa-lock"></i> تغيير كلمة المرور</label>
+                        <button type="button" class="change-password-btn" onclick="togglePasswordSection()">
+                            <i class="fas fa-key"></i> تغيير كلمة المرور
+                        </button>
+                    </div>
+
+                    <div id="passwordChangeSection" class="password-change-section" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">كلمة المرور الحالية</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" class="form-input" id="currentPassword">
+                                <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('currentPassword')"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">كلمة المرور الجديدة</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" class="form-input" id="newPassword">
+                                <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('newPassword')"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">تأكيد كلمة المرور الجديدة</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" class="form-input" id="confirmPassword">
+                                <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('confirmPassword')"><i class="fas fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div class="password-actions">
+                            <button type="button" class="save-password-btn" onclick="savePassword()">حفظ</button>
+                            <button type="button" class="cancel-password-btn" onclick="cancelPasswordChange()">إلغاء</button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions" id="formActions" style="display: none;">
+                        <button type="button" class="save-btn" onclick="saveChanges()">حفظ التغييرات</button>
+                        <button type="button" class="cancel-btn" onclick="cancelEdit()">إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="نُزل" class="footer-logo">
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-heading">استكشف</h4>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('places') }}">الوجهات</a></li>
+                    <li><a href="#experiences">التجارب</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>جميع الحقوق محفوظة © نُزل 2026</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+</body>
+</html>

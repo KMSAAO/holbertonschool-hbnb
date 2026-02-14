@@ -1,0 +1,457 @@
+/* قسم الملف الشخصي */
+.profile-section {
+    min-height: calc(100vh - 80px - 200px);
+    padding: 4rem 2rem;
+    padding-top: 180px;
+    background: linear-gradient(135deg, #EFE2CF 0%, #ffffff 100%);
+}
+
+.profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(129, 91, 47, 0.1);
+    overflow: hidden;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, #815B2F 0%, #654825 100%);
+    padding: 3rem 2rem;
+    text-align: center;
+    color: white;
+}
+
+.profile-avatar {
+    margin-bottom: 1.5rem;
+}
+
+.profile-avatar i {
+    font-size: 6rem;
+    color: #EFE2CF;
+}
+
+.profile-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.profile-content {
+    padding: 3rem 2rem;
+}
+
+/* نموذج الملف الشخصي */
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #815B2F;
+}
+
+.form-label i {
+    color: #D4AF37;
+    font-size: 1.2rem;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.form-input {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border: 2px solid #EFE2CF;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-family: 'Amiri', serif;
+    background: #f9f9f9;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #D4AF37;
+    background: white;
+}
+
+.form-input:read-only,
+.form-input:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+    color: #666;
+}
+
+.form-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%23815B2F' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1.5rem center;
+    padding-right: 3rem;
+}
+
+.form-select:disabled {
+    background-image: none;
+    cursor: not-allowed;
+}
+
+.readonly-badge {
+    font-size: 0.9rem;
+    color: #999;
+    font-style: italic;
+    padding-right: 0.5rem;
+}
+
+.edit-btn {
+    padding: 0.8rem 1.5rem;
+    background: white;
+    border: 2px solid #D4AF37;
+    border-radius: 12px;
+    color: #815B2F;
+    font-size: 1rem;
+    font-family: 'Amiri', serif;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.edit-btn:hover {
+    background: #D4AF37;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.edit-btn i {
+    font-size: 1rem;
+}
+
+/* حالة التعديل النشطة */
+.form-group.editable.active .form-input {
+    border-color: #D4AF37;
+    background: white;
+}
+
+.form-group.editable.active .edit-btn {
+    background: #815B2F;
+    color: white;
+    border-color: #815B2F;
+}
+
+/* أزرار الحفظ والإلغاء */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #EFE2CF;
+}
+
+.save-btn,
+.cancel-btn {
+    flex: 1;
+    padding: 1.2rem;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-family: 'Amiri', serif;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.save-btn {
+    background: #815B2F;
+    color: white;
+    border: none;
+}
+
+.save-btn:hover {
+    background: #654825;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(129, 91, 47, 0.3);
+}
+
+.cancel-btn {
+    background: white;
+    color: #815B2F;
+    border: 2px solid #815B2F;
+}
+
+.cancel-btn:hover {
+    background: #f5f5f5;
+}
+
+.save-btn i,
+.cancel-btn i {
+    font-size: 1.2rem;
+}
+
+/* تأثيرات الرسوم المتحركة */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-actions {
+    animation: slideDown 0.3s ease;
+}
+
+/* التجاوب مع الشاشات الصغيرة */
+@media (max-width: 768px) {
+    .profile-section {
+        padding: 2rem 1rem;
+    }
+
+    .profile-container {
+        border-radius: 15px;
+    }
+
+    .profile-header {
+        padding: 2rem 1rem;
+    }
+
+    .profile-avatar i {
+        font-size: 4rem;
+    }
+
+    .profile-title {
+        font-size: 1.5rem;
+    }
+
+    .profile-content {
+        padding: 2rem 1rem;
+    }
+
+    .input-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .edit-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-label {
+        font-size: 1rem;
+    }
+
+    .form-input {
+        font-size: 1rem;
+        padding: 0.8rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-header {
+        padding: 1.5rem 1rem;
+    }
+
+    .profile-avatar i {
+        font-size: 3rem;
+    }
+
+    .profile-title {
+        font-size: 1.3rem;
+    }
+
+    .form-group {
+        gap: 0.3rem;
+    }
+
+    .save-btn,
+    .cancel-btn {
+        font-size: 1rem;
+        padding: 1rem;
+    }
+}
+
+/* قسم تغيير كلمة المرور */
+.password-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #EFE2CF;
+}
+
+.change-password-btn {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: white;
+    border: 2px solid #815B2F;
+    border-radius: 12px;
+    color: #815B2F;
+    font-size: 1.1rem;
+    font-family: 'Amiri', serif;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.change-password-btn:hover {
+    background: #815B2F;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.password-change-section {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 12px;
+    border: 2px solid #EFE2CF;
+}
+
+.password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input-wrapper .form-input {
+    flex: 1;
+    padding-left: 3.5rem;
+}
+
+.toggle-password-btn {
+    position: absolute;
+    left: 1rem;
+    background: none;
+    border: none;
+    color: #815B2F;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.toggle-password-btn:hover {
+    color: #D4AF37;
+    transform: scale(1.1);
+}
+
+/* متطلبات كلمة المرور */
+.password-requirements {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #EFE2CF;
+}
+
+.password-requirements p {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #815B2F;
+    margin-bottom: 0.5rem;
+}
+
+.password-requirements ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.password-requirements li {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0.3rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.password-requirements li i {
+    font-size: 0.5rem;
+    color: #999;
+}
+
+.password-requirements li.valid {
+    color: #4CAF50;
+}
+
+.password-requirements li.valid i {
+    color: #4CAF50;
+}
+
+/* أزرار كلمة المرور */
+.password-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.save-password-btn,
+.cancel-password-btn {
+    flex: 1;
+    padding: 1rem;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-family: 'Amiri', serif;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.save-password-btn {
+    background: #815B2F;
+    color: white;
+    border: none;
+}
+
+.save-password-btn:hover {
+    background: #654825;
+    transform: translateY(-2px);
+}
+
+.cancel-password-btn {
+    background: white;
+    color: #815B2F;
+    border: 2px solid #815B2F;
+}
+
+.cancel-password-btn:hover {
+    background: #f5f5f5;
+}

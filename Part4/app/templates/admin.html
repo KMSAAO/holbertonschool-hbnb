@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة النُزل - نُزل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="نُزل" class="logo-img">
+            </div>
+            <div class="nav-menu">
+                <a href="{{ url_for('index') }}" class="nav-link">الرئيسية</a>
+                <a href="{{ url_for('places') }}" class="nav-link">الوجهات</a>
+                <a href="{{ url_for('admin') }}" class="nav-link active">إدارة النُزل</a>
+                <a href="{{ url_for('bookings') }}" class="nav-link" id="bookingsLink">حجوزاتي</a>
+                <a href="#" class="nav-link" id="logoutLink" onclick="logout(); return false;">خروج</a>
+                <a href="{{ url_for('login') }}" class="nav-link" id="loginLink" style="display:none;">تسجيل دخول</a>
+            </div>
+            <div class="profile">
+                <a href="{{ url_for('profile') }}" class="profile-circle">
+                    <i class="fas fa-user"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="admin-container">
+        <h1 class="admin-title">إدارة النُزل</h1>
+        <p class="admin-subtitle">أضف فندقك الخاص وابدأ في استقبال الحجوزات</p>
+
+        <div class="admin-form-container">
+            <h2 class="form-title">إضافة فندق جديد</h2>
+            
+            <form id="addHotelForm" class="admin-form">
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-info-circle"></i> المعلومات الأساسية</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hotelName">اسم الفندق <span class="required">*</span></label>
+                            <input type="text" id="hotelName" required placeholder="مثال: منتجع شيبارا">
+                        </div>
+                        <div class="form-group">
+                            <label for="hotelBasePrice">السعر الأساسي (ر.س) <span class="required">*</span></label>
+                            <input type="number" id="hotelBasePrice" required placeholder="مثال: 1500" min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hotelLat">خط العرض (Latitude) <span class="required">*</span></label>
+                            <input type="number" id="hotelLat" step="any" required placeholder="24.7136">
+                        </div>
+                        <div class="form-group">
+                            <label for="hotelLng">خط الطول (Longitude) <span class="required">*</span></label>
+                            <input type="number" id="hotelLng" step="any" required placeholder="46.6753">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hotelLocation">الموقع الوصفي <span class="required">*</span></label>
+                        <input type="text" id="hotelLocation" required placeholder="مثال: الرياض، حي الملقا">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hotelTagline">العبارة الترويجية (Description) <span class="required">*</span></label>
+                        <input type="text" id="hotelTagline" required placeholder="مثال: تجربة فاخرة تجمع بين الأصالة والراحة">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-align-left"></i> الوصف والتفاصيل</h3>
+                    <div id="aboutSections">
+                        <div class="about-item">
+                            <div class="form-group">
+                                <label>عنوان القسم <span class="required">*</span></label>
+                                <input type="text" class="about-title" placeholder="مثال: عن الفندق" required>
+                            </div>
+                            <div class="form-group">
+                                <label>الوصف <span class="required">*</span></label>
+                                <textarea class="about-content" rows="4" placeholder="اكتب وصفاً تفصيلياً..." required></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="add-btn" onclick="addAboutSection()">
+                        <i class="fas fa-plus"></i> إضافة قسم آخر
+                    </button>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-star"></i> المرافق والخدمات</h3>
+                    <div id="amenitiesList">
+                        <div class="amenity-item">
+                            <input type="text" class="amenity-icon" value="fas fa-wifi">
+                            <input type="text" class="amenity-text" placeholder="مثال: واي فاي مجاني" required>
+                        </div>
+                    </div>
+                    <button type="button" class="add-btn" onclick="addAmenity()">
+                        <i class="fas fa-plus"></i> إضافة مرفق
+                    </button>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-images"></i> صور الفندق</h3>
+                    <div class="form-group">
+                        <label>رفع الصور (5 صور كحد أقصى) <span class="required">*</span></label>
+                        <input type="file" id="hotelImages" accept="image/*" multiple required>
+                        <div class="images-preview" id="imagesPreview"></div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-save"></i> حفظ الفندق
+                    </button>
+                    <button type="reset" class="reset-btn">
+                        <i class="fas fa-redo"></i> إعادة تعيين
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="hotels-list-container">
+            <h2 class="form-title">الفنادق المضافة من قبلك</h2>
+            <div id="userHotelsList" class="user-hotels-grid">
+                </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-bottom">
+            <p>جميع الحقوق محفوظة © نُزل 2026</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/loading.js') }}"></script>
+</body>
+</html>

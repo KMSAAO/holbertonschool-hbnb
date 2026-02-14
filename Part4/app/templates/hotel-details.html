@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shebara Resort - نُزل</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/hotel-details.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/loading.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- شريط التنقل العلوي -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="نُزل" class="logo-img">
+            </div>
+            
+            <div class="nav-menu">
+                <a href="{{ url_for('index') }}" class="nav-link">الرئيسية</a>
+                <a href="{{ url_for('places') }}" class="nav-link">الوجهات</a>
+                <a href="{{ url_for('bookings') }}" class="nav-link" id="bookingsLink">حجوزاتي</a>
+                <a href="#" class="nav-link" id="logoutLink" onclick="logout(); return false;">خروج</a>
+                <a href="{{ url_for('login') }}" class="nav-link" id="loginLink" style="display:none;">تسجيل دخول</a>
+            </div>
+            
+            <div class="profile">
+                <a href="{{ url_for('profile') }}" class="profile-circle">
+                    <i class="fas fa-user"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- سلايدر الصور -->
+    <section class="hotel-slider">
+        <div class="slider-wrapper">
+            <div class="hotel-slide active">
+                <img src="{{ url_for('static', filename='images/shebara1.jpg') }}" alt="Shebara Resort 1">
+            </div>
+            <div class="hotel-slide">
+                <img src="{{ url_for('static', filename='images/shebara2.jpg') }}" alt="Shebara Resort 2">
+            </div>
+            <div class="hotel-slide">
+                <img src="{{ url_for('static', filename='images/shebara3.jpg') }}" alt="Shebara Resort 3">
+            </div>
+            <div class="hotel-slide">
+                <img src="{{ url_for('static', filename='images/shebara4.jpg') }}" alt="Shebara Resort 4">
+            </div>
+            <div class="hotel-slide">
+                <img src="{{ url_for('static', filename='images/shebara5.jpg') }}" alt="Shebara Resort 5">
+            </div>
+
+            <!-- أسهم التنقل -->
+            <button class="slider-arrow prev" onclick="changeSlide(-1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <button class="slider-arrow next" onclick="changeSlide(1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+            <!-- النقاط -->
+            <div class="slider-dots">
+                <span class="dot active" onclick="goToSlide(0)"></span>
+                <span class="dot" onclick="goToSlide(1)"></span>
+                <span class="dot" onclick="goToSlide(2)"></span>
+                <span class="dot" onclick="goToSlide(3)"></span>
+                <span class="dot" onclick="goToSlide(4)"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- معلومات الفندق -->
+    <section class="hotel-info">
+        <div class="container">
+            <div class="hotel-header">
+                <div class="hotel-title-section">
+                    <h1 class="hotel-name"></h1>
+                    <div class="hotel-rating"></div>
+                    <div class="hotel-location"></div>
+                </div>
+                <div class="hotel-price-section"></div>
+            </div>
+
+            <div class="hotel-tagline">
+                <p></p>
+            </div>
+
+            <!-- الوصف -->
+            <div class="hotel-description">
+                <h2 class="section-title">عن الفندق</h2>
+                <div id="hotelFullDescription" class="description-text-only">
+                    </div>
+            </div>
+
+            <!-- المرافق -->
+            <div class="hotel-amenities">
+                <h2 class="section-title">المرافق المميزة</h2>
+                <div class="amenities-grid">
+                </div>
+            </div>
+
+
+
+            <!-- التقييمات والتعليقات -->
+            <div class="reviews-section">
+                <h2 class="section-title">تقييمات النزلاء</h2>
+                <div class="reviews-summary">
+                    <div class="rating-overview">
+                        <div class="rating-score">
+                            <span class="score-number" id="averageRating"></span>
+                            <div class="rating-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="rating-label"></span>
+                            <span class="reviews-count" id="reviewsCount"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="add-review-section">
+                    <h3>شارك تجربتك</h3>
+                    <form id="reviewForm">
+                        <div class="rating-input">
+                            <label>التقييم:</label>
+                            <div class="star-rating">
+                                <i class="far fa-star" data-rating="1"></i>
+                                <i class="far fa-star" data-rating="2"></i>
+                                <i class="far fa-star" data-rating="3"></i>
+                                <i class="far fa-star" data-rating="4"></i>
+                                <i class="far fa-star" data-rating="5"></i>
+                            </div>
+                            <input type="hidden" id="selectedRating" value="0" required>
+                        </div>
+                        <div class="review-input">
+                            <label>تعليقك:</label>
+                            <textarea id="reviewText" placeholder="شاركنا رأيك في تجربتك..." rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-review-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            نشر التعليق
+                        </button>
+                    </form>
+                </div>
+                <div class="reviews-list" id="reviewsList"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- الغرف المتاحة -->
+
+
+    <!-- زر الحجز الثابت -->
+    <div class="booking-bar">
+        <div class="booking-bar-content">
+            <div class="booking-info">
+                <span class="booking-hotel-name"></span>
+                <span class="booking-price"></span>
+            </div>
+            <button class="booking-btn">
+                <i class="fas fa-calendar-check"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- الفوتر -->
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- اللوقو -->
+            <div class="footer-section">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="نُزل" class="footer-logo">
+            </div>
+
+            <!-- الشركة -->
+            <div class="footer-section">
+                <h4 class="footer-heading">الشركة</h4>
+                <ul class="footer-links">
+                    <li><a href="#about">من نحن</a></li>
+                    <li><a href="#contact">تواصل معنا</a></li>
+                </ul>
+            </div>
+
+            <!-- استكشف -->
+            <div class="footer-section">
+                <h4 class="footer-heading">استكشف</h4>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('places') }}">الوجهات</a></li>
+                    <li><a href="#experiences">التجارب</a></li>
+                    <li><a href="#offers">العروض الخاصة</a></li>
+                </ul>
+            </div>
+
+            <!-- مواقع التواصل -->
+            <div class="footer-section">
+                <h4 class="footer-heading">تابعنا</h4>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- حقوق النشر -->
+        <div class="footer-bottom">
+            <p>جميع الحقوق محفوظة © نُزل 2026</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/loading.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/reservation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/hotel-details.js') }}"></script>
+</body>
+</html>
