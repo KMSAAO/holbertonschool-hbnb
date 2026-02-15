@@ -21,7 +21,14 @@ place_create_model = api.model("PlaceCreate", {
     "status": fields.String(required=False),
     "latitude": fields.Float(required=True),
     "longitude": fields.Float(required=True),
-    "amenities": fields.List(fields.Raw, required=False), # Accepts list of {text, icon} or strings
+    "location": fields.String(required=False),
+    "amenities": fields.List(fields.Raw, required=False),
+    "number_of_rooms": fields.Integer(required=False, default=0),
+    "max_guests": fields.Integer(required=False, default=0),
+    "tagline": fields.String(required=False),
+    "rules": fields.String(required=False),
+    "details": fields.List(fields.Raw, required=False), # JSON or List for 'about' sections
+    "rooms": fields.List(fields.Raw, required=False),
 })
 
 place_update_model = api.model("PlaceUpdate", {
@@ -31,6 +38,14 @@ place_update_model = api.model("PlaceUpdate", {
     "status": fields.String(required=False),
     "latitude": fields.Float(required=False),
     "longitude": fields.Float(required=False),
+    "location": fields.String(required=False),
+    "number_of_rooms": fields.Integer(required=False),
+    "max_guests": fields.Integer(required=False),
+    "tagline": fields.String(required=False),
+    "rules": fields.String(required=False),
+    "details": fields.List(fields.Raw, required=False),
+    "rooms": fields.List(fields.Raw, required=False),
+    "amenities": fields.List(fields.String, required=False),
 })
 
 # Models for nested response
@@ -38,6 +53,7 @@ amenity_response_model = api.model("AmenityResponse", {
     "id": fields.String,
     "amenity_name": fields.String,
     "description": fields.String,
+    "icon": fields.String,
     "status": fields.String
 })
 
@@ -66,9 +82,16 @@ place_response_model = api.model("PlaceResponse", {
     "status": fields.String,
     "latitude": fields.Float,
     "longitude": fields.Float,
+    "location": fields.String,
     "images": fields.List(fields.String),
     "amenities": fields.List(fields.Nested(amenity_response_model)),
     "reviews": fields.List(fields.Nested(review_response_model)),
+    "number_of_rooms": fields.Integer,
+    "max_guests": fields.Integer,
+    "tagline": fields.String,
+    "rules": fields.String,
+    "details": fields.Raw, # Return as object/list
+    "rooms": fields.List(fields.Raw),
     "created_at": fields.String,
     "updated_at": fields.String,
 })
@@ -84,6 +107,26 @@ def _get_attr(obj, key, default=None):
 class PlaceList(Resource):
     @api.marshal_list_with(place_response_model, code=200)
     def get(self):
+        user_id = request.args.get('user_id')
+        if user_id:
+            # If user_id is 'ME', use the current authenticated user
+            if user_id == 'ME':
+                # This requires a token, but the endpoint generally might not.
+                # If 'ME' is passed, we check for token manually or assume client handles it.
+                # However, @jwt_required is NOT on this method.
+                # We can try verify_jwt_in_request(optional=True)
+                from flask_jwt_extended import verify_jwt_in_request
+                try:
+                    verify_jwt_in_request()
+                    current_user_id = get_jwt_identity()
+                    if current_user_id:
+                        return facade.get_places_by_user(current_user_id), 200
+                except Exception:
+                    pass # If fails, fallback or return empty/error? 
+            
+            # If specific UUID passed
+            return facade.get_places_by_user(user_id), 200
+            
         return facade.get_all_places(), 200
 
     @jwt_required()
@@ -145,6 +188,33 @@ class PlaceResource(Resource):
 
             place = facade.get_place_info(place_id)
             return place, 200
+        except ValueError as e:
+            api.abort(400, str(e))
+
+    @jwt_required()
+    def delete(self, place_id):
+        """Delete a place"""
+        current_user_id = get_jwt_identity()
+        if not current_user_id:
+            api.abort(401, "Invalid token")
+
+        try:
+            place = facade.get_place_info(place_id)
+        except ValueError as e:
+            api.abort(404, str(e))
+
+        owner_id = str(_get_attr(place, "owner_id"))
+        
+        # Check for admin?
+        claims = get_jwt() or {}
+        is_admin = claims.get("is_admin", False)
+
+        if owner_id != str(current_user_id) and not is_admin:
+            api.abort(403, "Unauthorized action")
+
+        try:
+            facade.delete_place(place_id)
+            return {"message": "Place deleted successfully"}, 200
         except ValueError as e:
             api.abort(400, str(e))
 

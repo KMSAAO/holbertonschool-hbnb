@@ -21,6 +21,15 @@ class Place(BaseModel):
     _latitude = db.Column("latitude", db.Float, nullable=True)
     _longitude = db.Column("longitude", db.Float, nullable=True)
     _images = db.Column("images", db.Text, nullable=True, default='[]')
+    
+    # New fields for Phase 3
+    _number_of_rooms = db.Column("number_of_rooms", db.Integer, default=0)
+    _max_guests = db.Column("max_guests", db.Integer, default=0)
+    _tagline = db.Column("tagline", db.String(255), nullable=True)
+    _rules = db.Column("rules", db.Text, nullable=True)
+    _details = db.Column("details", db.Text, nullable=True) # JSON for about sections
+    _rooms = db.Column("rooms", db.Text, nullable=True, default='[]') # JSON for room list
+    _location = db.Column("location", db.String(255), nullable=True)
 
     user = relationship("User", backref="places")
 
@@ -28,7 +37,8 @@ class Place(BaseModel):
 
     amenities = relationship("Amenity", secondary=place_amenity, backref="places", lazy=True)
 
-    def __init__(self, user_id, title, description, price, status, latitude, longitude):
+    def __init__(self, user_id, title, description, price, status, latitude, longitude,
+                 number_of_rooms=0, max_guests=0, tagline=None, rules=None, details=None, rooms=None, location=None):
         super().__init__()
         self.owner_id = user_id
         self.title = title
@@ -37,6 +47,13 @@ class Place(BaseModel):
         self.status = status
         self.latitude = latitude
         self.longitude = longitude
+        self.number_of_rooms = number_of_rooms
+        self.max_guests = max_guests
+        self.tagline = tagline
+        self.rules = rules
+        self.details = details or '[]'
+        self.rooms = rooms or []
+        self.location = location
         self.amenities = []
         self.reviews = []
 
@@ -132,6 +149,82 @@ class Place(BaseModel):
             self._images = value
         else:
             self._images = '[]'
+
+    @property
+    def number_of_rooms(self):
+        return self._number_of_rooms
+
+    @number_of_rooms.setter
+    def number_of_rooms(self, value):
+        self._number_of_rooms = int(value) if value else 0
+
+    @property
+    def max_guests(self):
+        return self._max_guests
+
+    @max_guests.setter
+    def max_guests(self, value):
+        self._max_guests = int(value) if value else 0
+
+    @property
+    def tagline(self):
+        return self._tagline
+
+    @tagline.setter
+    def tagline(self, value):
+        self._tagline = value
+
+    @property
+    def rules(self):
+        return self._rules
+
+    @rules.setter
+    def rules(self, value):
+        self._rules = value
+
+    @property
+    def details(self):
+        if not self._details:
+            return []
+        try:
+            return json.loads(self._details)
+        except (json.JSONDecodeError, TypeError):
+            return []
+
+    @details.setter
+    def details(self, value):
+        if isinstance(value, list):
+            self._details = json.dumps(value)
+        elif isinstance(value, str):
+            self._details = value
+        else:
+            self._details = '[]'
+
+    @property
+    def rooms(self):
+        if not self._rooms:
+            return []
+        try:
+            return json.loads(self._rooms)
+        except (json.JSONDecodeError, TypeError):
+            return []
+
+    @rooms.setter
+    def rooms(self, value):
+        if isinstance(value, list):
+            self._rooms = json.dumps(value)
+        elif isinstance(value, str):
+            self._rooms = value
+        else:
+            self._rooms = '[]'
+
+    @property
+    def location(self):
+        return self._location
+
+    @location.setter
+    def location(self, value):
+        self._location = value
     
     def to_dict(self):
         return {
@@ -144,6 +237,13 @@ class Place(BaseModel):
             "latitude": self.latitude,
             "longitude": self.longitude,
             "images": self.images,
+            "number_of_rooms": self.number_of_rooms,
+            "max_guests": self.max_guests,
+            "tagline": self.tagline,
+            "rules": self.rules,
+            "details": self.details,
+            "rooms": self.rooms,
+            "location": self.location,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
         }

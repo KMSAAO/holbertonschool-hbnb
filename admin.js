@@ -27,6 +27,16 @@ function clearEditMode() {
     if (imageInput) {
         imageInput.required = true;
     }
+
+    const locationInput = document.getElementById('hotelLocation');
+    if (locationInput) {
+        locationInput.required = true;
+    }
+
+    const regionInput = document.getElementById('hotelRegion');
+    if (regionInput) {
+        regionInput.required = true;
+    }
 }
 
 function setEditMode(placeId) {
@@ -45,6 +55,18 @@ function setEditMode(placeId) {
     const imageInput = document.getElementById('hotelImages');
     if (imageInput) {
         imageInput.required = false;
+    }
+
+    // Location/region are not fully represented in backend place schema yet.
+    // Keep edit flow usable by relaxing these required flags while editing.
+    const locationInput = document.getElementById('hotelLocation');
+    if (locationInput) {
+        locationInput.required = false;
+    }
+
+    const regionInput = document.getElementById('hotelRegion');
+    if (regionInput) {
+        regionInput.required = false;
     }
 }
 
@@ -395,27 +417,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const previousHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
-            const nextHotels = JSON.parse(JSON.stringify(previousHotels));
+            // const previousHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
+            // const nextHotels = JSON.parse(JSON.stringify(previousHotels));
 
-            let targetIndex = -1;
+            // let targetIndex = -1;
+            /*
             if (isEditMode) {
                 targetIndex = nextHotels.findIndex(h => h.id === currentEditId);
-                if (targetIndex === -1) {
-                    alert('تعذر العثور على الفندق المراد تعديله. يرجى تحديث الصفحة والمحاولة مرة أخرى.');
-                    clearEditMode();
-                    return;
-                }
-
-                // الاحتفاظ بالـ ID والصور الحالية حتى يتم رفع صور جديدة بنجاح.
-                hotelData.id = currentEditId;
-                hotelData.images = previousHotels[targetIndex]?.images || [];
-                nextHotels[targetIndex] = hotelData;
+                // ...
             } else {
-                hotelData.images = [];
-                nextHotels.push(hotelData);
-                targetIndex = nextHotels.length - 1;
+                // ...
             }
+            */
 
             // أيضاً حفظ/تحديث في الـ backend
             const userId = localStorage.getItem('userId');
@@ -425,6 +438,151 @@ document.addEventListener('DOMContentLoaded', () => {
                     let apiPlace;
 
                     if (isEditMode) {
+                        // Resolve amenities to IDs for update
+                        const allAmenities = await AmenitiesAPI.getAll();
+                        const resolvedAmenityIds = [];
+                        const createdAmenityIds = [];
+                        // Deduplicate by text (normalized) to avoid sending duplicates
+                        const processedTexts = new Set();
+                        const normalizeAmenityName = (value) => {
+                            return (value || '')
+                                .toString()
+                                .trim()
+                                .toLowerCase()
+                                .replace(/[\u064b-\u0652]/g, '')
+                                .replace(/[\u0623\u0625\u0622]/g, '\u0627')
+                                .replace(/\u0629/g, '\u0647')
+                                .replace(/\u0649/g, '\u064a')
+                                .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+                                .replace(/\s+/g, ' ')
+                                .replace(/^(?:\u0627\u0644)\s*/, '')
+                                .trim();
+                        };
+                        const aliasMap = {
+                            wifi: ['wifi', 'wi fi', 'wi-fi', 'internet', 'wireless', 'واي فاي', 'وايفاي', 'انترنت', 'الانترنت'],
+                            parking: ['parking', 'car park', 'garage', 'موقف سيارات', 'مواقف سيارات', 'باركينج', 'موقف'],
+                            'swimming pool': ['swimming pool', 'pool', 'حمام سباحه', 'حمام سباحة', 'مسبح', 'المسبح'],
+                            gym: ['gym', 'fitness', 'fitness center', 'جيم', 'نادي رياضي', 'صالة رياضة', 'الصالة الرياضية'],
+                            restaurant: ['restaurant', 'dining', 'مطعم', 'المطعم', 'مطاعم'],
+                            spa: ['spa', 'سبا', 'السبا'],
+                            'air conditioning': ['air conditioning', 'ac', 'a c', 'a/c', 'تكييف', 'التكييف', 'مكيف'],
+                            tv: ['tv', 'television', 'تلفاز', 'تلفزيون', 'التلفاز', 'التلفزيون'],
+                            laundry: ['laundry', 'washing', 'غسيل ملابس', 'غسيل', 'مغسلة', 'مغسله'],
+                            bar: ['bar', 'cocktail', 'بار', 'البار'],
+                            breakfast: ['breakfast', 'افطار', 'إفطار', 'فطور', 'الفطور', 'بوفيه'],
+                            'airport shuttle': ['airport shuttle', 'shuttle', 'airport transfer', 'نقل للمطار', 'توصيل للمطار', 'مواصلات المطار'],
+                            'pets allowed': ['pets allowed', 'pet friendly', 'pets', 'حيوانات أليفة', 'حيوانات اليفة', 'مسموح بالحيوانات'],
+                            'room service': ['room service', 'خدمة غرف', 'خدمة الغرف'],
+                            'business center': ['business center', 'مركز أعمال', 'مركز اعمال'],
+                            'wheelchair accessible': ['wheelchair accessible', 'accessible', 'دخول للكراسي المتحركة', 'مناسب لذوي الإعاقة', 'مناسب لذوي الاعاقة']
+                        };
+                        const decodeJwtPayload = (token) => {
+                            try {
+                                const payloadPart = (token || '').split('.')[1];
+                                if (!payloadPart) return null;
+                                const base64 = payloadPart.replace(/-/g, '+').replace(/_/g, '/');
+                                const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
+                                return JSON.parse(atob(padded));
+                            } catch (_) {
+                                return null;
+                            }
+                        };
+
+                        // Decode JWT claims to know if this user can create amenities
+                        let canCreateAmenities = false;
+                        const claims = decodeJwtPayload(localStorage.getItem('access_token') || '');
+                        canCreateAmenities = !!(claims && claims.is_admin);
+
+                        for (const item of hotelData.amenities) {
+                            const rawText = (item.text || '').trim();
+                            if (!rawText) {
+                                alert('يوجد مرفق بدون اسم. يرجى إدخال اسم صالح قبل التحديث.');
+                                return;
+                            }
+                            const normalizedText = normalizeAmenityName(rawText);
+
+                            if (processedTexts.has(normalizedText)) {
+                                continue;
+                            }
+                            processedTexts.add(normalizedText);
+
+                            // Try matching by exact text + option aliases (Arabic/English + tokens)
+                            const option = amenityOptions.find(opt => {
+                                return opt.icon === item.icon
+                                    || normalizeAmenityName(opt.label) === normalizedText
+                                    || normalizeAmenityName(opt.labelEn) === normalizedText;
+                            });
+                            const candidateNames = new Set([
+                                normalizedText,
+                                normalizeAmenityName(rawText)
+                            ]);
+                            if (option) {
+                                candidateNames.add(normalizeAmenityName(option.label));
+                                candidateNames.add(normalizeAmenityName(option.labelEn));
+                                candidateNames.add((option.label || '').trim().toLowerCase());
+                                candidateNames.add((option.labelEn || '').trim().toLowerCase());
+                                (option.labelEn || '')
+                                    .split(/\s+/)
+                                    .map(s => normalizeAmenityName(s.trim().toLowerCase()))
+                                    .filter(Boolean)
+                                    .forEach(token => candidateNames.add(token));
+                                const optionKey = normalizeAmenityName(option.labelEn);
+                                (aliasMap[optionKey] || [])
+                                    .map(alias => normalizeAmenityName(alias))
+                                    .filter(Boolean)
+                                    .forEach(alias => candidateNames.add(alias));
+                            }
+
+                            const match = allAmenities.find(a =>
+                                candidateNames.has(((a.amenity_name || '').trim().toLowerCase()))
+                                || candidateNames.has(normalizeAmenityName(a.amenity_name))
+                            );
+
+                            if (match) {
+                                resolvedAmenityIds.push(match.id);
+                                continue;
+                            }
+
+                            if (!canCreateAmenities) {
+                                alert(`المرفق "${rawText}" غير موجود في النظام، ولا تملك صلاحية إنشاء مرافق جديدة.\n\nتم إلغاء التحديث لضمان عدم فقدان البيانات.`);
+                                return;
+                            }
+
+                            // Explicit creation of missing amenity
+                            try {
+                                const newAmenity = await AmenitiesAPI.create({
+                                    amenity_name: rawText,
+                                    status: 'Active' // Default
+                                });
+                                if (newAmenity && newAmenity.id) {
+                                    resolvedAmenityIds.push(newAmenity.id);
+                                    createdAmenityIds.push(newAmenity.id);
+                                } else {
+                                    throw new Error('Created amenity has no ID');
+                                }
+                            } catch (createErr) {
+                                console.error('Failed to create amenity:', rawText, createErr);
+
+                                // Best-effort rollback to avoid partially-created amenities
+                                if (createdAmenityIds.length > 0 && typeof AmenitiesAPI !== 'undefined' && typeof AmenitiesAPI.delete === 'function') {
+                                    for (const createdId of createdAmenityIds) {
+                                        try {
+                                            await AmenitiesAPI.delete(createdId);
+                                        } catch (rollbackErr) {
+                                            console.warn('Rollback delete failed for amenity:', createdId, rollbackErr);
+                                        }
+                                    }
+                                }
+
+                                // Stop update to prevent data loss (silent removal of amenity)
+                                alert(`عذراً، تعذر إنشاء المرفق "${rawText}".\n\nالسبب: ${createErr.message || 'خطأ غير معروف'}.\n\nتم إلغاء التحديث لضمان عدم فقدان البيانات.`);
+                                return; // Abort submission
+                            }
+                        }
+
+                        // Deduplicate IDs as a final safeguard
+                        const uniqueAmenityIds = [...new Set(resolvedAmenityIds)];
+
                         // تحديث
                         apiPlace = await PlacesAPI.update(currentEditId, {
                             title: hotelData.name || hotelData.nameEn,
@@ -432,7 +590,15 @@ document.addEventListener('DOMContentLoaded', () => {
                             price: parseFloat(hotelData.startPrice) || 0,
                             latitude: hotelData.latitude,
                             longitude: hotelData.longitude,
-                            status: 'available'
+                            location: hotelData.location,
+                            status: 'available',
+                            number_of_rooms: hotelData.rooms.length,
+                            max_guests: 0, // Placeholder
+                            tagline: hotelData.tagline,
+                            rules: '', // Placeholder
+                            details: hotelData.about,
+                            rooms: hotelData.rooms,
+                            amenities: uniqueAmenityIds // Send IDs
                         });
                         console.log('تم تحديث المكان في الـ backend:', apiPlace);
                     } else {
@@ -441,52 +607,45 @@ document.addEventListener('DOMContentLoaded', () => {
                             title: hotelData.name || hotelData.nameEn,
                             description: hotelData.about?.[0]?.text || hotelData.tagline || '',
                             price: parseFloat(hotelData.startPrice) || 0,
+                            // Create flow still accepts naive list of objects/strings as per previous service logic
                             amenities: hotelData.amenities,
+                            location: hotelData.location,
                             user_id: userId,
                             latitude: hotelData.latitude,
                             longitude: hotelData.longitude,
-                            status: 'available'
+                            status: 'available',
+                            number_of_rooms: hotelData.rooms.length,
+                            max_guests: 0,
+                            tagline: hotelData.tagline,
+                            rules: '',
+                            details: hotelData.about,
+                            rooms: hotelData.rooms
                         });
                         console.log('تم حفظ المكان في الـ backend:', apiPlace);
                     }
 
                     // رفع الصور إلى السيرفر (إذا وجدت صور جديدة)
-                    let uploadedImages = [];
                     if (apiPlace && apiPlace.id && imageFiles.length > 0) {
                         try {
                             const uploadResult = await PlacesAPI.uploadImages(apiPlace.id, imageFiles);
-                            uploadedImages = uploadResult.images || [];
-                            console.log('تم رفع الصور بنجاح:', uploadedImages);
+                            console.log('تم رفع الصور بنجاح');
                         } catch (uploadErr) {
                             console.warn('تعذر رفع الصور:', uploadErr);
                         }
                     }
 
-                    // مزامنة localStorage بعد نجاح العملية في الـ backend
-                    if (!isEditMode && apiPlace && apiPlace.id) {
-                        nextHotels[targetIndex].id = apiPlace.id;
-                    }
-
-                    if (uploadedImages.length > 0) {
-                        nextHotels[targetIndex].images = uploadedImages;
-                    }
-
-                    localStorage.setItem('userHotels', JSON.stringify(nextHotels));
                     clearEditMode();
-
-                    alert(isEditMode ? 'تم تحديث الفندق بنجاح!' : 'تم إضافة الفندق بنجاح! سيظهر في صفحة الوجهات.');
-                    window.location.reload();
+                    alert(isEditMode ? 'تم تحديث الفندق بنجاح!' : 'تم إضافة الفندق بنجاح!');
+                    // Reload list instead of page reload
+                    displayUserHotels();
+                    // window.location.reload(); 
 
                 } catch (err) {
                     console.error('تعذر حفظ/تحديث المكان في الـ backend:', err);
                     alert('عذراً، حدث خطأ أثناء الاتصال بالخادم.\n\n' + err.message);
                 }
             } else {
-                // أوفلاين
-                localStorage.setItem('userHotels', JSON.stringify(nextHotels));
-                clearEditMode();
-                alert('تم الحفظ محلياً فقط.');
-                window.location.reload();
+                alert('يجب تسجيل الدخول لإضافة فندق.');
             }
         });
 
@@ -507,59 +666,91 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ==================== عرض وإدارة الفنادق المضافة ====================
 
+// ==================== عرض وإدارة الفنادق المضافة ====================
+
+let currentUserHotels = []; // لتخزين القائمة المحملة من الـ API
+
 // عرض الفنادق المضافة من المستخدم
-function displayUserHotels() {
+async function displayUserHotels() {
     const container = document.getElementById('userHotelsList');
     if (!container) return;
 
-    const userHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
-
-    if (userHotels.length === 0) {
-        container.innerHTML = '<p class="empty-message">لم تقم بإضافة أي فنادق بعد</p>';
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+        container.innerHTML = '<p class="empty-message">يجب تسجيل الدخول لعرض الفنادق.</p>';
         return;
     }
 
-    container.innerHTML = '';
-    userHotels.forEach((hotel, index) => {
-        const card = document.createElement('div');
-        card.className = 'user-hotel-card';
-        card.innerHTML = `
-            <img src="${hotel.images[0] || 'images/default-hotel.jpg'}" alt="${hotel.name}" class="user-hotel-image">
-            <div class="user-hotel-info">
-                <h3 class="user-hotel-name">${hotel.name}</h3>
-                <p class="user-hotel-location">
-                    <i class="fas fa-map-marker-alt"></i>
-                    ${hotel.location}
-                </p>
-                <div class="user-hotel-actions">
-                    <button class="edit-hotel-btn" onclick="editHotel(${index})">
-                        <i class="fas fa-edit"></i> تعديل
-                    </button>
-                    <button class="delete-hotel-btn" onclick="deleteHotel(${index})">
-                        <i class="fas fa-trash"></i> حذف
-                    </button>
+    container.innerHTML = '<p class="loading-message">جاري تحميل الفنادق...</p>';
+
+    try {
+        // Fetch from API
+        // We use 'ME' if we have a token, but here we might rely on the token being in headers
+        // PlacesAPI.getAll uses apiGet which should attach token.
+        // We can pass user_id='ME' to leverage the backend filter we just verified.
+        const places = await PlacesAPI.getAll({ user_id: 'ME' });
+        currentUserHotels = places;
+
+        if (!places || places.length === 0) {
+            container.innerHTML = '<p class="empty-message">لم تقم بإضافة أي فنادق بعد</p>';
+            return;
+        }
+
+        container.innerHTML = '';
+        places.forEach((hotel) => {
+            const imageUrl = (hotel.images && hotel.images.length > 0)
+                ? hotel.images[0]
+                : 'images/default-hotel.jpg';
+
+            // API returns 'title', frontend used 'name'.
+            // API returns 'tagline' or 'description'.
+
+            const card = document.createElement('div');
+            card.className = 'user-hotel-card';
+            card.innerHTML = `
+                <img src="${imageUrl}" alt="${hotel.title}" class="user-hotel-image">
+                <div class="user-hotel-info">
+                    <h3 class="user-hotel-name">${hotel.title}</h3>
+                    <p class="user-hotel-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        ${hotel.location || hotel.tagline || 'لا يوجد وصف مختصر'}
+                    </p>
+                    <div class="user-hotel-actions">
+                        <button class="edit-hotel-btn" onclick="editHotel('${hotel.id}')">
+                            <i class="fas fa-edit"></i> تعديل
+                        </button>
+                        <button class="delete-hotel-btn" onclick="deleteHotel('${hotel.id}')">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </div>
                 </div>
-            </div>
-        `;
-        container.appendChild(card);
-    });
+            `;
+            container.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error('Error fetching hotels:', error);
+        container.innerHTML = '<p class="error-message">تعذر تحميل الفنادق.</p>';
+    }
 }
 
 // حذف فندق
-function deleteHotel(index) {
+async function deleteHotel(id) {
     if (confirm('هل أنت متأكد من حذف هذا الفندق؟')) {
-        let userHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
-        userHotels.splice(index, 1);
-        localStorage.setItem('userHotels', JSON.stringify(userHotels));
-        displayUserHotels();
-        alert('تم حذف الفندق بنجاح');
+        try {
+            await PlacesAPI.delete(id);
+            alert('تم حذف الفندق بنجاح');
+            displayUserHotels(); // Refresh list
+        } catch (error) {
+            console.error('Error deleting hotel:', error);
+            alert('تعذر حذف الفندق: ' + error.message);
+        }
     }
 }
 
 // تعديل فندق
-function editHotel(index) {
-    const userHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
-    const hotel = userHotels[index];
+function editHotel(id) {
+    const hotel = currentUserHotels.find(h => h.id === id);
 
     if (!hotel) return;
 
@@ -567,11 +758,22 @@ function editHotel(index) {
     setEditMode(hotel.id);
 
     // 1. ملء الحقول الأساسية
-    document.getElementById('hotelName').value = hotel.name || '';
-    document.getElementById('hotelNameEn').value = hotel.nameEn || '';
+    // API uses 'title', 'price', etc.
+    document.getElementById('hotelName').value = hotel.title || '';
+    // hotelNameEn might not exist in API model? We assume title is enough for now or use same.
+    document.getElementById('hotelNameEn').value = hotel.title || '';
+
+    // API doesn't have 'location' as string, it has lat/long. 
+    // Maybe 'tagline' stores location text if we abuse it? 
+    // Or we assume location is part of description?
+    // Current backend has 'tagline'. Admin form has 'location' field.
+    // If we want to persist 'location' text, we should have added it to backend.
+    // For now, let's map 'location' to 'tagline' or leave empty?
+    // Wait, Place model has 'tagline'.
     document.getElementById('hotelLocation').value = hotel.location || '';
     document.getElementById('hotelTagline').value = hotel.tagline || '';
-    document.getElementById('hotelRegion').value = hotel.region || '';
+    document.getElementById('hotelRegion').value = ''; // Not in API
+
     document.getElementById('hotelLatitude').value = hotel.latitude ?? '';
     document.getElementById('hotelLongitude').value = hotel.longitude ?? '';
 
@@ -579,25 +781,46 @@ function editHotel(index) {
     const aboutContainer = document.getElementById('aboutSections');
     aboutContainer.innerHTML = ''; // مسح القديم
 
-    // إضافة الأقسام الموجودة
-    if (hotel.about && hotel.about.length > 0) {
-        hotel.about.forEach(item => {
-            addAboutSection(); // إضافة عنصر DOM جديد
+    // hotel.details is JSON/List from API (Phase 3)
+    let aboutData = hotel.details;
+    if (typeof aboutData === 'string') {
+        try { aboutData = JSON.parse(aboutData); } catch (e) { }
+    }
+
+    if (aboutData && Array.isArray(aboutData) && aboutData.length > 0) {
+        aboutData.forEach(item => {
+            addAboutSection();
             const sections = document.querySelectorAll('.about-item');
-            const lastSection = sections[sections.length - 1]; // الحصول على آخر واحد أضيف
+            const lastSection = sections[sections.length - 1];
 
             lastSection.querySelector('.about-title').value = item.title;
             lastSection.querySelector('.about-content').value = item.text;
             lastSection.querySelector('.about-icon').value = item.icon;
         });
     } else {
-        // إذا لم يوجد، أضف واحداً فارغاً
+        // Fallback or empty
         addAboutSection();
+        // If we have description but no details, maybe put description in first section?
+        if (hotel.description) {
+            const sections = document.querySelectorAll('.about-item');
+            const lastSection = sections[sections.length - 1];
+            lastSection.querySelector('.about-title').value = 'الوصف';
+            lastSection.querySelector('.about-content').value = hotel.description;
+        }
     }
 
     // 3. ملء المرافق
     const amenitiesContainer = document.getElementById('amenitiesList');
     amenitiesContainer.innerHTML = '';
+
+    // hotel.amenities is list of Amenity objects {id, amenity_name, ...} or similar from API
+    // Frontend expects {icon, text}
+    // We need to map if possible. But backend Amenity model doesn't store icon!
+    // This is a disconnect.
+    // Frontend Admin stores amenities as rich objects. Backend stores Amenity entities.
+    // If we want to persist Icons, we need to store them in Amenity table OR uses a fixed mapping.
+    // admin.js line 91 has `amenityOptions`.
+    // We can try to match amenity_name to label/labelEn to find icon.
 
     if (hotel.amenities && hotel.amenities.length > 0) {
         hotel.amenities.forEach(item => {
@@ -609,15 +832,15 @@ function editHotel(index) {
             const textInput = lastAmenity.querySelector('.amenity-text');
             const triggerSpan = lastAmenity.querySelector('.dropdown-trigger span');
 
-            iconInput.value = item.icon;
-            textInput.value = item.text;
+            // Try to find icon from name
+            const foundOpt = amenityOptions.find(opt => opt.label === item.amenity_name || opt.labelEn === item.amenity_name) || amenityOptions[0];
+            const iconClass = item.icon || foundOpt.icon;
 
-            // تحديث العرض البصري للأيقونة
-            // البحث عن LabelEn إذا أمكن
-            const opt = amenityOptions.find(o => o.icon === item.icon);
-            const labelEn = opt ? opt.labelEn : 'Selected';
+            iconInput.value = iconClass;
+            textInput.value = item.amenity_name; // Use backend name
 
-            triggerSpan.innerHTML = `<i class="${item.icon}"></i> ${labelEn}`;
+            const labelEn = foundOpt.labelEn;
+            triggerSpan.innerHTML = `<i class="${iconClass}"></i> ${labelEn}`;
         });
     } else {
         addAmenity();
@@ -627,24 +850,27 @@ function editHotel(index) {
     const roomsContainer = document.getElementById('roomsList');
     roomsContainer.innerHTML = '';
 
-    if (hotel.rooms && hotel.rooms.length > 0) {
-        hotel.rooms.forEach(item => {
+    const roomsData = Array.isArray(hotel.rooms) ? hotel.rooms : [];
+    if (roomsData.length > 0) {
+        roomsData.forEach(item => {
             addRoom();
             const rooms = document.querySelectorAll('.room-item');
             const lastRoom = rooms[rooms.length - 1];
 
-            lastRoom.querySelector('.room-name').value = item.name;
-            lastRoom.querySelector('.room-price').value = item.price;
-            lastRoom.querySelector('.room-size').value = item.size;
-            // المميزات قد تكون مصفوفة
-            const features = Array.isArray(item.features) ? item.features.join(', ') : item.features;
+            lastRoom.querySelector('.room-name').value = item.name || '';
+            lastRoom.querySelector('.room-price').value = item.price ?? '';
+            lastRoom.querySelector('.room-size').value = item.size ?? '';
+
+            const features = Array.isArray(item.features)
+                ? item.features.join(', ')
+                : (item.features || '');
             lastRoom.querySelector('.room-features').value = features;
         });
     } else {
         addRoom();
     }
 
-    // مسح الصور من العرض لأننا لا نستطيع تعيين value لـ input file
+    // مسح الصور من العرض
     document.getElementById('imagesPreview').innerHTML = '';
 
     // التمرير للأعلى

@@ -30,6 +30,10 @@ class Repository(ABC):
     def get_by_attribute(self, attr_name, value):
         pass
 
+    @abstractmethod
+    def get_all_by_attribute(self, attr_name, value):
+        pass
+
 class SQLAlchemyRepository(Repository):
     def __init__(self, model):
         self.model = model
@@ -67,6 +71,9 @@ class SQLAlchemyRepository(Repository):
 
     def get_by_attribute(self, attr_name, value):
         return self.model.query.filter_by(**{attr_name: value}).first()
+
+    def get_all_by_attribute(self, attr_name, value):
+        return self.model.query.filter_by(**{attr_name: value}).all()
     
     def commit(self):
         db.session.commit()

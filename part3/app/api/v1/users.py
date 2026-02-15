@@ -10,7 +10,8 @@ user_create_model = api.model("UserCreate", {
     "last_name":  fields.String(required=True, description="Last Name"),
     "email":      fields.String(required=True, description="Email"),
     "password":   fields.String(required=True, description="Password"),
-    "is_admin":   fields.Boolean(required=False, default=False, description="Is Admin"),
+    "is_admin":   fields.Boolean(required=False, default=False, description="Request Admin Role"),
+    "admin_code": fields.String(required=False, description="Admin signup code"),
     "is_active":  fields.Boolean(required=False, default=True, description="Is Active"),
 })
 

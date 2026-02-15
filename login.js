@@ -41,6 +41,23 @@ function togglePasswordVisibility(inputId) {
     }
 }
 
+function toggleAdminCodeField() {
+    const isAdminCheckbox = document.getElementById('signupIsAdmin');
+    const adminCodeGroup = document.getElementById('adminCodeGroup');
+    const adminCodeInput = document.getElementById('signupAdminCode');
+
+    if (!isAdminCheckbox || !adminCodeGroup || !adminCodeInput) return;
+
+    if (isAdminCheckbox.checked) {
+        adminCodeGroup.style.display = 'block';
+        adminCodeInput.required = true;
+    } else {
+        adminCodeGroup.style.display = 'none';
+        adminCodeInput.required = false;
+        adminCodeInput.value = '';
+    }
+}
+
 // دالة عرض الإشعارات
 function showNotification(message, type = 'error') {
     // إزالة أي إشعار قديم إن وجد
@@ -164,6 +181,8 @@ async function handleSignup(event) {
     const email = document.getElementById('signupEmail').value.trim();
     const password = document.getElementById('signupPassword').value;
     const confirmPassword = document.getElementById('signupConfirmPassword').value;
+    const isAdmin = !!document.getElementById('signupIsAdmin')?.checked;
+    const adminCode = document.getElementById('signupAdminCode')?.value || '';
 
     // --- التحقق من الشروط (Validations) ---
 
@@ -198,6 +217,11 @@ async function handleSignup(event) {
         return;
     }
 
+    if (isAdmin && !adminCode.trim()) {
+        showNotification('الرجاء إدخال كود المسؤول', 'error');
+        return;
+    }
+
     try {
         // لاحظ: الرابط بدون شرطة في النهاية لتجنب مشاكل CORS
         const response = await fetch('http://127.0.0.1:5000/api/v1/users', {
@@ -207,7 +231,9 @@ async function handleSignup(event) {
                 first_name: firstName,
                 last_name: lastName,
                 email: email,
-                password: password
+                password: password,
+                is_admin: isAdmin,
+                admin_code: adminCode.trim()
             })
         });
 
@@ -253,5 +279,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (signupForm) {
         signupForm.removeEventListener('submit', handleSignup);
         signupForm.addEventListener('submit', handleSignup);
+    }
+
+    const isAdminCheckbox = document.getElementById('signupIsAdmin');
+    if (isAdminCheckbox) {
+        isAdminCheckbox.addEventListener('change', toggleAdminCodeField);
+        toggleAdminCodeField();
     }
 });

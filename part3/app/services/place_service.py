@@ -11,10 +11,19 @@ class PlaceService():
         title = place_data.get('title')
         description = place_data.get('description')
         price = place_data.get('price')
-        status = place_data.get('status')
+        status = place_data.get('status', PlaceStatus.AVAILABLE)
         latitude = place_data.get('latitude')
         longitude = place_data.get('longitude')
+        location = place_data.get('location')
         amenities_data = place_data.get('amenities', [])
+        
+        # New fields for Phase 3
+        number_of_rooms = place_data.get('number_of_rooms', 0)
+        max_guests = place_data.get('max_guests', 0)
+        tagline = place_data.get('tagline')
+        rules = place_data.get('rules')
+        details = place_data.get('details') # Expecting JSON string or list
+        rooms = place_data.get('rooms', [])
 
         place = Place(
             user_id=owner.id,
@@ -23,7 +32,14 @@ class PlaceService():
             price=price,
             status=status,
             latitude=latitude,
-            longitude=longitude
+            longitude=longitude,
+            number_of_rooms=number_of_rooms,
+            max_guests=max_guests,
+            tagline=tagline,
+            rules=rules,
+            details=details,
+            rooms=rooms,
+            location=location
         )
 
         # Handle amenities
@@ -33,9 +49,8 @@ class PlaceService():
             
             for amenity_item in amenities_data:
                 # admin.js sends {icon: "...", text: "..."}
-                # Check format, simpler API might just send list of IDs or names?
-                # Admin JS sends objects.
                 amenity_name = amenity_item.get('text') if isinstance(amenity_item, dict) else amenity_item
+                amenity_icon = amenity_item.get('icon') if isinstance(amenity_item, dict) else None
                 
                 if amenity_name:
                     # Check if exists
@@ -49,7 +64,8 @@ class PlaceService():
                         new_amenity = Amenity(
                             amenity_name=amenity_name,
                             description=None,
-                            status=PlaceAmenityStatus.ACTIVE # Default status
+                            status=PlaceAmenityStatus.ACTIVE, # Default status
+                            icon=amenity_icon
                         )
                         amenity_repo.add(new_amenity)
                         place.amenities.append(new_amenity)
@@ -88,7 +104,14 @@ class PlaceService():
                 } if place.user else None,
                 "amenities": [amenity.to_dict() for amenity in place.amenities],
                 "reviews": [review.to_dict() for review in place.reviews],
-                "images": [] # JSON parsing needed if images are stored as string
+                "images": [],
+                "number_of_rooms": place.number_of_rooms,
+                "max_guests": place.max_guests,
+                "tagline": place.tagline,
+                "rules": place.rules,
+                "details": place.details, # Already handles JSON parsing in model property
+                "rooms": place.rooms,
+                "location": place.location
             }
             
             # Handle images if they are stored as JSON string or list
@@ -104,7 +127,7 @@ class PlaceService():
             
             return place_dict
     
-    def update_place(self, place_id: str, place_data: dict, place_repo) -> bool:
+    def update_place(self, place_id: str, place_data: dict, place_repo, amenity_repo=None) -> bool:
 
         place = place_repo.get(place_id)
         if not place:
@@ -131,12 +154,68 @@ class PlaceService():
         if "images" in place_data:
             place.images = place_data["images"]
 
+        # New fields updates
+        if "number_of_rooms" in place_data:
+            place.number_of_rooms = place_data["number_of_rooms"]
+            
+        if "max_guests" in place_data:
+            place.max_guests = place_data["max_guests"]
+            
+        if "tagline" in place_data:
+            place.tagline = place_data["tagline"]
+            
+        if "rules" in place_data:
+            place.rules = place_data["rules"]
+            
+        if "details" in place_data:
+            place.details = place_data["details"]
+
+        if "rooms" in place_data:
+            place.rooms = place_data["rooms"]
+
+        if "location" in place_data:
+            place.location = place_data["location"]
+
+        if "amenities" in place_data:
+            if not amenity_repo:
+                raise ValueError("amenity repository unavailable")
+
+            amenity_ids = place_data["amenities"]
+            if not isinstance(amenity_ids, list):
+                raise ValueError("amenities must be a list of IDs")
+
+            normalized_ids = []
+            seen_ids = set()
+            for raw_id in amenity_ids:
+                if not isinstance(raw_id, str):
+                    raise ValueError("amenities must be a list of amenity ID strings")
+
+                amenity_id = raw_id.strip()
+                if not amenity_id:
+                    raise ValueError("amenities contains an empty amenity ID")
+
+                if amenity_id in seen_ids:
+                    continue
+
+                seen_ids.add(amenity_id)
+                normalized_ids.append(amenity_id)
+
+            new_amenities = []
+            for amenity_id in normalized_ids:
+                amenity = amenity_repo.get(amenity_id)
+                if not amenity:
+                    raise ValueError(f"Amenity not found: {amenity_id}")
+                new_amenities.append(amenity)
+
+            # Atomic replace after full validation
+            place.amenities = new_amenities
+
         return True
     
     def get_all_places(self, place_repo):
         return place_repo.get_all()
 
-    def delete_place(place_id: str, place_repo) -> bool:
+    def delete_place(self, place_id: str, place_repo) -> bool:
         if not isinstance(place_id, str):
             raise ValueError("Place ID must be a string")
 
@@ -145,6 +224,9 @@ class PlaceService():
             raise ValueError("Place not found")
 
         return place_repo.delete(place_id)
+
+    def get_places_by_user(self, user_id: str, place_repo):
+        return place_repo.get_all_by_attribute('_user_id', user_id)
 
     def add_amenity(self, place_id: str, amenity_id: str, place_repo, amenity_repo) -> bool:
         place = place_repo.get(place_id)

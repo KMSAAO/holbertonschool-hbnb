@@ -70,7 +70,7 @@ async function fetchPlaceFromBackend(placeId) {
                 id: data.id,
                 name: data.title || 'مكان',
                 nameAr: data.title || '',
-                location: `${data.latitude || ''}, ${data.longitude || ''}`,
+                location: data.location || `${data.latitude || ''}, ${data.longitude || ''}`,
                 rating: 5, // افتراضي
                 startPrice: data.price || 0,
                 images: images,

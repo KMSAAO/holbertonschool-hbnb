@@ -43,16 +43,78 @@ def create_app(config_class="config.DevelopmentConfig"):
     with app.app_context():
         db.create_all()
 
-        # Idempotent migration: add 'images' column if it doesn't exist
+        # Idempotent migration: ensure evolving place schema columns exist
+        place_columns = [
+            ("images", "TEXT DEFAULT '[]'"),
+            ("number_of_rooms", "INTEGER DEFAULT 0"),
+            ("max_guests", "INTEGER DEFAULT 0"),
+            ("tagline", "VARCHAR(255)"),
+            ("rules", "TEXT"),
+            ("details", "TEXT"),
+            ("rooms", "TEXT DEFAULT '[]'"),
+        ]
+
+        for column_name, column_type in place_columns:
+            try:
+                db.session.execute(db.text(
+                    f"ALTER TABLE places ADD COLUMN {column_name} {column_type}"
+                ))
+                db.session.commit()
+                print(f"✅ Migration: '{column_name}' column added to places table")
+            except Exception:
+                db.session.rollback()
+                # Column likely exists — safe to ignore
+
+        # Idempotent seed: ensure admin default amenity catalog exists for frontend options
         try:
-            db.session.execute(db.text(
-                "ALTER TABLE places ADD COLUMN images TEXT DEFAULT '[]'"
-            ))
-            db.session.commit()
-            print("✅ Migration: 'images' column added to places table")
+            from app.models.amenity import Amenity
+            from app.enums.place_amenity_status import PlaceAmenityStatus
+
+            default_amenities = [
+                ("واي فاي", "fas fa-wifi"),
+                ("موقف سيارات", "fas fa-parking"),
+                ("مسبح", "fas fa-swimming-pool"),
+                ("صالة رياضة", "fas fa-dumbbell"),
+                ("مطعم", "fas fa-utensils"),
+                ("سبا", "fas fa-spa"),
+                ("تكييف", "fas fa-wind"),
+                ("تلفاز", "fas fa-tv"),
+                ("غسيل ملابس", "fas fa-tshirt"),
+                ("بار", "fas fa-cocktail"),
+                ("إفطار", "fas fa-coffee"),
+                ("نقل للمطار", "fas fa-shuttle-van"),
+                ("حيوانات أليفة", "fas fa-paw"),
+                ("خدمة غرف", "fas fa-concierge-bell"),
+                ("مركز أعمال", "fas fa-briefcase"),
+                ("دخول للكراسي المتحركة", "fas fa-wheelchair"),
+            ]
+
+            existing_names = {
+                (a.amenity_name or "").strip().lower()
+                for a in Amenity.query.all()
+                if a.amenity_name
+            }
+
+            created_count = 0
+            for amenity_name, icon in default_amenities:
+                key = amenity_name.strip().lower()
+                if key in existing_names:
+                    continue
+
+                db.session.add(Amenity(
+                    amenity_name=amenity_name,
+                    description=None,
+                    status=PlaceAmenityStatus.ACTIVE,
+                    icon=icon
+                ))
+                existing_names.add(key)
+                created_count += 1
+
+            if created_count > 0:
+                db.session.commit()
+                print(f"Seeded {created_count} default amenities")
         except Exception:
             db.session.rollback()
-            # Column already exists — safe to ignore
 
         # Create uploads directory
         upload_folder = app.config.get('UPLOAD_FOLDER', os.path.join(os.path.dirname(__file__), '..', 'uploads'))

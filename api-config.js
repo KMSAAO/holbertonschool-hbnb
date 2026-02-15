@@ -253,7 +253,7 @@ async function apiUploadFiles(endpoint, formData) {
 
 // دوال الأماكن (Places / الفنادق)
 const PlacesAPI = {
-    getAll: () => apiGet(API_ENDPOINTS.getPlaces),
+    getAll: (params) => apiGet(API_ENDPOINTS.getPlaces, params),
     getById: (id) => apiGet(replaceUrlParams(API_ENDPOINTS.getPlace, { id })),
     create: (placeData) => apiPost(API_ENDPOINTS.createPlace, placeData),
     update: (id, placeData) => apiPut(replaceUrlParams(API_ENDPOINTS.updatePlace, { id }), placeData),

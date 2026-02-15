@@ -1,5 +1,6 @@
 from app.models.user import User
 import re, hashlib, datetime
+import os
 
 class UserServices():
 
@@ -10,7 +11,19 @@ class UserServices():
         last_name  = user_data.get("last_name")
         email      = user_data.get("email")
         password   = user_data.get("password")
-        is_admin   = user_data.get("is_admin", False)
+        requested_admin = bool(user_data.get("is_admin", False))
+        admin_code = user_data.get("admin_code", "")
+        is_admin = False
+
+        if requested_admin:
+            expected_admin_code = os.getenv("ADMIN_SIGNUP_CODE", "")
+            if not expected_admin_code:
+                raise ValueError("Admin signup is disabled by server configuration")
+
+            if not admin_code or str(admin_code).strip() != expected_admin_code:
+                raise ValueError("Invalid admin code")
+
+            is_admin = True
         is_active  = user_data.get("is_active", True)
 
         if repo.get_by_attribute('email',email):

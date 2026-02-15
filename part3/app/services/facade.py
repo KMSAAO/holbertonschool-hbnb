@@ -107,7 +107,8 @@ class HBnBFacade:
         updated = self.place_service.update_place(
             place_id=place_id,
             place_data=place_data,
-            place_repo=self.place_db
+            place_repo=self.place_db,
+            amenity_repo=self.amenity_db
         )
 
         if updated:
@@ -117,6 +118,9 @@ class HBnBFacade:
 
     def get_all_places(self):
         return self.place_service.get_all_places(self.place_db)
+
+    def get_places_by_user(self, user_id: str):
+        return self.place_service.get_places_by_user(user_id, self.place_db)
 
     def delete_place(self, place_id: str) -> bool:
         return self.place_service.delete_place(
