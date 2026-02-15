@@ -69,43 +69,39 @@ async function handleLogin(event) {
         const data = await response.json();
 
         if (response.ok) {
-            // 1. حفظ التوكن في الكوكيز (للسيرفر)
+            // 1. حفظ التوكن
             if (data.access_token) {
                 document.cookie = `token=${data.access_token}; path=/`;
             }
 
-            // 2. التقاط المعرف
+            // 2. التقاط الـ ID (أهم خطوة!)
+            // نتأكد من التقاطه سواء جاء باسم id أو user_id
             const userId = data.id || data.user_id;
 
-            // 3. تجهيز كائن المستخدم (الجديد - لإصلاح مشكلة التقييم)
-            const userSession = {
+            console.log("🔥 تم التقاط المعرف:", userId); // للتأكد في الكونسول
+
+            // 3. حفظ كائن currentUser (هذا ما يبحث عنه admin.js)
+            const userObj = {
                 id: userId,
                 first_name: data.first_name || 'مستخدم',
                 last_name: data.last_name || '',
-                email: email,
-                gender: data.gender || 'male'
+                email: email
             };
+            localStorage.setItem('currentUser', JSON.stringify(userObj));
 
-            // 🔥 هنا الحل: نحفظ كل الصيغ لرضاء جميع الملفات 🔥
-            
-            // أ. الصيغة الجديدة (عشان hotel-details.js يشتغل)
-            localStorage.setItem('currentUser', JSON.stringify(userSession));
-
-            // ب. الصيغة القديمة (عشان auth.js والنافبار ما يطردوك)
+            // 4. حفظ القيم المنفصلة (عشان النافبار والملفات القديمة ما تزعل)
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('userFirstName', data.first_name || 'مستخدم');
             localStorage.setItem('userEmail', email);
-            localStorage.setItem('userId', userId); // احتياط
 
             showNotification('تم تسجيل الدخول بنجاح', 'success');
-            
-            // توجيه للصفحة الرئيسية بعد ثانية
             setTimeout(() => { window.location.href = '/'; }, 1000);
+
         } else {
             showNotification(data.message || 'فشل تسجيل الدخول', 'error');
         }
     } catch (error) {
-        console.error(error);
+        console.error('Login Error:', error);
         showNotification('حدث خطأ في الاتصال بالسيرفر', 'error');
     }
 }

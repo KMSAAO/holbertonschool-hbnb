@@ -13,7 +13,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- شريط التنقل العلوي -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
@@ -22,6 +21,9 @@
             
             <div class="nav-menu">
                 <a href="{{ url_for('index') }}" class="nav-link">الرئيسية</a>
+                
+                <a href="/admin" class="nav-link" id="adminLink" style="display: none;">إدارة النُزل</a>
+
                 <a href="{{ url_for('places') }}" class="nav-link">الوجهات</a>
                 <a href="{{ url_for('bookings') }}" class="nav-link" id="bookingsLink">حجوزاتي</a>
                 <a href="#" class="nav-link" id="logoutLink" onclick="logout(); return false;">خروج</a>
@@ -36,7 +38,6 @@
         </div>
     </nav>
 
-    <!-- سلايدر الصور -->
     <section class="hotel-slider">
         <div class="slider-wrapper">
             <div class="hotel-slide active">
@@ -55,7 +56,6 @@
                 <img src="{{ url_for('static', filename='images/shebara5.jpg') }}" alt="Shebara Resort 5">
             </div>
 
-            <!-- أسهم التنقل -->
             <button class="slider-arrow prev" onclick="changeSlide(-1)">
                 <i class="fas fa-chevron-right"></i>
             </button>
@@ -63,7 +63,6 @@
                 <i class="fas fa-chevron-left"></i>
             </button>
 
-            <!-- النقاط -->
             <div class="slider-dots">
                 <span class="dot active" onclick="goToSlide(0)"></span>
                 <span class="dot" onclick="goToSlide(1)"></span>
@@ -74,7 +73,6 @@
         </div>
     </section>
 
-    <!-- معلومات الفندق -->
     <section class="hotel-info">
         <div class="container">
             <div class="hotel-header">
@@ -83,30 +81,30 @@
                     <div class="hotel-rating"></div>
                     <div class="hotel-location"></div>
                 </div>
-                <div class="hotel-price-section"></div>
+                
+                <div class="hotel-price-section">
+                    <span id="hotelPrice" class="hotel-price">--</span> 
+                    <span class="currency">ر.س</span>
+                    <span class="unit">/ ليلة</span>
+                </div>
             </div>
 
             <div class="hotel-tagline">
                 <p></p>
             </div>
 
-            <!-- الوصف -->
             <div class="hotel-description">
                 <h2 class="section-title">عن الفندق</h2>
                 <div id="hotelFullDescription" class="description-text-only">
-                    </div>
-            </div>
-
-            <!-- المرافق -->
-            <div class="hotel-amenities">
-                <h2 class="section-title">المرافق المميزة</h2>
-                <div class="amenities-grid">
                 </div>
             </div>
 
+            <div class="hotel-amenities">
+                <h2 class="section-title">المرافق المميزة</h2>
+                <div class="amenities-grid" id="amenitiesGrid">
+                </div>
+            </div>
 
-
-            <!-- التقييمات والتعليقات -->
             <div class="reviews-section">
                 <h2 class="section-title">تقييمات النزلاء</h2>
                 <div class="reviews-summary">
@@ -154,10 +152,6 @@
         </div>
     </section>
 
-    <!-- الغرف المتاحة -->
-
-
-    <!-- زر الحجز الثابت -->
     <div class="booking-bar">
         <div class="booking-bar-content">
             <div class="booking-info">
@@ -170,15 +164,12 @@
         </div>
     </div>
 
-    <!-- الفوتر -->
     <footer class="footer">
         <div class="footer-container">
-            <!-- اللوقو -->
             <div class="footer-section">
                 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="نُزل" class="footer-logo">
             </div>
 
-            <!-- الشركة -->
             <div class="footer-section">
                 <h4 class="footer-heading">الشركة</h4>
                 <ul class="footer-links">
@@ -187,7 +178,6 @@
                 </ul>
             </div>
 
-            <!-- استكشف -->
             <div class="footer-section">
                 <h4 class="footer-heading">استكشف</h4>
                 <ul class="footer-links">
@@ -197,7 +187,6 @@
                 </ul>
             </div>
 
-            <!-- مواقع التواصل -->
             <div class="footer-section">
                 <h4 class="footer-heading">تابعنا</h4>
                 <div class="social-links">
@@ -208,7 +197,6 @@
             </div>
         </div>
 
-        <!-- حقوق النشر -->
         <div class="footer-bottom">
             <p>جميع الحقوق محفوظة © نُزل 2026</p>
         </div>

@@ -5,6 +5,9 @@ const dots = document.querySelectorAll('.dot');
 
 // تشغيل السلايدر تلقائياً
 function autoSlide() {
+    // ✅ إضافة تحقق: إذا لم تكن هناك سلايدات، توقف فوراً
+    if (slides.length === 0) return; 
+
     currentSlideIndex++;
     if (currentSlideIndex >= slides.length) {
         currentSlideIndex = 0;
@@ -14,6 +17,9 @@ function autoSlide() {
 
 // عرض سلايد معين
 function showSlide(index) {
+    // ✅ تحقق إضافي لضمان وجود السلايدات قبل الوصول لخصائصها
+    if (slides.length === 0 || !slides[index]) return; //
+
     // إخفاء جميع السلايدات
     slides.forEach(slide => {
         slide.classList.remove('active');
@@ -26,7 +32,7 @@ function showSlide(index) {
     
     // عرض السلايد المطلوب
     slides[index].classList.add('active');
-    dots[index].classList.add('active');
+    if (dots[index]) dots[index].classList.add('active');
 }
 
 // الانتقال لسلايد معين عند الضغط على النقطة
@@ -35,26 +41,35 @@ function currentSlide(n) {
     showSlide(currentSlideIndex);
 }
 
-// تشغيل السلايدر كل ثانيتين
-let slideInterval = setInterval(autoSlide, 2000);
-
-// إيقاف التشغيل التلقائي عند التمرير فوق السلايدر
-document.querySelector('.hero-slider').addEventListener('mouseenter', () => {
-    clearInterval(slideInterval);
-});
-
-// استئناف التشغيل التلقائي عند مغادرة السلايدر
-document.querySelector('.hero-slider').addEventListener('mouseleave', () => {
+// ✅ تشغيل السلايدر فقط إذا كانت العناصر موجودة فعلياً في الصفحة
+let slideInterval;
+if (slides.length > 0) {
     slideInterval = setInterval(autoSlide, 2000);
-});
+}
+
+// إيقاف التشغيل التلقائي عند التمرير فوق السلايدر (مع التحقق من وجوده)
+const heroSlider = document.querySelector('.hero-slider');
+if (heroSlider) { // ✅ هذا السطر يمنع خطأ null (reading 'addEventListener')
+    heroSlider.addEventListener('mouseenter', () => {
+        if (slideInterval) clearInterval(slideInterval);
+    });
+
+    heroSlider.addEventListener('mouseleave', () => {
+        if (slides.length > 0) {
+            slideInterval = setInterval(autoSlide, 2000);
+        }
+    });
+}
 
 // تفعيل زر "ابدأ رحلتك"
 document.querySelectorAll('.hero-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        // التمرير إلى قسم الفنادق
-        document.querySelector('.hotels-section').scrollIntoView({ 
-            behavior: 'smooth' 
-        });
+        const hotelSection = document.querySelector('.hotels-section');
+        if (hotelSection) { // ✅ تحقق من وجود القسم قبل التمرير
+            hotelSection.scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
     });
 });
 
@@ -63,19 +78,15 @@ document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', (e) => {
         const href = link.getAttribute('href');
         
-        // إذا كان الرابط يشير إلى قسم في الصفحة
-        if (href.startsWith('#') && href !== '#logout') {
+        if (href && href.startsWith('#') && href !== '#logout') {
             e.preventDefault();
             
-            // إزالة الكلاس active من جميع الروابط
             document.querySelectorAll('.nav-link').forEach(l => {
                 l.classList.remove('active');
             });
             
-            // إضافة الكلاس active للرابط الحالي
             link.classList.add('active');
             
-            // التمرير للقسم المطلوب
             const section = document.querySelector(href);
             if (section) {
                 section.scrollIntoView({ behavior: 'smooth' });
@@ -91,7 +102,6 @@ window.addEventListener('scroll', () => {
     
     sections.forEach(section => {
         const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
         if (window.pageYOffset >= sectionTop - 200) {
             current = section.getAttribute('id');
         }
@@ -99,17 +109,18 @@ window.addEventListener('scroll', () => {
     
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
-        if (link.getAttribute('href') === `#${current}`) {
+        if (current && link.getAttribute('href') === `#${current}`) {
             link.classList.add('active');
         }
     });
     
-    // إذا كنا في أعلى الصفحة، فعّل رابط الرئيسية
+    // إذا كنا في أعلى الصفحة، فعّل رابط الرئيسية (مع التحقق من وجوده)
     if (window.pageYOffset < 300) {
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.remove('active');
         });
-        document.querySelector('.nav-link[href="#"]').classList.add('active');
+        const homeLink = document.querySelector('.nav-link[href="#"]');
+        if (homeLink) homeLink.classList.add('active');
     }
 });
 

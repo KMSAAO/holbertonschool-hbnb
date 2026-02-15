@@ -9,8 +9,14 @@ login_model = api.model('Login', {
     'password': fields.String(required=True, description='User Password'),
 })
 
+# 🔥 التعديل الأول: السماح بمرور البيانات الإضافية في الاستجابة 🔥
 login_response_model = api.model('LoginResponse', {
-    'access_token': fields.String
+    'access_token': fields.String,
+    'id': fields.String,          # ضروري جداً
+    'first_name': fields.String,
+    'last_name': fields.String,
+    'email': fields.String,
+    'is_admin': fields.Boolean
 })
 
 protected_response_model = api.model('ProtectedResponse', {
@@ -57,7 +63,15 @@ class AuthLogin(Resource):
                 }
             )
 
-            return {'access_token': access_token}, 200
+            # 🔥 التعديل الثاني: إرجاع البيانات المطلوبة مع التوكن 🔥
+            return {
+                'access_token': access_token,
+                'id': user_id,            # <--- هذا هو المفتاح المفقود!
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'is_admin': is_admin
+            }, 200
 
         except ValueError as e:
             api.abort(400, str(e))

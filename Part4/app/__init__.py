@@ -47,9 +47,10 @@ def create_app(config_class="config.DevelopmentConfig"):
     @app.route("/hotel-details", strict_slashes=False)
     def hotel_details():
         return render_template("hotel-details.html")
-    @app.route("/reservation", strict_slashes=False)
+    @app.route("/payment", strict_slashes=False)
     def reservation():
         return render_template("reservation.html")
+
 
     bcrypt.init_app(app)
     jwt.init_app(app)
