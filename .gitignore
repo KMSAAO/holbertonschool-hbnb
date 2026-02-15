@@ -44,9 +44,16 @@ Thumbs.db
 # Flask stuff:
 .flaskenv
 instance/
+part3/uploads/
 
 # Local settings
 .env
 .venv
 pip-log.txt
 pip-delete-this-directory.txt
+
+# Test/runtime caches
+.pytest_cache/
+part3/.pytest_cache/
+part3/__pycache__/
+part3/tests/__pycache__/

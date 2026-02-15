@@ -52,6 +52,7 @@ def create_app(config_class="config.DevelopmentConfig"):
             ("rules", "TEXT"),
             ("details", "TEXT"),
             ("rooms", "TEXT DEFAULT '[]'"),
+            ("location", "VARCHAR(255)"),
         ]
 
         for column_name, column_type in place_columns:
@@ -65,6 +66,20 @@ def create_app(config_class="config.DevelopmentConfig"):
                 db.session.rollback()
                 # Column likely exists — safe to ignore
 
+        amenity_columns = [
+            ("icon", "VARCHAR(50)"),
+        ]
+
+        for column_name, column_type in amenity_columns:
+            try:
+                db.session.execute(db.text(
+                    f"ALTER TABLE amenities ADD COLUMN {column_name} {column_type}"
+                ))
+                db.session.commit()
+                print(f"Migration: '{column_name}' column added to amenities table")
+            except Exception:
+                db.session.rollback()
+                # Column likely exists; safe to ignore
         # Idempotent seed: ensure admin default amenity catalog exists for frontend options
         try:
             from app.models.amenity import Amenity
@@ -197,3 +212,4 @@ def user_lookup_callback(_jwt_header, jwt_data):
         return user  
     except Exception:
         return None
+
