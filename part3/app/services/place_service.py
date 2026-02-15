@@ -276,3 +276,37 @@ class PlaceService():
         place.amenities.remove(amenity)
         place_repo.add(place)
         return True
+
+    def get_top_places(self, place_repo, limit=3):
+        places = place_repo.get_all()
+        
+        # Calculate average rating for each place
+        places_with_ratings = []
+        for place in places:
+            # Check if reviews relationship is loaded or accessible
+            # In SQLAlchemy query it might be lazy, accessing it triggers load.
+            # We assume place.reviews is a list of Review objects
+            reviews = getattr(place, 'reviews', [])
+            if reviews:
+                avg_rating = sum(r.rating for r in reviews) / len(reviews)
+                places_with_ratings.append((place, avg_rating))
+        
+        # Sort by rating desc
+        places_with_ratings.sort(key=lambda x: x[1], reverse=True)
+        top_places = [p[0] for p in places_with_ratings]
+        
+        # Fallback logic: if fewer than limit, add random available places
+        if len(top_places) < limit:
+            needed = limit - len(top_places)
+            # valid fallback places: not in top_places and status is AVAILABLE
+            # We assume PlaceStatus enum is imported
+            from app.enums.place_status import PlaceStatus
+            
+            top_ids = {p.id for p in top_places}
+            others = [p for p in places if p.id not in top_ids and p.status == PlaceStatus.AVAILABLE.value]
+            
+            import random
+            random.shuffle(others)
+            top_places.extend(others[:needed])
+            
+        return top_places[:limit]

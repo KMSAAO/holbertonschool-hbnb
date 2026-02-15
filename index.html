@@ -88,76 +88,11 @@
 
     <!-- قسم الفنادق -->
     <section class="hotels-section">
-        <div class="hotels-container">
-            <!-- فندق 1 -->
-            <div class="hotel-card">
-                <div class="hotel-image">
-                    <img src="images/hotel1.jpg" alt="منتجع شيبارا">
-                    <div class="hotel-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                </div>
-                <div class="hotel-info">
-                    <h3 class="hotel-name">منتجع شيبارا</h3>
-                    <div class="hotel-price">
-                        <span class="price-amount">9,700</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/الليلة</span>
-                    </div>
-                    <button class="details-btn" onclick="showLoadingScreen('hotel-details.html?hotel=shebara')">عرض
-                        التفاصيل</button>
-                </div>
-            </div>
-
-            <!-- فندق 2 -->
-            <div class="hotel-card">
-                <div class="hotel-image">
-                    <img src="images/hotel2.jpg" alt="منتجع ديزرت روك">
-                    <div class="hotel-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                </div>
-                <div class="hotel-info">
-                    <h3 class="hotel-name">منتجع ديزرت روك</h3>
-                    <div class="hotel-price">
-                        <span class="price-amount">11,500</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/الليلة</span>
-                    </div>
-                    <button class="details-btn" onclick="showLoadingScreen('hotel-details.html?hotel=desertrock')">عرض
-                        التفاصيل</button>
-                </div>
-            </div>
-
-            <!-- فندق 3 -->
-            <div class="hotel-card">
-                <div class="hotel-image">
-                    <img src="images/hotel3.jpg" alt="منتجع شادن">
-                    <div class="hotel-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                </div>
-                <div class="hotel-info">
-                    <h3 class="hotel-name">منتجع شادن</h3>
-                    <div class="hotel-price">
-                        <span class="price-amount">4,360</span>
-                        <span class="price-currency">ر.س</span>
-                        <span class="price-per">/الليلة</span>
-                    </div>
-                    <button class="details-btn" onclick="showLoadingScreen('hotel-details.html?hotel=shaden')">عرض
-                        التفاصيل</button>
-                </div>
+        <div class="hotels-container" id="top-rated-hotels-list">
+            <!-- Hotels will be loaded dynamically via script.js -->
+            <div class="loading" style="text-align: center; width: 100%; padding: 2rem;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p>جاري تحميل الفنادق المميزة...</p>
             </div>
         </div>
     </section>

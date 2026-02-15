@@ -114,6 +114,19 @@ def _get_attr(obj, key, default=None):
 class PlaceList(Resource):
     @api.marshal_list_with(place_response_model, code=200)
     def get(self):
+        # Check for sorting by rating
+        sort_by = request.args.get('_sort')
+        limit = request.args.get('_limit', default=3, type=int)
+        
+        # Validate limit
+        if limit < 1:
+            limit = 3
+        if limit > 20:
+            limit = 20
+        
+        if sort_by == 'rating':
+            return facade.get_top_places(limit=limit), 200
+
         user_id = request.args.get('user_id')
         if user_id:
             # If user_id is 'ME', use the current authenticated user

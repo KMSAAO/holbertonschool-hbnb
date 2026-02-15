@@ -119,6 +119,9 @@ class HBnBFacade:
     def get_all_places(self):
         return self.place_service.get_all_places(self.place_db)
 
+    def get_top_places(self, limit=3):
+        return self.place_service.get_top_places(self.place_db, limit)
+
     def get_places_by_user(self, user_id: str):
         return self.place_service.get_places_by_user(user_id, self.place_db)
 
