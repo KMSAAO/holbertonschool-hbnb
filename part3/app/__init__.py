@@ -12,38 +12,31 @@ from app.api.v1.auth import api as auth_ns
 from app.api.v1.guests import api as guests_ns
 from app.api.v1.bookings import api as bookings_ns
 
-# استيراد الامتدادات (Extensions)
+
 from app.bcrypt import bcrypt
 from app.JWTManger import jwt   
 from app.db import db
 import app.services.facade as facade
 
-# مسار ملفات الواجهة الأمامية (Frontend) — المجلد الأب الذي يحتوي على HTML/CSS/JS
 FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 def create_app(config_class="config.DevelopmentConfig"):
     app = Flask(__name__)
     
-    # 🔥 التعديل السحري هنا 🔥
-    # هذا يمنع Flask من تحويل الرابط (Redirect) إذا كانت الشرطة المائلة ناقصة أو زائدة
-    # ويحل مشكلة CORS Error + 308 Permanent Redirect
     app.url_map.strict_slashes = False
 
     app.config.from_object(config_class)
 
-    # تفعيل CORS والسماح لجميع المصادر (*) بالوصول
     CORS(app, resources={r"/*": {"origins": "*"}})
 
-    # تهيئة المكتبات
     bcrypt.init_app(app)
     jwt.init_app(app)
     db.init_app(app)
 
-    # إنشاء الجداول تلقائياً عند بدء التشغيل
+
     with app.app_context():
         db.create_all()
 
-        # Idempotent migration: ensure evolving place schema columns exist
         place_columns = [
             ("images", "TEXT DEFAULT '[]'"),
             ("number_of_rooms", "INTEGER DEFAULT 0"),
@@ -64,7 +57,6 @@ def create_app(config_class="config.DevelopmentConfig"):
                 print(f"✅ Migration: '{column_name}' column added to places table")
             except Exception:
                 db.session.rollback()
-                # Column likely exists — safe to ignore
 
         amenity_columns = [
             ("icon", "VARCHAR(50)"),
@@ -79,8 +71,6 @@ def create_app(config_class="config.DevelopmentConfig"):
                 print(f"Migration: '{column_name}' column added to amenities table")
             except Exception:
                 db.session.rollback()
-                # Column likely exists; safe to ignore
-        # Idempotent seed: ensure admin default amenity catalog exists for frontend options
         try:
             from app.models.amenity import Amenity
             from app.enums.place_amenity_status import PlaceAmenityStatus

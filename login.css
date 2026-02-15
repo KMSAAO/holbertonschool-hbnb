@@ -485,3 +485,45 @@ body {
         gap: 0.4rem;
     }
 }
+
+
+.auth-card {
+    max-height: 85vh; 
+    overflow-y: auto; 
+    padding: 15px; /* تقليل الحشو الداخلي للكارد من 20 إلى 15 */
+}
+
+/* تقليل المسافات بين الخانات */
+.form-group {
+    width: 100%;
+    margin-bottom: 10px; /* تقليل المسافة من 20px إلى 10px */
+    display: flex;
+    flex-direction: column;
+}
+
+/* تصغير المسافة تحت الليبل */
+.form-label {
+    margin-bottom: 4px; 
+    font-size: 0.9rem; /* تصغير خط العنوان قليلاً */
+}
+
+/* تصغير الخانات نفسها */
+.form-input {
+    width: 100%;
+    padding: 8px; /* تقليل الـ padding من 12px إلى 8px */
+    font-size: 0.95rem;
+    box-sizing: border-box; 
+}
+
+/* تصغير زر الإرسال */
+.auth-btn {
+    width: 100%;
+    padding: 10px; /* تقليل الـ padding من 15px إلى 10px */
+    background-color: #c9a050; 
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 5px;
+}

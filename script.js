@@ -236,3 +236,51 @@ async function loadTopHotels() {
         container.innerHTML = '<p style="text-align:center; width:100%; color:red;">حدث خطأ أثناء تحميل الفنادق. يرجى المحاولة لاحقاً.</p>';
     }
 }
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const isAdmin = localStorage.getItem('is_admin') === 'true';
+    const adminLink = document.querySelector('a[href="admindash.html"]');
+    if (adminLink) {
+        adminLink.style.display = isAdmin ? 'inline-block' : 'none';
+    }
+});
+
+
+function updateNavbar() {
+    const token = localStorage.getItem('access_token');
+    const isAdmin = localStorage.getItem('is_admin') === 'true';
+
+    // جلب العناصر بالـ IDs الصحيحة من الـ HTML الخاص بك
+    const nuzulLink = document.getElementById('nuzulLink'); // إدارة النُزل
+    const adminLink = document.getElementById('adminLink'); // ادمن
+    const bookingsLink = document.getElementById('bookingsLink'); // حجوزاتي
+    const logoutLink = document.getElementById('logoutLink'); // خروج
+    const loginLink = document.getElementById('loginLink'); // تسجيل دخول
+    const profileContainer = document.getElementById('profileContainer'); // أيقونة البروفايل
+
+    if (token) {
+        // --- حالة تسجيل الدخول (Logged In) ---
+        if (loginLink) loginLink.style.display = 'none';
+        if (logoutLink) logoutLink.style.display = 'inline-block';
+        if (bookingsLink) bookingsLink.style.display = 'inline-block';
+        if (profileContainer) profileContainer.style.display = 'flex';
+        
+        // روابط الإدارة تظهر فقط للأدمن
+        const adminDisplay = isAdmin ? 'inline-block' : 'none';
+        if (adminLink) adminLink.style.display = adminDisplay;
+        if (nuzulLink) nuzulLink.style.display = adminDisplay;
+
+    } else {
+        // --- حالة تسجيل الخروج (Logged Out) ---
+        if (loginLink) loginLink.style.display = 'inline-block';
+        if (logoutLink) logoutLink.style.display = 'none';
+        if (bookingsLink) bookingsLink.style.display = 'none'; // إخفاء الحجوزات
+        if (adminLink) adminLink.style.display = 'none'; // إخفاء ادمن
+        if (nuzulLink) nuzulLink.style.display = 'none'; // إخفاء إدارة النُزل
+        if (profileContainer) profileContainer.style.display = 'none';
+    }
+}
+
+// تشغيل الدالة فور تحميل الصفحة
+document.addEventListener('DOMContentLoaded', updateNavbar);

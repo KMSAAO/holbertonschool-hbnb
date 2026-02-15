@@ -112,6 +112,7 @@ async function handleLogin(event) {
         if (response.ok) {
             // 2. حفظ التوكن
             localStorage.setItem('access_token', data.access_token);
+            localStorage.setItem('is_admin', data.is_admin);
 
             // 3. فك تشفير JWT للحصول على user_id
             let userId = '';
@@ -136,7 +137,7 @@ async function handleLogin(event) {
                     });
                     if (userResponse.ok) {
                         const userData = await userResponse.json();
-                        // 5. حفظ جلسة المستخدم (يربط مع auth.js)
+                        localStorage.setItem('is_admin', userData.is_admin);
                         saveUserSession({
                             firstName: userData.first_name || '',
                             lastName: userData.last_name || '',
@@ -144,7 +145,6 @@ async function handleLogin(event) {
                             gender: userData.gender || 'female'
                         });
                     } else {
-                        // حفظ بيانات أساسية إذا فشل جلب المستخدم
                         saveUserSession({
                             firstName: '',
                             lastName: '',
@@ -157,7 +157,6 @@ async function handleLogin(event) {
                     saveUserSession({ firstName: '', lastName: '', email: email, gender: 'female' });
                 }
             } else {
-                // حفظ جلسة بدون userId
                 saveUserSession({ firstName: '', lastName: '', email: email, gender: 'female' });
             }
 
@@ -223,7 +222,6 @@ async function handleSignup(event) {
     }
 
     try {
-        // لاحظ: الرابط بدون شرطة في النهاية لتجنب مشاكل CORS
         const response = await fetch('http://127.0.0.1:5000/api/v1/users', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

@@ -28,14 +28,15 @@
             <div class="nav-menu">
                 <a href="#" class="nav-link active">الرئيسية</a>
                 <a href="places.html" class="nav-link">الوجهات</a>
-                <a href="admin.html" class="nav-link">إدارة النُزل</a>
+                <a href="admin.html" class="nav-link" id="nuzulLink">إدارة النُزل</a>
                 <a href="bookings.html" class="nav-link" id="bookingsLink">حجوزاتي</a>
+                <a href="admindash.html" class="nav-link" id="adminLink"> ادمن</a>
                 <a href="#" class="nav-link" id="logoutLink" onclick="logout(); return false;">خروج</a>
                 <a href="login.html" class="nav-link" id="loginLink" style="display:none;">تسجيل دخول</a>
             </div>
 
             <!-- صورة الملف الشخصي على اليمين -->
-            <div class="profile">
+            <div class="profile" id="profileContainer">
                 <a href="profile.html" class="profile-circle">
                     <i class="fas fa-user"></i>
                 </a>
@@ -178,7 +179,6 @@
 
     <script src="api-config.js"></script>
     <script src="auth.js"></script>
-    <script src="script.js"></script>
     <script src="loading.js"></script>
 </body>
 

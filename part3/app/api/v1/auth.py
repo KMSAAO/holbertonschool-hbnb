@@ -57,7 +57,10 @@ class AuthLogin(Resource):
                 }
             )
 
-            return {'access_token': access_token}, 200
+            return {
+                    'access_token': access_token,
+                    'is_admin': is_admin
+                }, 200
 
         except ValueError as e:
             api.abort(400, str(e))

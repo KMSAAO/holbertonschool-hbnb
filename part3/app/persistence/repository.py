@@ -61,13 +61,21 @@ class SQLAlchemyRepository(Repository):
         return True
 
     def delete(self, obj_id):
+        print(f"--- محاولة حذف {self.model.__name__} بالرقم: {obj_id} ---") # تظهر في الـ Terminal
         obj = self.get(obj_id)
         if not obj:
+            print(f"--- فشل: لم يتم العثور على العنصر في قاعدة البيانات ---")
             return False
 
-        db.session.delete(obj)
-        db.session.commit()
-        return True
+        try:
+            db.session.delete(obj)
+            db.session.commit()
+            print(f"--- نجاح: تم الحذف والاعتماد (Commit) في القاعدة ---")
+            return True
+        except Exception as e:
+            db.session.rollback()
+            print(f"--- خطأ أثناء الحذف: {str(e)} ---")
+            return False
 
     def get_by_attribute(self, attr_name, value):
         return self.model.query.filter_by(**{attr_name: value}).first()
