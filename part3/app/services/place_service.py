@@ -103,13 +103,23 @@ class PlaceService():
                     "email": place.user.email
                 } if place.user else None,
                 "amenities": [amenity.to_dict() for amenity in place.amenities],
-                "reviews": [review.to_dict() for review in place.reviews],
+                "reviews": [
+                    {
+                        **review.to_dict(),
+                        "user": {
+                            "id": review.user.id,
+                            "first_name": review.user.first_name,
+                            "last_name": review.user.last_name
+                        } if review.user else None
+                    }
+                    for review in place.reviews
+                ],
                 "images": [],
                 "number_of_rooms": place.number_of_rooms,
                 "max_guests": place.max_guests,
                 "tagline": place.tagline,
                 "rules": place.rules,
-                "details": place.details, # Already handles JSON parsing in model property
+                "details": place.details,
                 "rooms": place.rooms,
                 "location": place.location
             }

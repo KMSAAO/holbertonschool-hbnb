@@ -289,7 +289,7 @@ async function displayReviews(hotel) {
         reviewsHTML += `
             <div class="review-card">
                 <div class="review-header">
-                    <span class="reviewer-name">مستخدم</span>
+                    <span class="reviewer-name">${review.user ? escapeHtml(`${review.user.first_name} ${review.user.last_name}`.trim()) : 'مستخدم'}</span>
                     <span class="review-date">${new Date(review.created_at || Date.now()).toLocaleDateString('ar-EG')}</span>
                 </div>
                 <div class="review-rating">${stars}</div>

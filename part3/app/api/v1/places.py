@@ -64,12 +64,19 @@ user_response_model = api.model("UserResponse", {
     "email": fields.String
 })
 
+review_user_model = api.model("ReviewUser", {
+    "id": fields.String,
+    "first_name": fields.String,
+    "last_name": fields.String
+})
+
 review_response_model = api.model("ReviewResponse", {
     "id": fields.String,
     "rating": fields.Integer,
     "comment": fields.String,
     "created_at": fields.String,
-    "updated_at": fields.String
+    "updated_at": fields.String,
+    "user": fields.Nested(review_user_model)
 })
 
 place_response_model = api.model("PlaceResponse", {

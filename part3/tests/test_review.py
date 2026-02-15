@@ -167,3 +167,26 @@ class TestReviewAPI(unittest.TestCase):
         fake_id = str(uuid.uuid4())
         response = self.client.delete(f'/api/v1/reviews/{fake_id}', headers=self.reviewer_headers)
         self.assertEqual(response.status_code, 404)
+
+    def test_place_reviews_include_user_details(self):
+        """Verify that fetching place info includes reviews with user details (regression test)"""
+        # Create review
+        self.client.post('/api/v1/reviews/', json=self.review_data, headers=self.reviewer_headers)
+
+        # Fetch place info
+        response = self.client.get(f'/api/v1/places/{self.place_id}')
+        self.assertEqual(response.status_code, 200)
+        
+        data = response.json
+        self.assertTrue('reviews' in data)
+        self.assertGreater(len(data['reviews']), 0)
+        
+        review = data['reviews'][0]
+        self.assertTrue('user' in review)
+        self.assertIsNotNone(review['user'])
+        self.assertEqual(review['user']['first_name'], self.reviewer_data['first_name'])
+        self.assertEqual(review['user']['last_name'], self.reviewer_data['last_name'])
+        
+        # Security check: Ensure email/password are NOT present
+        self.assertNotIn('email', review['user'], "Email should not be exposed in review user details")
+        self.assertNotIn('password', review['user'], "Password should not be exposed in review user details")
