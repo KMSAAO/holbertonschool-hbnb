@@ -417,20 +417,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // const previousHotels = JSON.parse(localStorage.getItem('userHotels') || '[]');
-            // const nextHotels = JSON.parse(JSON.stringify(previousHotels));
-
-            // let targetIndex = -1;
-            /*
-            if (isEditMode) {
-                targetIndex = nextHotels.findIndex(h => h.id === currentEditId);
-                // ...
-            } else {
-                // ...
-            }
-            */
-
-            // أيضاً حفظ/تحديث في الـ backend
             const userId = localStorage.getItem('userId');
 
             if (userId && typeof PlacesAPI !== 'undefined') {

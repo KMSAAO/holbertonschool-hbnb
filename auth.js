@@ -28,6 +28,11 @@ function saveUserSession(userData) {
 function logout() {
     // تسجيل الخروج مباشرة بدون تأكيد
     performLogout();
+    console.log("جاري تسجيل الخروج وتنظيف البيانات...");
+    
+    // الطريقة الأضمن لمسح كل شيء متعلق بالموقع
+    localStorage.clear();
+    window.location.href = 'index.html';
 }
 
 // عرض مربع تأكيد تسجيل الخروج
@@ -388,3 +393,38 @@ function initAuth() {
         }, 300);
     }
 }
+
+
+
+function updateNavbar() {
+    const token = localStorage.getItem('access_token');
+    // إذا لم يوجد توكن، نعتبره ليس أدمن تلقائياً لتجنب القيم القديمة
+    const isAdmin = token ? (localStorage.getItem('is_admin') === 'true') : false;
+
+    // جلب العناصر مع التحقق من وجودها في الصفحة
+    const adminLink = document.getElementById('adminLink');
+    const nuzulLink = document.getElementById('nuzulLink');
+    const loginLink = document.getElementById('loginLink');
+    const logoutLink = document.getElementById('logoutLink');
+    const profileContainer = document.getElementById('profileContainer');
+
+    if (token) {
+        // --- حالة تسجيل الدخول ---
+        if (loginLink) loginLink.style.display = 'none';
+        if (logoutLink) logoutLink.style.display = 'inline-block';
+        if (profileContainer) profileContainer.style.display = 'flex';
+        
+        // إظهار روابط الإدارة فقط للأدمن
+        const adminDisplay = isAdmin ? 'inline-block' : 'none';
+        if (adminLink) adminLink.style.display = adminDisplay;
+    } else {
+        // --- حالة تسجيل الخروج (إخفاء كل شيء حساس) ---
+        if (loginLink) loginLink.style.display = 'inline-block';
+        if (logoutLink) logoutLink.style.display = 'none';
+        if (adminLink) adminLink.style.display = 'none';
+        if (nuzulLink) nuzulLink.style.display = 'none';
+        if (profileContainer) profileContainer.style.display = 'none';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', updateNavbar);

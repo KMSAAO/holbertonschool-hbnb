@@ -146,15 +146,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadTopHotels() {
     const container = document.getElementById('top-rated-hotels-list');
+    if (!container) return;
 
     try {
-        // Use PlacesAPI wrapper from api-config.js to handle full URL and auth if needed
+        // نرسل الطلب لجلب البيانات
         const places = await PlacesAPI.getAll({ _sort: 'rating', _limit: 3 });
 
-        container.innerHTML = ''; // Clear loading spinner
+        // --- الخطوة الأهم: مسح علامة التحميل فور وصول الرد ---
+        container.innerHTML = ''; 
 
-        if (places.length === 0) {
-            container.innerHTML = '<p style="text-align:center; width:100%;">لا توجد وكهات متاحة حالياً</p>';
+        if (!places || places.length === 0) {
+            container.innerHTML = '<p style="text-align:center; width:100%;">لا توجد وجهات متاحة حالياً</p>';
             return;
         }
 
@@ -162,81 +164,56 @@ async function loadTopHotels() {
             const card = document.createElement('div');
             card.className = 'hotel-card';
 
-            // Calculate rating stars
-            let ratingHtml = '';
-            // Determine rating: use average from reviews if available on the object, 
-            // or we might need to calculate it if the API returns raw reviews.
-            // Our backend get_top_places logic sorts by rating but returns Place objects.
-            // Validating: Place objects usually have a 'reviews' list.
-
+            // حساب التقييم (Rating)
             let rating = 0;
             if (place.reviews && place.reviews.length > 0) {
                 const sum = place.reviews.reduce((acc, r) => acc + r.rating, 0);
                 rating = Math.round(sum / place.reviews.length);
             }
 
+            let ratingHtml = '';
             for (let i = 0; i < 5; i++) {
-                if (i < rating) {
-                    ratingHtml += '<i class="fas fa-star"></i>';
-                } else {
-                    ratingHtml += '<i class="far fa-star"></i>';
-                }
+                ratingHtml += i < rating ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>';
             }
 
-            // Handle image - use first image or placeholder
-            let imageUrl = 'images/hotel1.jpg'; // specific placeholder
+            // معالجة الصور (Image Handling)
+            let imageUrl = 'images/hotel1.jpg'; 
             if (place.images && place.images.length > 0) {
-                // Check if it's a string needing parse (API handles this usually)
-                // If it's a list, take first.
                 imageUrl = place.images[0];
-            } else {
-                // Random default for variety if no image, or just cyclic
-                const defaults = ['images/hotel1.jpg', 'images/hotel2.jpg', 'images/hotel3.jpg'];
-                // distinct based on id char?
-                const idx = place.id.charCodeAt(0) % 3;
-                imageUrl = defaults[idx];
             }
 
-            // Safe access for price
-            const price = (place.price !== null && place.price !== undefined)
-                ? place.price.toLocaleString()
-                : 'N/A';
+            const price = (place.price !== null && place.price !== undefined) ? place.price.toLocaleString() : 'N/A';
 
             card.innerHTML = `
                 <div class="hotel-image">
                     <img src="${imageUrl}" alt="${place.title}">
-                    <div class="hotel-rating">
-                        ${ratingHtml}
-                    </div>
+                    <div class="hotel-rating">${ratingHtml}</div>
                 </div>
                 <div class="hotel-info">
                     <h3 class="hotel-name">${place.title}</h3>
                     <div class="hotel-price">
                         <span class="price-amount">${price}</span>
-                        <span class="price-currency">ر.س</span>
+                        <span class="price-currency"> ر.س</span>
                         <span class="price-per">/الليلة</span>
                     </div>
-                    <button class="details-btn" onclick="showLoadingScreen('hotel-details.html?hotel=${place.id}')">عرض التفاصيل</button>
+                    <button class="details-btn" onclick="window.location.href='hotel-details.html?hotel=${place.id}'">عرض التفاصيل</button>
                 </div>
             `;
 
-            // Initial style for animation
+            // إعدادات الأنيميشن الابتدائية
             card.style.opacity = '0';
             card.style.transform = 'translateY(30px)';
             card.style.transition = 'all 0.6s ease-out';
 
             container.appendChild(card);
-
-            // Observe for animation
-            observer.observe(card);
+            observer.observe(card); // الآن ستعمل لأننا عرفنا الـ observer في الأعلى
         });
 
     } catch (error) {
         console.error('Error loading hotels:', error);
-        container.innerHTML = '<p style="text-align:center; width:100%; color:red;">حدث خطأ أثناء تحميل الفنادق. يرجى المحاولة لاحقاً.</p>';
+        container.innerHTML = '<p style="text-align:center; width:100%; color:red;">حدث خطأ أثناء تحميل الفنادق. تأكد من تشغيل السيرفر.</p>';
     }
 }
-
 
 document.addEventListener('DOMContentLoaded', () => {
     const isAdmin = localStorage.getItem('is_admin') === 'true';
@@ -249,38 +226,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function updateNavbar() {
     const token = localStorage.getItem('access_token');
-    const isAdmin = localStorage.getItem('is_admin') === 'true';
+    // إذا لم يوجد توكن، نعتبره ليس أدمن تلقائياً لتجنب القيم القديمة
+    const isAdmin = token ? (localStorage.getItem('is_admin') === 'true') : false;
 
-    // جلب العناصر بالـ IDs الصحيحة من الـ HTML الخاص بك
-    const nuzulLink = document.getElementById('nuzulLink'); // إدارة النُزل
-    const adminLink = document.getElementById('adminLink'); // ادمن
-    const bookingsLink = document.getElementById('bookingsLink'); // حجوزاتي
-    const logoutLink = document.getElementById('logoutLink'); // خروج
-    const loginLink = document.getElementById('loginLink'); // تسجيل دخول
-    const profileContainer = document.getElementById('profileContainer'); // أيقونة البروفايل
+    // جلب العناصر مع التحقق من وجودها في الصفحة
+    const adminLink = document.getElementById('adminLink');
+    const nuzulLink = document.getElementById('nuzulLink');
+    const loginLink = document.getElementById('loginLink');
+    const logoutLink = document.getElementById('logoutLink');
+    const profileContainer = document.getElementById('profileContainer');
 
     if (token) {
-        // --- حالة تسجيل الدخول (Logged In) ---
+        // --- حالة تسجيل الدخول ---
         if (loginLink) loginLink.style.display = 'none';
         if (logoutLink) logoutLink.style.display = 'inline-block';
-        if (bookingsLink) bookingsLink.style.display = 'inline-block';
         if (profileContainer) profileContainer.style.display = 'flex';
         
-        // روابط الإدارة تظهر فقط للأدمن
+        // إظهار روابط الإدارة فقط للأدمن
         const adminDisplay = isAdmin ? 'inline-block' : 'none';
         if (adminLink) adminLink.style.display = adminDisplay;
-        if (nuzulLink) nuzulLink.style.display = adminDisplay;
-
     } else {
-        // --- حالة تسجيل الخروج (Logged Out) ---
+        // --- حالة تسجيل الخروج (إخفاء كل شيء حساس) ---
         if (loginLink) loginLink.style.display = 'inline-block';
         if (logoutLink) logoutLink.style.display = 'none';
-        if (bookingsLink) bookingsLink.style.display = 'none'; // إخفاء الحجوزات
-        if (adminLink) adminLink.style.display = 'none'; // إخفاء ادمن
-        if (nuzulLink) nuzulLink.style.display = 'none'; // إخفاء إدارة النُزل
+        if (adminLink) adminLink.style.display = 'none';
+        if (nuzulLink) nuzulLink.style.display = 'none';
         if (profileContainer) profileContainer.style.display = 'none';
     }
 }
 
-// تشغيل الدالة فور تحميل الصفحة
 document.addEventListener('DOMContentLoaded', updateNavbar);
