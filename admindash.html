@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نُزل - لوحة الإدارة</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-section { padding: 120px 5% 50px; }
+        .admin-tabs { display: flex; gap: 15px; margin-bottom: 30px; justify-content: center; }
+        .tab-btn { padding: 12px 30px; border: 2px solid #c9a050; background: transparent; cursor: pointer; border-radius: 30px; font-family: 'Amiri', serif; font-weight: bold; transition: 0.3s; }
+        .tab-btn.active { background: #c9a050; color: white; }
+        .table-container { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 18px; text-align: right; border-bottom: 1px solid #f0f0f0; }
+        th { background-color: #fcf9f2; color: #c9a050; font-size: 1.1rem; }
+        .btn-delete { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .btn-delete:hover { background: #c0392b; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><img src="images/logo.png" alt="نُزل" class="logo-img"></div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="admindash.html" class="nav-link active">إدارة النُزل</a>
+                <a href="#" class="nav-link" onclick="logout()">خروج</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="admin-section">
+        <h2 class="section-title" style="text-align: center; margin-bottom: 40px;">لوحة تحكم المدير</h2>
+        
+        <div class="admin-tabs">
+            <button class="tab-btn active" onclick="switchTab('users', event)">إدارة المستخدمين</button>
+            <button class="tab-btn" onclick="switchTab('places', event)">إدارة الأماكن</button>
+            <button class="tab-btn" onclick="switchTab('reviews', event)">إدارة التعليقات</button>
+        </div>
+
+        <div id="admin-loader" style="display:none; text-align:center; padding: 20px;">
+            <i class="fas fa-spinner fa-spin fa-2x" style="color: #c9a050;"></i>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr id="admin-header">
+                        </tr>
+                </thead>
+                <tbody id="admin-data-rows">
+                    </tbody>
+            </table>
+        </div>
+    </section>
+
+    <script src="api-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="admindash.js"></script> </body>
+</html>

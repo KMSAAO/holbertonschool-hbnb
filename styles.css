@@ -1,0 +1,523 @@
+/* الإعدادات العامة */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Amiri', serif;
+    background-color: #EFE2CF;
+    color: #815B2F;
+    direction: rtl;
+    text-align: right;
+}
+
+/* شريط التنقل */
+.navbar {
+    background-color: #fff;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    flex: 0 0 auto;
+}
+
+.logo-img {
+    height: 120px;
+    width: auto;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 3rem;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+.nav-link {
+    color: #815B2F;
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-weight: 500;
+    transition: all 0.3s;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background-color: #815B2F;
+    color: #fff;
+}
+
+.profile {
+    flex: 0 0 auto;
+}
+
+.profile-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #815B2F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+.profile-circle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(129, 91, 47, 0.3);
+}
+
+/* الهيدر المتحرك */
+.hero-slider {
+    position: relative;
+    width: 100%;
+    height: 550px;
+    margin-top: 160px;
+    overflow: hidden;
+}
+
+.slider-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.slide.active {
+    opacity: 1;
+}
+
+.slide-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.7);
+}
+
+.slide-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+    z-index: 2;
+    width: 90%;
+    max-width: 800px;
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.8rem;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    line-height: 1.4;
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.5);
+}
+
+.hero-btn {
+    background-color: #EFE2CF;
+    color: #815B2F;
+    padding: 0.8rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.hero-btn:hover {
+    background-color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* مؤشرات السلايدر */
+.slider-dots {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    z-index: 3;
+}
+
+.dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.dot.active,
+.dot:hover {
+    background-color: #fff;
+    transform: scale(1.2);
+}
+
+/* قسم المقدمة */
+.intro-section {
+    text-align: center;
+    padding: 4rem 2rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.8rem;
+    color: #815B2F;
+}
+
+.section-subtitle {
+    font-size: 1.3rem;
+    color: #815B2F;
+    opacity: 0.8;
+}
+
+/* قسم الفنادق */
+.hotels-section {
+    padding: 3rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.hotels-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2.5rem;
+    justify-items: center;
+}
+
+.hotel-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.12);
+    transition: all 0.3s;
+    width: 100%;
+    max-width: 400px;
+}
+
+.hotel-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.hotel-image {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+}
+
+.hotel-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.3s;
+}
+
+.hotel-card:hover .hotel-image img {
+    transform: scale(1.1);
+}
+
+.hotel-rating {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background-color: rgba(255, 215, 0, 0.15);
+    backdrop-filter: blur(10px);
+    color: #FFD700;
+    padding: 0.5rem 1rem;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.hotel-info {
+    padding: 1.5rem;
+}
+
+.hotel-name {
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #815B2F;
+}
+
+.hotel-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+}
+
+.price-amount {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #815B2F;
+}
+
+.price-currency {
+    font-weight: bold;
+    color: #815B2F;
+}
+
+.price-per {
+    color: #815B2F;
+    opacity: 0.7;
+}
+
+.details-btn {
+    width: 100%;
+    background-color: #EFE2CF;
+    color: #815B2F;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-family: 'Amiri', serif;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 700;
+}
+
+.details-btn:hover {
+    background-color: #e0d3bc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(129, 91, 47, 0.3);
+}
+
+/* قسم التجربة */
+.experience-section {
+    padding: 4rem 2rem;
+    text-align: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.features-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 3rem;
+    margin-top: 3rem;
+}
+
+.feature {
+    padding: 2rem;
+}
+
+.feature-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+}
+
+.feature:hover .feature-icon {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 8px 30px rgba(129, 91, 47, 0.3);
+}
+
+.feature-icon i {
+    font-size: 3rem;
+    color: #815B2F;
+}
+
+.feature-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.8rem;
+    color: #815B2F;
+}
+
+.feature-desc {
+    font-size: 1.1rem;
+    color: #815B2F;
+    opacity: 0.8;
+    line-height: 1.6;
+}
+
+/* الفوتر */
+.footer {
+    background-color: #815B2F;
+    color: #EFE2CF;
+    padding: 3rem 2rem 1rem;
+    margin-top: 4rem;
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.footer-section {
+    text-align: center;
+}
+
+.footer-logo {
+    height: 80px;
+    width: auto;
+    filter: brightness(0) invert(1);
+}
+
+.footer-heading {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+.footer-links {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: 0.8rem;
+}
+
+.footer-links a {
+    color: #EFE2CF;
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: all 0.3s;
+}
+
+.footer-links a:hover {
+    color: #fff;
+    padding-right: 5px;
+}
+
+.social-links {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.social-link {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #EFE2CF;
+    color: #815B2F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1.5rem;
+    transition: all 0.3s;
+}
+
+.social-link:hover {
+    background-color: #fff;
+    transform: translateY(-5px);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(239, 226, 207, 0.3);
+    font-size: 1.1rem;
+}
+
+/* التجاوب مع الشاشات الصغيرة */
+@media (max-width: 768px) {
+    .nav-menu {
+        gap: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .nav-link {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+
+    .hero-btn {
+        padding: 0.8rem 2rem;
+        font-size: 1.1rem;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+    }
+
+    .section-subtitle {
+        font-size: 1rem;
+    }
+
+    .hotels-container {
+        grid-template-columns: 1fr;
+    }
+
+    .features-container {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr;
+    }
+}

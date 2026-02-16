@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الوجهات - نُزل</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="places.css">
+    <link rel="stylesheet" href="loading.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- شريط التنقل العلوي -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <!-- اللوقو على اليسار -->
+            <div class="logo">
+                <img src="images/logo.png" alt="نُزل" class="logo-img">
+            </div>
+
+            <!-- القائمة في المنتصف -->
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">الرئيسية</a>
+                <a href="places.html" class="nav-link active">الوجهات</a>
+                <a href="admin.html" class="nav-link">إدارة النُزل</a>
+                <a href="bookings.html" class="nav-link" id="bookingsLink">حجوزاتي</a>
+                <a href="admindash.html" class="nav-link"> ادمن</a>
+                <a href="#" class="nav-link" id="logoutLink" onclick="logout(); return false;">خروج</a>
+                <a href="login.html" class="nav-link" id="loginLink" style="display:none;">تسجيل دخول</a>
+            </div>
+
+            <!-- صورة الملف الشخصي على اليمين -->
+            <div class="profile">
+                <a href="profile.html" class="profile-circle">
+                    <i class="fas fa-user"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- الهيدر المتحرك بالصور -->
+    <header class="hero-slider">
+        <div class="slider-container">
+            <div class="slide active">
+                <img src="images/slider1.jpg" alt="صحراء 1" class="slide-img">
+                <div class="slide-content">
+                    <h1 class="hero-title">استكشف وجهات الصحراء الفاخرة</h1>
+                    <p class="hero-subtitle">رحلة استثنائية في قلب الصحراء العربية مع أرقى المنتجعات والتجارب الفريدة
+                    </p>
+                    <button class="hero-btn">ابدأ رحلتك</button>
+                </div>
+            </div>
+            <div class="slide">
+                <img src="images/slider2.jpg" alt="صحراء 2" class="slide-img">
+                <div class="slide-content">
+                    <h1 class="hero-title">استكشف وجهات الصحراء الفاخرة</h1>
+                    <p class="hero-subtitle">رحلة استثنائية في قلب الصحراء العربية مع أرقى المنتجعات والتجارب الفريدة
+                    </p>
+                    <button class="hero-btn">ابدأ رحلتك</button>
+                </div>
+            </div>
+            <div class="slide">
+                <img src="images/slider3.jpg" alt="صحراء 3" class="slide-img">
+                <div class="slide-content">
+                    <h1 class="hero-title">استكشف وجهات الصحراء الفاخرة</h1>
+                    <p class="hero-subtitle">رحلة استثنائية في قلب الصحراء العربية مع أرقى المنتجعات والتجارب الفريدة
+                    </p>
+                    <button class="hero-btn">ابدأ رحلتك</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- مؤشرات السلايدر -->
+        <div class="slider-dots">
+            <span class="dot active" onclick="currentSlide(1)"></span>
+            <span class="dot" onclick="currentSlide(2)"></span>
+            <span class="dot" onclick="currentSlide(3)"></span>
+        </div>
+    </header>
+
+    <!-- شريط الفلاتر -->
+    <section class="filters-section">
+        <div class="filters-container">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">كل المناطق</button>
+                <button class="filter-btn" data-filter="alula">العلا</button>
+                <button class="filter-btn" data-filter="coast">البحر الأحمر</button>
+                <button class="filter-btn" data-filter="najd">الرياض</button>
+                <button class="filter-btn" data-filter="mountains">الجبال</button>
+            </div>
+            <div class="sort-dropdown">
+                <button class="sort-btn">
+                    <i class="fas fa-sort-amount-down"></i>
+                    <span>ترتيب حسب</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- شبكة البطاقات - يتم تحميلها ديناميكياً من الـ API -->
+    <section class="destinations-grid-section">
+        <div class="destinations-grid" id="placesGrid">
+            <!-- حالة التحميل -->
+            <div class="places-loading" id="placesLoading">
+                <div class="loading-spinner-container">
+                    <i class="fas fa-spinner fa-spin fa-3x"></i>
+                    <p>جاري تحميل الوجهات...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- رسالة عدم وجود وجهات -->
+        <div class="no-places-message" id="noPlacesMessage" style="display: none;">
+            <i class="fas fa-map-marked-alt fa-3x"></i>
+            <h3>لا توجد وجهات متاحة حالياً</h3>
+            <p>يمكنك إضافة وجهات جديدة من <a href="admin.html">صفحة إدارة النُزل</a></p>
+        </div>
+
+        <!-- رسالة خطأ -->
+        <div class="places-error" id="placesError" style="display: none;">
+            <i class="fas fa-exclamation-triangle fa-3x"></i>
+            <h3>تعذر تحميل الوجهات</h3>
+            <p>تأكد من أن الخادم يعمل على المنفذ 5000</p>
+            <button class="card-btn" onclick="fetchAndRenderPlaces()">إعادة المحاولة</button>
+        </div>
+    </section>
+
+    <!-- الفوتر -->
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- اللوقو -->
+            <div class="footer-section">
+                <img src="images/logo.png" alt="نُزل" class="footer-logo">
+            </div>
+
+            <!-- الشركة -->
+            <div class="footer-section">
+                <h4 class="footer-heading">الشركة</h4>
+                <ul class="footer-links">
+                    <li><a href="#about">من نحن</a></li>
+                    <li><a href="#contact">تواصل معنا</a></li>
+                </ul>
+            </div>
+
+            <!-- استكشف -->
+            <div class="footer-section">
+                <h4 class="footer-heading">استكشف</h4>
+                <ul class="footer-links">
+                    <li><a href="places.html">الوجهات</a></li>
+                    <li><a href="#experiences">التجارب</a></li>
+                    <li><a href="#offers">العروض الخاصة</a></li>
+                </ul>
+            </div>
+
+            <!-- مواقع التواصل -->
+            <div class="footer-section">
+                <h4 class="footer-heading">تابعنا</h4>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- حقوق النشر -->
+        <div class="footer-bottom">
+            <p>جميع الحقوق محفوظة © نُزل 2026</p>
+        </div>
+    </footer>
+
+    <script src="api-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="script.js"></script>
+    <script src="places.js"></script>
+    <script src="loading.js"></script>
+
+</body>
+
+</html>
